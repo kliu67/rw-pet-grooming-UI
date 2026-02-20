@@ -19,6 +19,7 @@ const Sidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
     { name: 'Appointments', path: '/appointments', icon: Calendar },
     { name: 'Clients', path: '/clients', icon: Users },
     { name: 'Services', path: '/services', icon: Scissors },
+    { name: 'Species', path: '/species', icon: Scissors },
   ];
 
   return (
