@@ -25,6 +25,8 @@ const columnHelper = createColumnHelper<Species>();
 
 export const SpeciesTable = () => {
     const [sorting, setSorting] = useState<SortingState>([]);
+    const { t } = useTranslation();
+
     /* ---------------- Fetch Data ---------------- */
     const { data = [], isLoading, error } = useQuery({
         queryKey: ["species"],
@@ -141,13 +143,12 @@ export const SpeciesTable = () => {
 
 export const Species = () => {
     const [searchTerm, setSearchTerm] = useState('');
-    const [services, setServices] = useState([]);
     const [species, setSpecies] = useState([]);
 
-    const filteredServices = services.filter(
-        (service) =>
-            service.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            service.category?.toLowerCase().includes(searchTerm.toLowerCase())
+    const { t } = useTranslation();
+
+    const filteredSpecies = species.filter(
+        (species) => species.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -159,7 +160,7 @@ export const Species = () => {
                 </div>
                 <button className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
                     <Plus className="h-4 w-4" />
-                    Add Service
+                    {t('species.add')}
                 </button>
             </div>
 
@@ -178,7 +179,6 @@ export const Species = () => {
                 </div>
 
                 <div className="overflow-x-auto">
-                    <h2>Species</h2>
                     <SpeciesTable />
                     {/* <table className="w-full text-left text-sm text-gray-500">
             <thead className="bg-gray-50 text-xs uppercase text-gray-700 font-semibold">
@@ -223,7 +223,7 @@ export const Species = () => {
           </table> */}
                 </div>
 
-                {filteredServices.length === 0 && (
+                {filteredSpecies.length === 0 && (
                     <div className="p-8 text-center text-gray-500">
                         No services found matching your search.
                     </div>

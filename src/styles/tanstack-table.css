@@ -1,0 +1,109 @@
+/* Container */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+/* Table */
+.tanstack-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-size: 14px;
+}
+
+/* Header */
+.tanstack-table thead {
+  background: #f9fafb;
+}
+
+.tanstack-table th {
+  text-align: left;
+  padding: 12px 14px;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* Sort indicators */
+.tanstack-table th.sortable {
+  cursor: pointer;
+}
+
+.tanstack-table th.sortable:hover {
+  background: #f3f4f6;
+}
+
+.sort-indicator {
+  margin-left: 6px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+/* Body */
+.tanstack-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #111827;
+}
+
+/* Zebra rows */
+.tanstack-table tbody tr:nth-child(even) {
+  background: #fcfcfd;
+}
+
+/* Hover row */
+.tanstack-table tbody tr:hover {
+  background: #f1f5f9;
+}
+
+/* Selected row */
+.tanstack-table tbody tr.selected {
+  background: #e0f2fe;
+}
+
+/* Empty state */
+.table-empty {
+  text-align: center;
+  padding: 24px;
+  color: #6b7280;
+}
+
+/* Pagination */
+.table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px;
+  border-top: 1px solid #e5e7eb;
+  background: #fafafa;
+}
+
+.table-pagination button {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.table-pagination button:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+.table-pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Page info */
+.page-info {
+  font-size: 13px;
+  color: #6b7280;
+}

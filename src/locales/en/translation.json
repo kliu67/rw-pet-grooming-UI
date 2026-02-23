@@ -1,0 +1,12 @@
+{
+    "general":{
+        "next": "Next",
+        "prev": "Prev"
+    },
+    "species":{
+        "title": "Species",
+        "subtitle": "Manage your species",
+        "add": "Add species",
+        "search": "Search species..."
+    }
+}
