@@ -9,7 +9,7 @@ import {
   Menu,
 } from 'lucide-react';
 import { useState } from 'react';
-import { cn } from '../../lib/utils'; // Assuming utility exists or I'll create it
+import { cn } from '../lib/utils'; // Assuming utility exists or I'll create it
 
 const Sidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const location = useLocation();
