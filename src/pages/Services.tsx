@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next"
 import { useModal } from "@/components/modal/ModalProvider";
 import { MODAL_TYPES } from "@/components/modal/modalRegistry";
 import { useCreateService } from "@/hooks/useCreateService";
+import { RowActionsMenu } from '@/components/RowActionDropdown';
 
 const columnHelper = createColumnHelper<Services>();
 
@@ -130,6 +131,36 @@ export const Services = () => {
 
   );
 
+  const handleCreate = async (formData) => {
+    try{
+      console.log('submitting service data', formData);
+      const service = await createServiceMutation.mutateAsync(formData);
+      console.log('created');
+      closeModal();
+    }
+    catch(err){
+      console.error(err?.message);
+    }
+
+  }
+
+  const handleEdit =  (service) => {
+     openModal(MODAL_TYPES.UPDATE_SERVICE, {
+      initialData: service,
+    });
+  }
+
+  const onEditSubmit = async (formData) => {
+
+  }
+
+  const handleDelete =  (service) => {
+
+  }
+
+  const onDeleteSubmit = async (formData) => {
+
+  }
 
   const columns = React.useMemo(()=> [
     columnHelper.accessor("id", {
@@ -155,24 +186,29 @@ export const Services = () => {
         return v ? new Date(v).toLocaleDateString() : "-";
       },
     }),
-  ], []);
+
+    //ACTIONS COLUMN
+    columnHelper.display({
+    id: "actions",
+    header: "",
+    cell: ({ row }) => {
+      const service = row.original;
+
+      return (
+        <RowActionsMenu
+          onEdit={() => handleEdit(service)}
+          onDelete={() => handleDelete(service)}
+        />
+      );
+    },
+  }),
+  ], [handleEdit, handleDelete]);
 
   if (isLoading) return <p>{t('general.loading')}</p>;
   if (error) return <p>{t('services.errors.loading')}</p>;
 
 
-  const handleCreate = async (formData) => {
-    try{
-      console.log('submitting service data', formData);
-      const service = await createServiceMutation.mutateAsync(formData);
-      console.log('created');
-      closeModal();
-    }
-    catch(err){
-      console.error(err?.message);
-    }
 
-  }
 
   return (
     <div className="space-y-6">
