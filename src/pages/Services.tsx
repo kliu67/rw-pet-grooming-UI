@@ -130,8 +130,6 @@ export const Services = () => {
 
   );
 
-  if (isLoading) return <p>{t('general.loading')}</p>;
-  if (error) return <p>{t('services.errors.loading')}</p>;
 
   const columns = React.useMemo(()=> [
     columnHelper.accessor("id", {
@@ -158,6 +156,10 @@ export const Services = () => {
       },
     }),
   ], []);
+
+  if (isLoading) return <p>{t('general.loading')}</p>;
+  if (error) return <p>{t('services.errors.loading')}</p>;
+
 
   const handleCreate = async (formData) => {
     try{
