@@ -1,7 +1,9 @@
 {
     "general":{
         "next": "Next",
-        "prev": "Prev"
+        "prev": "Prev",
+        "save": "Save",
+        "cancel": "Cancel"
     },
     "species":{
         "title": "Species",
@@ -18,6 +20,11 @@
             "name": "Service Name",
             "base_price": "Base Price",
             "description": "Description"
+        },
+        "errors":{
+            "name": "Service name length must be between 0 and 60 characters.",
+            "base_price": "Base price must be between 0 and 9999999.99.",
+            "description": "Description cannot be longer than 200 characters."
         }
     }
 }

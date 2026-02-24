@@ -11,3 +11,16 @@ export async function getServices() {
   return res.json();
 }
 
+export async function createService(data) {
+  const res = await fetch(`${API_URL}/services`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to create service");
+  }
+
+  return res.json();
+}

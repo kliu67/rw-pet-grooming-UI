@@ -17,7 +17,7 @@ import {
   getPaginationRowModel,
 } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
-import { getServices } from "../api/services";
+import { getServices, createService } from "../api/services";
 import { useTranslation } from "react-i18next"
 import { useModal } from "@/components/modal/ModalProvider";
 import { MODAL_TYPES } from "@/components/modal/modalRegistry";
@@ -120,7 +120,7 @@ export const Services = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [services, setServices] = useState([]);
   const { t } = useTranslation();
-  const { openModal } = useModal();
+  const { openModal, closeModal } = useModal();
 
 
   const filteredServices = services.filter(
@@ -162,6 +162,24 @@ export const Services = () => {
     }),
   ];
 
+  const handleCreate = async (formData) => {
+    const payload = {
+      name: formData?.name,
+      base_price: Number(formData?.base_price),
+      description: formData.description,
+    }
+    try{
+      console.log('submitting service data', payload);
+      const service = await createService(payload);
+      console.log('created');
+      closeModal();
+    }
+    catch(err){
+      console.error(err?.message);
+    }
+
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -171,7 +189,9 @@ export const Services = () => {
         </div>
         <button className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
           onClick={() =>
-            openModal(MODAL_TYPES.CREATE_SERVICE)
+            openModal(MODAL_TYPES.CREATE_SERVICE, {
+              onSubmit: handleCreate,
+            })
           }
         >
           <Plus className="h-4 w-4" />

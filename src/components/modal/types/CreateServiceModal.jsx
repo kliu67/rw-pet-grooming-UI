@@ -1,49 +1,66 @@
 import { useState } from "react";
 import { isValidPrice } from "@/utils";
 import { useTranslation } from "react-i18next"
+import { MAX_SERVICE_NAME_LENGTH, MAX_SERVICE_DESC_LENGTH, MIN_SERVICE_BASE_PRICE_VALUE, MAX_SERVICE_BASE_PRICE_VALUE } from "@/constants";
 
 
-export default function CreateServiceModal({ closeModal }) {
+export default function CreateServiceModal({ closeModal, onSubmit }) {
     const [form, setForm] = useState({
         name: "",
         description: "",
     });
 
-    const [canSubmit, setCanSubmit] = useState(false);
     const [price, setPrice] = useState(0);
 
     const { t } = useTranslation();
+    const [nameHasError, setNameHasError] = useState(false);
+    const [basePriceHasError, setBasePriceHasError] = useState(false);
+    const [descriptionHasError, setDescriptionHasError] = useState(false);
 
+    const isError = nameHasError || basePriceHasError || descriptionHasError;
+
+    
     const inputs = {
         name: {
             id: 'services-name',
             name: 'name',
-            placeholder: t('services.placeholderText.name')
+            placeholder: t('services.placeholderText.name'),
+            errorMsg: t('services.errors.name')
         },
         base_price: {
             id: 'services-base_price',
             name: 'base_price',
-            placeholder: t('services.placeholderText.base_price')
+            placeholder: t('services.placeholderText.base_price'),
+            errorMsg: t('services.errors.base_price')
         },
         description: {
             id: 'services_description',
             name: 'description',
-            placeholder: t('services.placeholderText.description')
+            placeholder: t('services.placeholderText.description'),
+            errorMsg: t('services.errors.description')
         }
     }
     function handleChange(e) {
         const name = e.target.name;
-        if (name === 'base price') {
-
+        const value = e.target.value;
+        if (name === inputs.name.name) {
+            setNameHasError(value.length < 1 || value.length > MAX_SERVICE_NAME_LENGTH);
+        }
+        if (name === inputs.base_price.name) {
+            setBasePriceHasError(Number(value) < 0 || Number(value) > MAX_SERVICE_BASE_PRICE_VALUE)
+        }
+        if (name === inputs.description.name) {
+            setDescriptionHasError(value.length < 1 || value.length > MAX_SERVICE_DESC_LENGTH)
         }
         setForm({ ...form, [e.target.name]: e.target.value });
+
     }
 
     function handleSubmit(e) {
         e.preventDefault();
 
         console.log("Creating:", form);
-
+        onSubmit(form);
         // call mutation here
         closeModal();
     }
@@ -60,6 +77,12 @@ export default function CreateServiceModal({ closeModal }) {
                 for={inputs.name.id}
             >{inputs.name.placeholder}
             </label>
+            {nameHasError &&
+                (<label
+                    className="error"
+                    for={inputs.name.id}
+                >{inputs.name.errorMsg}
+                </label>)}
             <input
                 id={inputs.name.id}
                 name={inputs.name.name}
@@ -73,16 +96,12 @@ export default function CreateServiceModal({ closeModal }) {
                 for={inputs.base_price.id}
             >{inputs.name.placeholder}
             </label>
-            {/* <input
-                id={inputs.base_price.id}
-                name={inputs.base_price.name}
-                placeholder={inputs.base_price.placeholder}
-                value={form.base_price}
-                onChange={handleChange}
-                className="w-full border rounded-lg px-3 py-2 mb-3"
-                required
-            /> */}
-
+            {basePriceHasError &&
+                (<label
+                    className="error"
+                    for={inputs.base_price.id}
+                >{inputs.base_price.errorMsg}
+                </label>)}
             <input
                 id={inputs.base_price.id}
                 name={inputs.base_price.name}
@@ -90,15 +109,22 @@ export default function CreateServiceModal({ closeModal }) {
                 type="number"
                 step="0.01"
                 min="0"
-                max="99999999.99"
-                value={price}
+                max={MAX_SERVICE_BASE_PRICE_VALUE}
+                value={form.base_price}
                 className="w-full border rounded-lg px-3 py-2 mb-3"
-                onChange={(e) => setPrice(e.target.value)}
+                onChange={handleChange}
+                required
             />
             <label
                 for={inputs.description.id}
             >{inputs.description.placeholder}
             </label>
+            {descriptionHasError &&
+                (<label
+                    className="error"
+                    for={inputs.description.id}
+                >{inputs.description.errorMsg}
+                </label>)}
             <textarea
                 id={inputs.description.id}
                 name={inputs.description.name}
@@ -120,12 +146,17 @@ export default function CreateServiceModal({ closeModal }) {
 
                 <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-                    disabled={canSubmit}
+                    className="
+                    px-4 py-2 bg-blue-600 text-white rounded-lg
+                    disabled:bg-gray-400
+                    disabled:cursor-not-allowed
+                    disabled:opacity-60"
+                    disabled={isError || !form.name|| !form.base_price || !form.description}
+                    onClick={handleSubmit}
                 >
                     Save
                 </button>
             </div>
-        </form>
+        </form >
     );
 }
