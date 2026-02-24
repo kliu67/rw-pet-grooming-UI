@@ -8,5 +8,16 @@
         "subtitle": "Manage your species",
         "add": "Add species",
         "search": "Search species..."
+    },
+    "services":{
+        "heading": "Services",
+        "subheading": "Manage your services",
+        "add": "Add services",
+        "search": "Search services...",
+        "placeholderText":{
+            "name": "Service Name",
+            "base_price": "Base Price",
+            "description": "Description"
+        }
     }
 }
