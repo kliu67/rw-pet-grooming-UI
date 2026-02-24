@@ -3,7 +3,8 @@
         "next": "Next",
         "prev": "Prev",
         "save": "Save",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "loading": "Loading..."
     },
     "species":{
         "title": "Species",
@@ -24,7 +25,8 @@
         "errors":{
             "name": "Service name length must be between 0 and 60 characters.",
             "base_price": "Base price must be between 0 and 9999999.99.",
-            "description": "Description cannot be longer than 200 characters."
+            "description": "Description cannot be longer than 200 characters.",
+            "loading": "Error loading services"
         }
     }
 }
