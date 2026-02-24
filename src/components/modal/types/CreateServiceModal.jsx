@@ -1,16 +1,15 @@
 import { useState } from "react";
-import { isValidPrice } from "@/utils";
 import { useTranslation } from "react-i18next"
+import { isValidPrice } from "@/utils";
 import { MAX_SERVICE_NAME_LENGTH, MAX_SERVICE_DESC_LENGTH, MIN_SERVICE_BASE_PRICE_VALUE, MAX_SERVICE_BASE_PRICE_VALUE } from "@/constants";
 
 
-export default function CreateServiceModal({ closeModal, onSubmit }) {
+export default function CreateServiceModal({ closeModal, onSubmit, isLoading, serverError }) {
     const [form, setForm] = useState({
         name: "",
+        base_price: "",
         description: "",
     });
-
-    const [price, setPrice] = useState(0);
 
     const { t } = useTranslation();
     const [nameHasError, setNameHasError] = useState(false);
@@ -19,7 +18,7 @@ export default function CreateServiceModal({ closeModal, onSubmit }) {
 
     const isError = nameHasError || basePriceHasError || descriptionHasError;
 
-    
+
     const inputs = {
         name: {
             id: 'services-name',
@@ -47,7 +46,7 @@ export default function CreateServiceModal({ closeModal, onSubmit }) {
             setNameHasError(value.length < 1 || value.length > MAX_SERVICE_NAME_LENGTH);
         }
         if (name === inputs.base_price.name) {
-            setBasePriceHasError(Number(value) < 0 || Number(value) > MAX_SERVICE_BASE_PRICE_VALUE)
+            setBasePriceHasError(!isValidPrice(value) || Number(value) > MAX_SERVICE_BASE_PRICE_VALUE)
         }
         if (name === inputs.description.name) {
             setDescriptionHasError(value.length < 1 || value.length > MAX_SERVICE_DESC_LENGTH)
@@ -58,11 +57,13 @@ export default function CreateServiceModal({ closeModal, onSubmit }) {
 
     function handleSubmit(e) {
         e.preventDefault();
-
+        if (isLoading || isError) return;
         console.log("Creating:", form);
-        onSubmit(form);
-        // call mutation here
-        closeModal();
+        onSubmit({
+            name: form.name.trim(),
+            base_price: Number(form.base_price),
+            description: form.description.trim(),
+        });
     }
 
     //length of name cannot exceed 60 characters
@@ -74,14 +75,15 @@ export default function CreateServiceModal({ closeModal, onSubmit }) {
                 Create Service
             </h2>
             <label
-                for={inputs.name.id}
+                htmlFor={inputs.name.id}
             >{inputs.name.placeholder}
             </label>
             {nameHasError &&
                 (<label
                     className="error"
-                    for={inputs.name.id}
-                >{inputs.name.errorMsg}
+                    htmlFor={inputs.name.id}
+                >
+                    {inputs.name.errorMsg}
                 </label>)}
             <input
                 id={inputs.name.id}
@@ -93,14 +95,16 @@ export default function CreateServiceModal({ closeModal, onSubmit }) {
                 required
             />
             <label
-                for={inputs.base_price.id}
-            >{inputs.name.placeholder}
+                htmlFor={inputs.base_price.id}
+            >
+                {inputs.base_price.placeholder}
             </label>
             {basePriceHasError &&
                 (<label
                     className="error"
-                    for={inputs.base_price.id}
-                >{inputs.base_price.errorMsg}
+                    htmlFor={inputs.base_price.id}
+                >
+                    {inputs.base_price.errorMsg}
                 </label>)}
             <input
                 id={inputs.base_price.id}
@@ -116,13 +120,13 @@ export default function CreateServiceModal({ closeModal, onSubmit }) {
                 required
             />
             <label
-                for={inputs.description.id}
+                htmlFor={inputs.description.id}
             >{inputs.description.placeholder}
             </label>
             {descriptionHasError &&
                 (<label
                     className="error"
-                    for={inputs.description.id}
+                    htmlFor={inputs.description.id}
                 >{inputs.description.errorMsg}
                 </label>)}
             <textarea
@@ -136,6 +140,9 @@ export default function CreateServiceModal({ closeModal, onSubmit }) {
             />
 
             <div className="flex justify-end gap-2">
+                {serverError && (
+                    <p className="text-red-500 text-sm">{serverError}</p>
+                )}
                 <button
                     type="button"
                     onClick={closeModal}
@@ -151,8 +158,7 @@ export default function CreateServiceModal({ closeModal, onSubmit }) {
                     disabled:bg-gray-400
                     disabled:cursor-not-allowed
                     disabled:opacity-60"
-                    disabled={isError || !form.name|| !form.base_price || !form.description}
-                    onClick={handleSubmit}
+                    disabled={isLoading || isError || !form.name || form.base_price === '' || !form.description}
                 >
                     Save
                 </button>

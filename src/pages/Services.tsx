@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import {
-  MoreHorizontal,
   Plus,
   Search,
-  Scissors,
-  DollarSign,
-  Clock,
 } from 'lucide-react';
 import {
   createColumnHelper,
@@ -21,8 +17,7 @@ import { getServices, createService } from "../api/services";
 import { useTranslation } from "react-i18next"
 import { useModal } from "@/components/modal/ModalProvider";
 import { MODAL_TYPES } from "@/components/modal/modalRegistry";
-
-
+import { useCreateService } from "@/hooks/useCreateService";
 
 const columnHelper = createColumnHelper<Services>();
 
@@ -118,25 +113,27 @@ export const ServicesTable = ({ data, columns }) => {
 }
 export const Services = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [services, setServices] = useState([]);
   const { t } = useTranslation();
   const { openModal, closeModal } = useModal();
+  const createServiceMutation = useCreateService();
 
-
-  const filteredServices = services.filter(
-    (service) =>
-      service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      service.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+//query hooks
   const { data = [], isLoading, error } = useQuery({
     queryKey: ["services"],
     queryFn: getServices,
   });
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error loading species</p>;
-  const columns = [
+  const filteredServices = data.filter(
+    (service) =>
+      service.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.description?.toLowerCase().includes(searchTerm.toLowerCase())
+
+  );
+
+  if (isLoading) return <p>{t('general.loading')}</p>;
+  if (error) return <p>{t('services.errors.loading')}</p>;
+
+  const columns = React.useMemo(()=> [
     columnHelper.accessor("id", {
       header: "ID",
       cell: info => info.getValue(),
@@ -147,7 +144,7 @@ export const Services = () => {
     }),
     columnHelper.accessor("base_price", {
       header: "Base Price",
-      cell: info => info.getValue(),
+      cell: info => `$${Number(info.getValue()).toFixed(2)}`,
     }),
     columnHelper.accessor("description", {
       header: "Description",
@@ -160,17 +157,12 @@ export const Services = () => {
         return v ? new Date(v).toLocaleDateString() : "-";
       },
     }),
-  ];
+  ], []);
 
   const handleCreate = async (formData) => {
-    const payload = {
-      name: formData?.name,
-      base_price: Number(formData?.base_price),
-      description: formData.description,
-    }
     try{
-      console.log('submitting service data', payload);
-      const service = await createService(payload);
+      console.log('submitting service data', formData);
+      const service = await createServiceMutation.mutateAsync(formData);
       console.log('created');
       closeModal();
     }
@@ -191,6 +183,8 @@ export const Services = () => {
           onClick={() =>
             openModal(MODAL_TYPES.CREATE_SERVICE, {
               onSubmit: handleCreate,
+              isLoading: createServiceMutation.isPending,
+              serverError: createServiceMutation.error?.message,
             })
           }
         >
@@ -215,7 +209,7 @@ export const Services = () => {
 
         <div className="overflow-x-auto">
           <ServicesTable
-            data={data}
+            data={filteredServices}
             columns={columns}
           />
         </div>
