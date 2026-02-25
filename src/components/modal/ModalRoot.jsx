@@ -15,7 +15,7 @@ export default function ModalRoot({ modal, closeModal }) {
       />
 
       {/* Modal container */}
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-xl p-6">
         <Component {...modal.props} closeModal={closeModal} />
       </div>
     </div>
