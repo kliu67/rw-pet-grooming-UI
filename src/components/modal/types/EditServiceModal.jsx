@@ -160,7 +160,7 @@ export default function EditServiceModal({
           onClick={closeModal}
           className="px-4 py-2 border rounded-lg"
         >
-          Cancel
+          {t('general.cancel')}
         </button>
 
         <button
@@ -172,7 +172,7 @@ export default function EditServiceModal({
             disabled:opacity-60"
           disabled={isLoading || isError || !hasChanges(form)}
         >
-          Save
+          {t('general.update')}
         </button>
       </div>
     </form>

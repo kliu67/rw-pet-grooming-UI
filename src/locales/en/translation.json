@@ -6,6 +6,7 @@
         "cancel": "Cancel",
         "loading": "Loading...",
         "edit": "Edit",
+        "update": "Update",
         "delete": "Delete",
         "create": "Create"
     },
@@ -21,6 +22,8 @@
         "add": "Add service",
         "create": "Create service",
         "edit": "Edit service",
+        "delete": "Delete service",
+        "confirmDelete": "Are you sure you want to delete \"{{service}}\"? To confirm, type the name of the service in the field below.",
         "search": "Search services...",
         "placeholderText":{
             "name": "Service Name",

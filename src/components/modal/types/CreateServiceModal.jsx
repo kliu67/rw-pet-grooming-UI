@@ -150,7 +150,7 @@ export default function CreateServiceModal({
           onClick={closeModal}
           className="px-4 py-2 border rounded-lg"
         >
-          Cancel
+          {t('general.cancel')}
         </button>
 
         <button
@@ -168,7 +168,7 @@ export default function CreateServiceModal({
             !form.description
           }
         >
-          Save
+          {t('general.create')}
         </button>
       </div>
     </form>
