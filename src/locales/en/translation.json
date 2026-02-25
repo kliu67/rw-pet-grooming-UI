@@ -37,5 +37,23 @@
             "notEmpty": "\"{{input}}\" field cannot be empty",
             "loading": "Error loading services"
         }
+    },
+
+    "breeds": {
+        "heading": "Breeds",
+        "subheading": "Manage your breeds",
+        "add": "Add breed",
+        "edit": "Edit breed",
+        "delete": "Delete breed",
+        "confirmDelete": "Are you sure you want to delete \"{{breed}}\"? To confirm, type the name of the breed in the field below.",
+        "search": "Search breeds...",
+        "placeholderText": {
+            "name": "Breed name"
+        },
+        "errors":{
+            "name": "Breed name length must be between 0 and \"{{max}}\" characters",
+            "notEmpty": "\"{{input}}\" field cannot be empty",
+            "loading": "Error loading breeds"
+        }
     }
 }
