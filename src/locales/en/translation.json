@@ -43,6 +43,7 @@
         "heading": "Breeds",
         "subheading": "Manage your breeds",
         "add": "Add breed",
+        "create": "Create breed",
         "edit": "Edit breed",
         "delete": "Delete breed",
         "confirmDelete": "Are you sure you want to delete \"{{breed}}\"? To confirm, type the name of the breed in the field below.",
