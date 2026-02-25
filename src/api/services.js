@@ -24,3 +24,20 @@ export async function createService(data) {
 
   return res.json();
 }
+
+export async function updateService(id, data) {
+  const res = await fetch(`${API_URL}/services/${id}`, {
+    method: "PUT", // or PATCH depending on backend
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => null);
+    throw new Error(error?.message || "Failed to update service");
+  }
+
+  return res.json();
+}
