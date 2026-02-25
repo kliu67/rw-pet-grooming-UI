@@ -17,8 +17,8 @@ import { getServices } from "../api/services";
 import { useTranslation } from "react-i18next"
 import { useModal } from "@/components/modal/ModalProvider";
 import { MODAL_TYPES } from "@/components/modal/modalRegistry";
-import { useCreateService } from "@/hooks/useCreateService";
-import { useUpdateService } from "@/hooks/useUpdateService"
+import { useCreateService } from "@/hooks/service";
+import { useUpdateService } from "@/hooks/service";
 import { RowActionsMenu } from '@/components/RowActionDropdown';
 
 const columnHelper = createColumnHelper<Services>();
@@ -242,7 +242,7 @@ export const Services = () => {
         return (
           <RowActionsMenu
             onEdit={() => handleEdit(service)}
-            // onDelete={() => handleDelete(service)}
+            onDelete={() => handleDelete(service)}
           />
         );
       },

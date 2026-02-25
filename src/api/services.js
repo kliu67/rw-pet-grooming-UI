@@ -41,3 +41,20 @@ export async function updateService(id, data) {
 
   return res.json();
 }
+
+export async function deleteService(id) {
+  const res = await fetch(`${API_URL}/services/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => null);
+    throw new Error(error?.message || "Failed to delete service");
+  }
+
+  try {
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
