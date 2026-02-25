@@ -1,45 +1,48 @@
+import { t } from "i18next";
 import { useState } from "react";
 
-export default function DeletServiceModal({ closeModal }) {
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-  });
+export default function DeleteServiceModal({
+  closeModal,
+  onSubmit,
+  isLoading,
+  serverError,
+  service
+}) {
+  const [name, setName] = useState("");
+  const [canDelete, setCanDelete] = useState(false);
 
   function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const value = e.target.value;
+    setName(value);
+    setCanDelete(value === service.name);
   }
 
   function handleSubmit(e) {
     e.preventDefault();
-
-    console.log("Creating:", form);
-
-    // call mutation here
-    closeModal();
+    if (isLoading || !canDelete) return;
+    onSubmit(service.id);
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <h2 className="text-lg font-semibold mb-4">
-        Create Service
+        {t("services.delete")}
       </h2>
-
+      <p className="text-xs text-red-600 mt-1">
+        {t("services.confirmDelete", { service: service.name })}
+      </p>
+      {serverError &&
+        <p className="text-sm text-red-600 mt-2">
+          {serverError}
+        </p>}
       <input
+        autoFocus
         name="name"
         placeholder="Service Name"
-        value={form.name}
+        value={name}
         onChange={handleChange}
         className="w-full border rounded-lg px-3 py-2 mb-3"
         required
-      />
-
-      <textarea
-        name="description"
-        placeholder="Description"
-        value={form.description}
-        onChange={handleChange}
-        className="w-full border rounded-lg px-3 py-2 mb-4"
       />
 
       <div className="flex justify-end gap-2">
@@ -48,14 +51,18 @@ export default function DeletServiceModal({ closeModal }) {
           onClick={closeModal}
           className="px-4 py-2 border rounded-lg"
         >
-          Cancel
+          {t("general.cancel")}
         </button>
 
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+          className="px-4 py-2 bg-red-600 text-white rounded-lg
+            disabled:bg-gray-400
+            disabled:cursor-not-allowed
+            disabled:opacity-60"
+          disabled={!canDelete || isLoading || serverError}
         >
-          Save
+          {t("general.delete")}
         </button>
       </div>
     </form>
