@@ -13,11 +13,12 @@ import {
   getPaginationRowModel,
 } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
-import { getServices, createService } from "../api/services";
+import { getServices } from "../api/services";
 import { useTranslation } from "react-i18next"
 import { useModal } from "@/components/modal/ModalProvider";
 import { MODAL_TYPES } from "@/components/modal/modalRegistry";
 import { useCreateService } from "@/hooks/useCreateService";
+import { useUpdateService } from "@/hooks/useUpdateService"
 import { RowActionsMenu } from '@/components/RowActionDropdown';
 
 const columnHelper = createColumnHelper<Services>();
@@ -117,12 +118,34 @@ export const Services = () => {
   const { t } = useTranslation();
   const { openModal, closeModal } = useModal();
   const createServiceMutation = useCreateService();
+  const updateServiceMutation = useUpdateService();
 
-//query hooks
+  //query hooks
   const { data = [], isLoading, error } = useQuery({
     queryKey: ["services"],
     queryFn: getServices,
   });
+
+  const serviceInputs = React.useMemo(()=>({
+    name: {
+      id: 'services-name',
+      name: 'name',
+      placeholder: t('services.placeholderText.name'),
+      errorMsg: t('services.errors.name')
+    },
+    base_price: {
+      id: 'services-base_price',
+      name: 'base_price',
+      placeholder: t('services.placeholderText.base_price'),
+      errorMsg: t('services.errors.base_price')
+    },
+    description: {
+      id: 'services_description',
+      name: 'description',
+      placeholder: t('services.placeholderText.description'),
+      errorMsg: t('services.errors.description')
+    }
+  }), [t]);
 
   const filteredServices = data.filter(
     (service) =>
@@ -131,38 +154,60 @@ export const Services = () => {
 
   );
 
-  const handleCreate = async (formData) => {
-    try{
+  const onCreateSubmit = async (formData) => {
+    try {
       console.log('submitting service data', formData);
       const service = await createServiceMutation.mutateAsync(formData);
       console.log('created');
       closeModal();
     }
-    catch(err){
+    catch (err) {
       console.error(err?.message);
     }
 
   }
 
-  const handleEdit =  (service) => {
-     openModal(MODAL_TYPES.UPDATE_SERVICE, {
+  const onEditSubmit = async (id, formData) => {
+    try {
+      console.log('submitting service data', formData);
+      const service = await updateServiceMutation.mutateAsync({id, data: formData});
+      console.log('updated');
+      closeModal();
+    }
+    catch (err) {
+      console.error(err?.message);
+    }
+  }
+
+  const handleCreate = React.useCallback(()=>{
+     openModal(MODAL_TYPES.CREATE_SERVICE, {
+              onSubmit: onCreateSubmit,
+              inputs: serviceInputs,
+              isLoading: createServiceMutation.isPending,
+              serverError: createServiceMutation.error?.message,
+            });
+  }, [openModal, createServiceMutation])
+
+  const handleEdit = React.useCallback((service) => {
+    openModal(MODAL_TYPES.UPDATE_SERVICE, {
       initialData: service,
+      onSubmit: onEditSubmit,
+      inputs: serviceInputs,
+      isLoading: updateServiceMutation.isPending,
+      serverError: updateServiceMutation.error?.message,
     });
-  }
+  },[openModal, updateServiceMutation]);
 
-  const onEditSubmit = async (formData) => {
+  // const onDeleteSubmit = async (formData) => {
 
-  }
+  // }
 
-  const handleDelete =  (service) => {
+  // const handleDelete = (service) => {
 
-  }
+  // }
 
-  const onDeleteSubmit = async (formData) => {
 
-  }
-
-  const columns = React.useMemo(()=> [
+  const columns = React.useMemo(() => [
     columnHelper.accessor("id", {
       header: "ID",
       cell: info => info.getValue(),
@@ -189,20 +234,20 @@ export const Services = () => {
 
     //ACTIONS COLUMN
     columnHelper.display({
-    id: "actions",
-    header: "",
-    cell: ({ row }) => {
-      const service = row.original;
+      id: "actions",
+      header: "",
+      cell: ({ row }) => {
+        const service = row.original;
 
-      return (
-        <RowActionsMenu
-          onEdit={() => handleEdit(service)}
-          onDelete={() => handleDelete(service)}
-        />
-      );
-    },
-  }),
-  ], [handleEdit, handleDelete]);
+        return (
+          <RowActionsMenu
+            onEdit={() => handleEdit(service)}
+            // onDelete={() => handleDelete(service)}
+          />
+        );
+      },
+    }),
+  ], [handleEdit, /*handleDelete*/]);
 
   if (isLoading) return <p>{t('general.loading')}</p>;
   if (error) return <p>{t('services.errors.loading')}</p>;
@@ -218,13 +263,7 @@ export const Services = () => {
           <p className="text-gray-500 mt-1">{t('services.subheading')}</p>
         </div>
         <button className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-          onClick={() =>
-            openModal(MODAL_TYPES.CREATE_SERVICE, {
-              onSubmit: handleCreate,
-              isLoading: createServiceMutation.isPending,
-              serverError: createServiceMutation.error?.message,
-            })
-          }
+          onClick={handleCreate}
         >
           <Plus className="h-4 w-4" />
           {t('services.add')}

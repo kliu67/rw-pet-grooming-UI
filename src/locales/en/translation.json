@@ -4,7 +4,10 @@
         "prev": "Prev",
         "save": "Save",
         "cancel": "Cancel",
-        "loading": "Loading..."
+        "loading": "Loading...",
+        "edit": "Edit",
+        "delete": "Delete",
+        "create": "Create"
     },
     "species":{
         "title": "Species",
@@ -15,7 +18,9 @@
     "services":{
         "heading": "Services",
         "subheading": "Manage your services",
-        "add": "Add services",
+        "add": "Add service",
+        "create": "Create service",
+        "edit": "Edit service",
         "search": "Search services...",
         "placeholderText":{
             "name": "Service Name",
@@ -26,6 +31,7 @@
             "name": "Service name length must be between 0 and 60 characters.",
             "base_price": "Base price must be between 0 and 9999999.99.",
             "description": "Description cannot be longer than 200 characters.",
+            "notEmpty": "\"{{input}}\" field cannot be empty",
             "loading": "Error loading services"
         }
     }
