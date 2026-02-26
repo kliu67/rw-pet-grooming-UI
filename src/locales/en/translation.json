@@ -10,6 +10,11 @@
         "delete": "Delete",
         "create": "Create"
     },
+    "DeleteModal":{
+        "title" : "Delete {{entity}}",
+        "confirmDelete": "Are you sure you want to delete the {{entity}} \"{{entity_name}}\"? To confirm, type the name of the service in the field below.",
+        "warning": "Note: This action cannot be undone."
+    },
     "species":{
         "title": "Species",
         "subtitle": "Manage your species",
@@ -45,8 +50,6 @@
         "add": "Add breed",
         "create": "Create breed",
         "edit": "Edit breed",
-        "delete": "Delete breed",
-        "confirmDelete": "Are you sure you want to delete \"{{breed}}\"? To confirm, type the name of the breed in the field below.",
         "search": "Search breeds...",
         "placeholderText": {
             "name": "Breed name"
