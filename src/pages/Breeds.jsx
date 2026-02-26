@@ -142,6 +142,9 @@ export const Breeds = () => {
     species.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  if (isLoading) return <p>{t("general.loading")}</p>;
+  if (error) return <p>{t("breeds.errors.loading")}</p>;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
