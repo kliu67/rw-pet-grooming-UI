@@ -25,8 +25,7 @@ export default function BreedModal({
   };
 
   const handleChange = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
+    const { name, value } = e.target;
     // ----- NAME -----
     if (name === "name") {
       if (value === "") {
@@ -102,7 +101,7 @@ export default function BreedModal({
 
             {serverError && (
               <p className="text-red-500 text-sm">
-                {serverError.error || "Failed to create breed"}
+                {serverError.error || "Failed to save breed"}
               </p>
             )}
           </div>
