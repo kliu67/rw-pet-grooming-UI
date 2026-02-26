@@ -6,7 +6,7 @@ export default function DeleteModal({
   onSubmit,
   isLoading,
   serverError,
-  row
+  entityName,
 }) {
   const [name, setName] = useState("");
   const [canDelete, setCanDelete] = useState(false);
@@ -14,31 +14,34 @@ export default function DeleteModal({
   function handleChange(e) {
     const value = e.target.value;
     setName(value);
-    setCanDelete(value === row.name);
+    setCanDelete(value === entityName);
   }
 
   function handleSubmit(e) {
     e.preventDefault();
     if (isLoading || !canDelete) return;
-    onSubmit(row.id);
+    onSubmit();
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <h2 className="text-lg font-semibold mb-4">
-        {t("general.delete")}
+        {t("DeleteModal.title", {entity: "Breed"})}
       </h2>
-      <p className="text-xs text-red-600 mt-1">
-        {t("general.confirmDelete", { row: row.name })}
+      <p className="text-md text-black-600 mt-1">
+        {t("DeleteModal.confirmDelete", { entity: 'breed', entity_name: entityName })}
+      </p>
+        <p className="text-md text-red-600 mt-1">
+        {t("DeleteModal.warning")}
       </p>
       {serverError &&
         <p className="text-sm text-red-600 mt-2">
           {serverError}
-        </p>}
+        </p>} 
       <input
         autoFocus
         name="name"
-        placeholder="Row Name"
+        placeholder="Entity Name"
         value={name}
         onChange={handleChange}
         className="w-full border rounded-lg px-3 py-2 mb-3"
