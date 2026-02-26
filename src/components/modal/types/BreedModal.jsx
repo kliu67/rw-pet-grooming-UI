@@ -101,7 +101,7 @@ export default function BreedModal({
 
             {serverError && (
               <p className="text-red-500 text-sm">
-                {serverError.error || "Failed to create breed"}
+                {serverError.error || "Failed to save breed"}
               </p>
             )}
           </div>
