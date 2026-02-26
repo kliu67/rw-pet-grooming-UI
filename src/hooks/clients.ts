@@ -13,7 +13,7 @@ export function useCreateClient() {
   });
 }
 
-export function useUpdateService() {
+export function useUpdateClient() {
   const queryClient = useQueryClient();
 
   return useMutation({
