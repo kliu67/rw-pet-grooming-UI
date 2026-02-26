@@ -7,6 +7,7 @@ export default function DeleteModal({
   isLoading,
   serverError,
   entityName,
+  entityType
 }) {
   const [name, setName] = useState("");
   const [canDelete, setCanDelete] = useState(false);
@@ -26,10 +27,10 @@ export default function DeleteModal({
   return (
     <form onSubmit={handleSubmit}>
       <h2 className="text-lg font-semibold mb-4">
-        {t("DeleteModal.title", {entity: "Breed"})}
+        {t("DeleteModal.title", {entity: entityType})}
       </h2>
       <p className="text-md text-black-600 mt-1">
-        {t("DeleteModal.confirmDelete", { entity: 'breed', entity_name: entityName })}
+        {t("DeleteModal.confirmDelete", { entity: entityType, entity_name: entityName })}
       </p>
         <p className="text-md text-red-600 mt-1">
         {t("DeleteModal.warning")}
