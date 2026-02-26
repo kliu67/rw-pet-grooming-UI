@@ -5,7 +5,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Appointments } from './pages/Appointments';
 import { Clients } from './pages/Clients';
 import { Services } from './pages/Services';
-import { Species } from './pages/Species';
+import { Breeds } from './pages/Breeds';
 
 export const router = createBrowserRouter([
   {
@@ -30,7 +30,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'species',
-        Component: Species,
+        Component: Breeds,
       }
     ],
   },
