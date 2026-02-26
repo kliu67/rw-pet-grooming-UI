@@ -13,7 +13,7 @@ import { MODAL_TYPES } from "@/components/modals/modalRegistry.js";
 import { RowActionsMenu } from "@/components/RowActionDropdown";
 import { Table as SpeciesTable } from "@/components/Table";
 import { useCreateBreed, useUpdateBreed, useDeleteBreed } from "@/hooks/breeds";
-import BreedModal from "@/components/modals/types/BreedModal";
+import BreedModal from "@/components/modals/BreedModal";
 
 const columnHelper = createColumnHelper();
 

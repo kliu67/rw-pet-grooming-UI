@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getServices } from "../api/services";
 import { useTranslation } from "react-i18next";
 import { useModal } from "@/components/modals/ModalProvider";
-import ServiceModal from "@/components/modals/types/ServiceModal";
+import ServiceModal from "@/components/modals/ServiceModal";
 import { Table as ServiceTable } from "@/components/Table";
 import { MODAL_TYPES } from "@/components/modals/modalRegistry";
 import {

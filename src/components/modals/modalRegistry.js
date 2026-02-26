@@ -1,4 +1,4 @@
-import DeleteModal from "./types/DeleteModal";
+import DeleteModal from "./genericModal/DeleteModal";
 
 export const MODAL_TYPES = {
   DELETE: "DELETE"
