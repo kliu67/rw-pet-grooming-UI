@@ -19,7 +19,8 @@ export async function createService(data) {
   });
 
   if (!res.ok) {
-    throw new Error("Failed to create service");
+    const error = await res.json();
+    throw error;   // important
   }
 
   return res.json();
