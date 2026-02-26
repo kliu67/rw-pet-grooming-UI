@@ -18,7 +18,7 @@ vi.mock("@tanstack/react-query", () => ({
 const openModal = vi.fn();
 const closeModal = vi.fn();
 
-vi.mock("@/components/modal/ModalProvider.jsx", () => ({
+vi.mock("@/components/modals/ModalProvider.jsx", () => ({
   useModal: () => ({
     openModal,
     closeModal
@@ -72,7 +72,7 @@ vi.mock("@/components/RowActionDropdown", () => ({
   )
 }));
 
-vi.mock("@/components/modal/types/BreedModal", () => ({
+vi.mock("@/components/modals/BreedModal", () => ({
   default: ({ mode, onSubmit, onClose }) => (
     <div data-testid="breed-modal">
       <button onClick={() => onSubmit({ name: "Poodle" })}>submit-{mode}</button>

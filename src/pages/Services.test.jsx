@@ -21,7 +21,7 @@ vi.mock("@tanstack/react-query", () => ({
 const openModal = vi.fn();
 const closeModal = vi.fn();
 
-vi.mock("@/components/modal/ModalProvider", () => ({
+vi.mock("@/components/modals/ModalProvider", () => ({
   useModal: () => ({
     openModal,
     closeModal
@@ -79,7 +79,7 @@ vi.mock("@/components/RowActionDropdown", () => ({
 }));
 
 // ServiceModal
-vi.mock("@/components/modal/types/ServiceModal", () => ({
+vi.mock("@/components/modals/ServiceModal", () => ({
   default: ({ mode, onSubmit, onClose }) => (
     <div data-testid="service-modal">
       <button onClick={() => onSubmit({ name: "Test" })}>submit-{mode}</button>
@@ -190,7 +190,6 @@ describe("Services", () => {
     });
 
     render(<Services />);
-    screen.debug();
     fireEvent.click(screen.getAllByText("edit")[0]);
     fireEvent.click(screen.getByText("submit-edit"));
 

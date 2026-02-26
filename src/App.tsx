@@ -1,7 +1,7 @@
 import React from 'react';
 import { RouterProvider } from 'react-router';
 import { router } from './routes';
-import { ModalProvider } from "./components/modal/ModalProvider";
+import { ModalProvider } from "./components/modals/ModalProvider";
 
 
 export default function App() {
