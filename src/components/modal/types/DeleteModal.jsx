@@ -1,12 +1,13 @@
 import { t } from "i18next";
 import { useState } from "react";
 
-export default function DeleteServiceModal({
+export default function DeleteModal({
   closeModal,
   onSubmit,
   isLoading,
   serverError,
-  service
+  entityName,
+  entityType
 }) {
   const [name, setName] = useState("");
   const [canDelete, setCanDelete] = useState(false);
@@ -14,31 +15,34 @@ export default function DeleteServiceModal({
   function handleChange(e) {
     const value = e.target.value;
     setName(value);
-    setCanDelete(value === service.name);
+    setCanDelete(value === entityName);
   }
 
   function handleSubmit(e) {
     e.preventDefault();
     if (isLoading || !canDelete) return;
-    onSubmit(service.id);
+    onSubmit();
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <h2 className="text-lg font-semibold mb-4">
-        {t("services.delete")}
+        {t("DeleteModal.title", {entity: entityType})}
       </h2>
-      <p className="text-xs text-red-600 mt-1">
-        {t("services.confirmDelete", { service: service.name })}
+      <p className="text-md text-black-600 mt-1">
+        {t("DeleteModal.confirmDelete", { entity: entityType, entity_name: entityName })}
+      </p>
+        <p className="text-md text-red-600 mt-1">
+        {t("DeleteModal.warning")}
       </p>
       {serverError &&
         <p className="text-sm text-red-600 mt-2">
           {serverError}
-        </p>}
+        </p>} 
       <input
         autoFocus
         name="name"
-        placeholder="Service Name"
+        placeholder="Entity Name"
         value={name}
         onChange={handleChange}
         className="w-full border rounded-lg px-3 py-2 mb-3"

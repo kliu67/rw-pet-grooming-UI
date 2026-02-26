@@ -182,7 +182,6 @@ export const Services = () => {
     try{
       console.log("deleting service");
       const response = await deleteServiceMutation.mutateAsync(id)
-      console.log("deleted");
       closeModal();
     }
     catch (err) {
@@ -201,7 +200,7 @@ export const Services = () => {
 
   const handleEdit = React.useCallback(
     (service) => {
-      openModal(MODAL_TYPES.UPDATE_SERVICE, {
+      openModal(MODAL_TYPES.EDIT_SERVICE, {
         initialData: service,
         onSubmit: onEditSubmit,
         inputs: serviceInputs,
@@ -214,11 +213,12 @@ export const Services = () => {
 
   const handleDelete = React.useCallback(
     (service) => {
-      openModal(MODAL_TYPES.DELETE_SERVICE, {
-        onSubmit: onDeleteSubmit,
+      openModal(MODAL_TYPES.DELETE, {
+        onSubmit: async ()=> onDeleteSubmit(service.id),
         isLoading: deleteServiceMutation.isPending,
         serverError: deleteServiceMutation.error?.message, 
-        service: service,
+        entityName: service.name || '',
+        entityType: 'service',
       });
     },
     [openModal, deleteServiceMutation]
@@ -265,9 +265,7 @@ export const Services = () => {
           );
         }
       })
-    ],
-    [handleEdit, handleDelete]
-  );
+    ],[handleEdit, handleDelete]);
 
   if (isLoading) return <p>{t("general.loading")}</p>;
   if (error) return <p>{t("services.errors.loading")}</p>;

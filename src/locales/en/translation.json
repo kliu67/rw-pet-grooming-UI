@@ -10,6 +10,11 @@
         "delete": "Delete",
         "create": "Create"
     },
+    "DeleteModal":{
+        "title" : "Delete {{entity}}",
+        "confirmDelete": "Are you sure you want to delete the {{entity}} \"{{entity_name}}\"? To confirm, type the name of the service in the field below.",
+        "warning": "Note: This action cannot be undone."
+    },
     "species":{
         "title": "Species",
         "subtitle": "Manage your species",
@@ -36,6 +41,23 @@
             "description": "Description cannot be longer than 200 characters.",
             "notEmpty": "\"{{input}}\" field cannot be empty",
             "loading": "Error loading services"
+        }
+    },
+
+    "breeds": {
+        "heading": "Breeds",
+        "subheading": "Manage your breeds",
+        "add": "Add breed",
+        "create": "Create breed",
+        "edit": "Edit breed",
+        "search": "Search breeds...",
+        "placeholderText": {
+            "name": "Breed name"
+        },
+        "errors":{
+            "name": "Breed name length must be between 0 and \"{{max}}\" characters",
+            "notEmpty": "\"{{input}}\" field cannot be empty",
+            "loading": "Error loading breeds"
         }
     }
 }

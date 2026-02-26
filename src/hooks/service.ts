@@ -6,10 +6,51 @@ export function useCreateService() {
 
   return useMutation({
     mutationFn: createService,
-    onSuccess: () => {
-      // refresh services table
-      queryClient.invalidateQueries({ queryKey: ["services"] });
+
+    // 1️⃣ Optimistic update
+    onMutate: async (newService) => {
+      await queryClient.cancelQueries({ queryKey: ["services"] });
+
+      const previousServices = queryClient.getQueryData(["services"]);
+
+      const optimisticService = {
+        id: `temp-${Date.now()}`, // temporary id
+        ...newService,
+        base_price: Number(newService.base_price),
+        created_at: new Date().toISOString()
+      };
+
+      queryClient.setQueryData(["services"], (old = []) => [
+        ...old,
+        optimisticService
+      ]);
+
+      return { previousServices };
     },
+
+    // 2️⃣ Rollback if error
+    onError: (err, newService, context) => {
+      queryClient.setQueryData(
+        ["services"],
+        context.previousServices
+      );
+    },
+
+    // 3️⃣ Replace optimistic with real server response
+    onSuccess: (createdService) => {
+      queryClient.setQueryData(["services"], (old = []) =>
+        old.map((service) =>
+          String(service.id).startsWith("temp-")
+            ? createdService
+            : service
+        )
+      );
+    },
+
+    // 4️⃣ Optional safety refetch
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["services"] });
+    }
   });
 }
 
@@ -17,7 +58,7 @@ export function useUpdateService() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }) => updateService(id, data),
+    mutationFn: ({ id, data }) => updateSpecies(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["services"] });
     },
