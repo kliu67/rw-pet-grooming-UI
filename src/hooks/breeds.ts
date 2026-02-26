@@ -18,9 +18,32 @@ export function useUpdateBreed() {
 
   return useMutation({
     mutationFn: ({ id, data }) => updateBreed(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["species"] });
+     // 🔥 Optimistic update
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: ["species"] });
+
+      const previousBreeds = queryClient.getQueryData(["species"]);
+
+      queryClient.setQueryData(["species"], (old) =>
+        old?.map((breed) =>
+          breed.id === id ? { ...breed, ...data } : breed
+        )
+      );
+
+      return { previousBreeds };
     },
+
+    // 🔥 Rollback on error
+    onError: (err, variables, context) => {
+      if (context?.previousBreeds) {
+        queryClient.setQueryData(["species"], context.previousBreeds);
+      }
+    },
+
+    // 🔥 Ensure server truth
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["species"] });
+    }
   });
 }
 
