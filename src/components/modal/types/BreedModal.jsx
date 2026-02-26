@@ -25,8 +25,7 @@ export default function BreedModal({
   };
 
   const handleChange = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
+    const { name, value } = e.target;
     // ----- NAME -----
     if (name === "name") {
       if (value === "") {
