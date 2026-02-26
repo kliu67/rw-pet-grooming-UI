@@ -95,10 +95,12 @@ export const Breeds = () => {
         },
         isLoading: deleteBreedMutation.isPending,
         serverError: deleteBreedMutation.error?.message,
-        entityName: breedData.name || ""
+        entityName: breedData.name || "",
+        entityType: 'breed'
       });
     }
-  }, []);
+  }, [openModal, deleteBreedMutation]);
+  
   /* ---------------- Columns ---------------- */
   const columns = React.useMemo(
     () => [
