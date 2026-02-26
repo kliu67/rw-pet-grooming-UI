@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { isValidPrice } from "@/utils";
+import {
+  MAX_SERVICE_NAME_LENGTH,
+  MAX_SERVICE_DESC_LENGTH,
+  MAX_SERVICE_BASE_PRICE_VALUE
+} from "@/constants";
 
 export default function ServiceModal({
   onClose,
@@ -139,7 +145,7 @@ export default function ServiceModal({
             try {
               await onSubmit({
                 name: form.name.trim(),
-                base_price: String(form.base_price),
+                base_price: Number(form.base_price),
                 description: form.description.trim()
               });
 
@@ -202,7 +208,7 @@ export default function ServiceModal({
           {/* Server Error */}
           {serverError && (
             <p className="text-red-500 text-sm mb-2">
-              {serverError?.message || "Failed to save service"}
+              {serverError?.error || "Failed to save service"}
             </p>
           )}
 
