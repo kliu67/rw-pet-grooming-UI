@@ -59,5 +59,31 @@
             "notEmpty": "\"{{input}}\" field cannot be empty",
             "loading": "Error loading breeds"
         }
+    },
+
+    "clients": {
+        "heading": "Clients",
+        "subheding": "Manage your clients",
+        "add": "Add client",
+        "create": "Create client",
+        "edit": "Edit client",
+        "search": "Search clients...",
+        "placeholderText": {
+            "first_name": "First name",
+            "last_name": "Last name",
+            "phone": "Phone",
+            "email": "Email",
+            "description": "Description"
+        },
+
+        "errors":{
+            "first_name": "First name length must be between 0 and \"{{max}}\" characters",
+            "last_name": "First name length must be between 0 and \"{{max}}\" characters",
+            "phone": "phone length must be between 0 and \"{{max}}\" and consist of numbers and '-' only",
+            "email": "Email length must be between 0 and \"{{max}}\" characters and be in valid format",
+            "description": "Description cannot be longer than 200 characters.",
+            "notEmpty": "\"{{input}}\" field cannot be empty",
+            "loading": "Error loading clients"
+        }
     }
 }
