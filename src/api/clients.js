@@ -37,7 +37,7 @@ export async function updateClient(id, data) {
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
-    throw new Error(error?.message || "Failed to update service");
+    throw new Error(error?.message || "Failed to update client");
   }
 
   return res.json();
@@ -50,7 +50,7 @@ export async function deleteClient(id) {
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
-    throw new Error(error?.message || "Failed to delete service");
+    throw new Error(error?.message || "Failed to delete client");
   }
 
   try {
