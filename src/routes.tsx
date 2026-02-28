@@ -6,6 +6,7 @@ import { Appointments } from './pages/Appointments';
 import { Clients } from './pages/Clients';
 import { Services } from './pages/Services';
 import { Breeds } from './pages/Breeds';
+import { Pets } from './pages/Pets';
 
 export const router = createBrowserRouter([
   {
@@ -31,7 +32,11 @@ export const router = createBrowserRouter([
       {
         path: 'species',
         Component: Breeds,
-      }
+      },
+      {
+        path: 'pets',
+        Component: Pets,
+      },
     ],
   },
 ]);
