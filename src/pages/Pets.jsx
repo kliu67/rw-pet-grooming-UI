@@ -181,38 +181,38 @@ export const Pets = () => {
   const columns = React.useMemo(
     () => [
       columnHelper.accessor("id", {
-        header: "ID",
+        header: t('columns.id'),
         cell: (info) => info.getValue()
       }),
       columnHelper.accessor("name", {
-        header: "Name",
+        header: t('columns.name'),
         cell: (info) => info.getValue()
       }),
       columnHelper.accessor("owner", {
-        header: "Owner",
+        header: t('columns.owner'),
         cell: (info) => info.getValue()
       }),
       columnHelper.accessor("breed", {
-        header: "Breed",
+        header: t('columns.breed'),
         cell: (info) => info.getValue()
       }),
       columnHelper.accessor("weightClass", {
-        header: "Weight Class",
+        header: t('columns.weightClass'),
         cell: (info) => info.getValue()
       }),
       columnHelper.accessor("uuid", {
-        header: "UUID",
+        header: t('columns.uuid'),
         cell: (info) => info.getValue()
       }),
       columnHelper.accessor("createdAt", {
-        header: "Create Date",
+        header: t('columns.createdAt'),
         cell: (info) => {
           const v = info.getValue();
           return v ? new Date(v).toLocaleDateString() : "-";
         }
       }),
       columnHelper.accessor("updatedAt", {
-        header: "Update Date",
+        header: t('columns.updatedAt'),
         cell: (info) => {
           const v = info.getValue();
           return v ? new Date(v).toLocaleDateString() : "-";
