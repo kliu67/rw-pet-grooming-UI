@@ -44,16 +44,16 @@ export const Pets = () => {
   });
 
   const {
-    data: weightClassData = [],
-    isLoading: weightClassIsLoading,
-    error: weightClassError
+    data: weightClassesData = [],
+    isLoading: weightClassesIsLoading,
+    error: weightClassesError
   } = useQuery({
     queryKey: [WEIGHT_CLASSES_QUERY_KEY],
     queryFn: getWeightClasses
   });
 
   const {
-    data: breedData = [],
+    data: breedsData = [],
     isLoading: breedsIsLoading,
     error: breedsError
   } = useQuery({
@@ -62,13 +62,16 @@ export const Pets = () => {
   });
 
   const {
-    data: clientData = [],
+    data: clientsData = [],
     isLoading: clientsIsLoading,
     error: clientsError
   } = useQuery({
     queryKey: [CLIENTS_QUERY_KEY],
     queryFn: getClients
   });
+
+  const isLoading = petsIsLoading || weightClassesIsLoading || breedsIsLoading || clientsIsLoading;
+  const isError = petsError || weightClassesError || breedsError || clientsError
 
   const petInputs = React.useMemo(
     () => ({
@@ -108,15 +111,16 @@ export const Pets = () => {
         : false;
 
   const pets = petsData.map((pet) => {
-    const owner = clientData.find((client) => client.id === pet.owner);
-    const breed = breedData.find((breed) => breed.id === pet.breed);
-    const weightClass = weightClassData.find(
+    const owner = clientsData.find((client) => client.id === pet.owner);
+    const breed = breedsData.find((breed) => breed.id === pet.breed);
+    const weightClass = weightClassesData.find(
       (wc) => wc.id === pet.weight_class_id
     );
+  
     return {
       id: pet.id,
       name: pet.name,
-      breed: breed?.name || t("general.notFound"),
+      // breed: breed?.name || t("general.notFound"),
       owner: owner,
       ownerDisplayName: (owner && `${owner.last_name}, ${owner.first_name}`) ||
         t("general.notFound"),
@@ -132,8 +136,7 @@ export const Pets = () => {
 
   const filteredPets = pets.filter(
     (pet) =>
-      pet.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      pet.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      pet.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   /* ---------------- CREATE AND EDIT ACTION HANDLER ---------------- */
@@ -162,7 +165,7 @@ export const Pets = () => {
         });
       }
     },
-    [openModal, deletePetMutation]
+    [openModal, closeModal,  deletePetMutation]
   );
 
   const handleSubmit = async (formData) => {
@@ -240,8 +243,8 @@ export const Pets = () => {
     [handleAction]
   );
 
-  if (petsIsLoading) return <p>{t("general.loading")}</p>;
-  if (petsError) return <p>{t("pets.errors.loading")}</p>;
+  if (isLoading) return <p>{t("general.loading")}</p>;
+  if (isError) return <p>{t("pets.errors.loading")}</p>;
 
   return (
     <div className="space-y-6">
@@ -286,9 +289,9 @@ export const Pets = () => {
             petData={pet}
             onClose={() => setIsOpen(false)}
             isLoading={isSubmitting}
-            weightClassData={weightClassData}
-            clientData={clientData}
-            breedData={breedData}
+            weightClassData={weightClassesData}
+            clientData={clientsData}
+            breedData={breedsData}
           />
         )}
       </div>

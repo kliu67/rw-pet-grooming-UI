@@ -1,10 +1,8 @@
 import { Fragment, useState, useEffect } from "react";
-import { Plus, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
 import { useTranslation } from "react-i18next";
-import { isValidPhone, isValidEmail } from "@/utils";
 import { MAX_PET_NAME_LENGTH } from "@/constants";
-import Dropdown from "../Dropdown";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -51,6 +49,7 @@ export default function PetModal({
   const [serverError, setServerError] = useState(null);
 
   const isEdit = mode === "edit";
+  const hasValidationErrors = errors.name;
 
   const modalTexts = {
     heading: isEdit ? t("pets.edit") : t("pets.create"),
@@ -114,13 +113,12 @@ export default function PetModal({
   const hasChanges = (current) => {
     return (
       (petData?.name || "").trim() !== current.name.trim() ||
-      (petData?.owner || "") !== current.owner ||
-      (petData?.breed || "") !== current.breed ||
-      (petData?.weightClass || "") !== current.weightClass && !!current.weightClass
+      (petData?.owner?.id || "") !== current.owner.id ||
+      (petData?.breed?.id || "") !== current.breed.id ||
+      ((petData?.weightClass?.id || "") !== current.weightClass?.id &&
+        !!current.weightClass?.id)
     );
   };
-
-  const hasValidationErrors = errors.name;
 
   const canSubmit =
     !isLoading &&
@@ -132,12 +130,11 @@ export default function PetModal({
 
   // ---------- Reset form when editing another row ----------
   useEffect(() => {
-
     setForm({
       name: petData?.name || "",
-      owner: petData?.owner ||  "",
+      owner: petData?.owner || "",
       breed: petData?.breed || "",
-      weightClass: petData?.weightClass|| ""
+      weightClass: petData?.weightClass || ""
     });
     setErrors({
       name: "",
@@ -161,25 +158,21 @@ export default function PetModal({
             e.preventDefault();
             if (!canSubmit) return;
             let delta = {};
-            if(petData.name !== form.name.trim()){
+            if (petData?.name !== form?.name?.trim()) {
               delta.name = form.name.trim();
             }
-            if(petData.owner.id !== form.owner.id){
-              delta.owner = form.owner.id
+            if (petData?.owner?.id !== form?.owner?.id) {
+              delta.owner = form.owner.id;
             }
-            if(petData.breed !== form.breed){
-              delta.breed = form.breed.id
+            if (petData?.breed?.id !== form?.breed?.id) {
+              delta.breed = form.breed.id;
             }
-            if(petData.weightClass.id !== form.weightClass?.id){
-              delta.weightClassId = form.weightClass.id
+            if (petData?.weightClass?.id !== form.weightClass?.id) {
+              delta.weightClassId = form.weightClass.id;
             }
-            setForm({...delta});
 
             try {
-              await onSubmit({
-                ...delta
-              });
-
+              await onSubmit(delta);
               setServerError(null);
               onClose();
             } catch (err) {
@@ -211,7 +204,7 @@ export default function PetModal({
                   {form.owner
                     ? `${form.owner.last_name}, ${form.owner.first_name}`
                     : inputs.owner.placeholder}{" "}
-                  <span aria-hidden="true">▼</span>
+                  <span aria-hidden="true">&#9662;</span>
                 </button>
               </DropdownMenuTrigger>
 
@@ -226,7 +219,7 @@ export default function PetModal({
                       onSelect={() => {
                         setForm((prev) => ({
                           ...prev,
-                          owner: client,
+                          owner: client
                         }));
                       }}
                     >{`${client.last_name}, ${client.first_name}`}</DropdownMenuItem>
@@ -241,7 +234,8 @@ export default function PetModal({
             <DropdownMenu id="breed">
               <DropdownMenuTrigger asChild>
                 <button className="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-                  {form.breed ? form.breed.name : inputs.breed.placeholder} <span aria-hidden="true">▼</span>
+                  {form.breed ? form.breed.name : inputs.breed.placeholder}{" "}
+                  <span aria-hidden="true">&#9662;</span>
                 </button>
               </DropdownMenuTrigger>
 
@@ -252,12 +246,14 @@ export default function PetModal({
                 ></DropdownSearch>
                 {filteredBreeds.map((breed) => (
                   <Fragment key={breed.id}>
-                    <DropdownMenuItem onSelect={() => {
+                    <DropdownMenuItem
+                      onSelect={() => {
                         setForm((prev) => ({
                           ...prev,
-                          breed: breed,
+                          breed: breed
                         }));
-                    }}>
+                      }}
+                    >
                       {breed.name}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -268,23 +264,27 @@ export default function PetModal({
           </div>
 
           <div className="mt-4 mb-4">
-            <DropdownMenu id="breed">
+            <DropdownMenu id="weightClass">
               <DropdownMenuTrigger asChild>
                 <button className="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-                  {form.weightClass ? form.weightClass.label : inputs.weightClass.placeholder}{" "}
-                  <span aria-hidden="true">▼</span>
+                  {form.weightClass
+                    ? form.weightClass.label
+                    : inputs.weightClass.placeholder}{" "}
+                  <span aria-hidden="true">&#9662;</span>
                 </button>
               </DropdownMenuTrigger>
 
               <DropdownMenuContent align="end">
                 {filteredWeightClasses.map((wc) => (
                   <Fragment key={wc.id}>
-                    <DropdownMenuItem onSelect={() => {
-                      setForm((prev) => ({
-                        ...prev,
-                        weightClass: wc,
-                      }));
-                    }}>
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        setForm((prev) => ({
+                          ...prev,
+                          weightClass: wc
+                        }));
+                      }}
+                    >
                       {wc.label}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -297,7 +297,7 @@ export default function PetModal({
           {/* Server Error */}
           {serverError && (
             <p className="text-red-500 text-sm mb-2">
-              {serverError?.error || "Failed to save pet"}
+              {serverError?.error || serverError?.message || "Failed to save pet"}
             </p>
           )}
 
