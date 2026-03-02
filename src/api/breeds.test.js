@@ -19,7 +19,7 @@ describe("api/breeds", () => {
     fetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue(payload) });
 
     await expect(getBreeds()).resolves.toEqual(payload);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/breeds");
+    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/breeds");
   });
 
   it("getBreeds throws backend error message", async () => {
@@ -37,7 +37,7 @@ describe("api/breeds", () => {
     fetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue(created) });
 
     await expect(createBreed(input)).resolves.toEqual(created);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/breeds", {
+    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/breeds", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input)
@@ -58,7 +58,7 @@ describe("api/breeds", () => {
     });
 
     await expect(updateBreed(1, { name: "Mix" })).rejects.toThrow("Failed to update breed");
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/breeds/1", {
+    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/breeds/1", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: "Mix" })
@@ -72,7 +72,7 @@ describe("api/breeds", () => {
     });
 
     await expect(deleteBreed(1)).resolves.toBeNull();
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/breeds/1", {
+    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/breeds/1", {
       method: "DELETE"
     });
   });
