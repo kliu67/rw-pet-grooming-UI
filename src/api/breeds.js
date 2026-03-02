@@ -12,7 +12,7 @@ export async function getBreeds() {
 }
 
 export async function createBreed(data) {
-  const res = await fetch(`${API_URL}/breeds`, {
+  const res = await fetch(`${API_URL}/api/breeds`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -27,7 +27,7 @@ export async function createBreed(data) {
 }
 
 export async function updateBreed(id, data) {
-  const res = await fetch(`${API_URL}/breeds/${id}`, {
+  const res = await fetch(`${API_URL}/api/breeds/${id}`, {
     method: "PUT", // or PATCH depending on backend
     headers: {
       "Content-Type": "application/json",
@@ -44,7 +44,7 @@ export async function updateBreed(id, data) {
 }
 
 export async function deleteBreed(id) {
-  const res = await fetch(`${API_URL}/breeds/${id}`, {
+  const res = await fetch(`${API_URL}/api/breeds/${id}`, {
     method: "DELETE",
   });
 
