@@ -109,14 +109,14 @@ export const Pets = () => {
 
   const pets = petsData.map((pet) => {
     const owner = clientData.find((client) => client.id === pet.owner);
-    const breed = breedData.find((breed) => breed.id === pet.species);
+    const breed = breedData.find((breed) => breed.id === pet.breed);
     const weightClass = weightClassData.find(
       (wc) => wc.id === pet.weight_class_id
     );
     return {
       id: pet.id,
       name: pet.name,
-      species: breed?.name || t("general.notFound"),
+      breed: breed?.name || t("general.notFound"),
       owner: owner,
       ownerDisplayName: (owner && `${owner.last_name}, ${owner.first_name}`) ||
         t("general.notFound"),

@@ -1,18 +1,18 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export async function getBreeds() {
-  const res = await fetch(`${API_URL}/species`);
+  const res = await fetch(`${API_URL}/api/breeds`);
 
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.error || "Failed to fetch species");
+    throw new Error(err.error || "Failed to fetch breeds");
   }
 
   return res.json();
 }
 
 export async function createBreed(data) {
-  const res = await fetch(`${API_URL}/species`, {
+  const res = await fetch(`${API_URL}/breeds`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -27,7 +27,7 @@ export async function createBreed(data) {
 }
 
 export async function updateBreed(id, data) {
-  const res = await fetch(`${API_URL}/species/${id}`, {
+  const res = await fetch(`${API_URL}/breeds/${id}`, {
     method: "PUT", // or PATCH depending on backend
     headers: {
       "Content-Type": "application/json",
@@ -37,20 +37,20 @@ export async function updateBreed(id, data) {
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
-    throw new Error(error?.message || "Failed to update species");
+    throw new Error(error?.message || "Failed to update breeds");
   }
 
   return res.json();
 }
 
 export async function deleteBreed(id) {
-  const res = await fetch(`${API_URL}/species/${id}`, {
+  const res = await fetch(`${API_URL}/breeds/${id}`, {
     method: "DELETE",
   });
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
-    throw new Error(error?.message || "Failed to delete species");
+    throw new Error(error?.message || "Failed to delete breeds");
   }
 
   try {

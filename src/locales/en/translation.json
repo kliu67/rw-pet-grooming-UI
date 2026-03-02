@@ -25,12 +25,6 @@
         "confirmDelete": "Are you sure you want to delete the {{entity}} \"{{entity_name}}\"? To confirm, type the name of the service in the field below.",
         "warning": "Note: This action cannot be undone."
     },
-    "species":{
-        "title": "Species",
-        "subtitle": "Manage your species",
-        "add": "Add species",
-        "search": "Search species..."
-    },
     "services":{
         "heading": "Services",
         "subheading": "Manage your services",

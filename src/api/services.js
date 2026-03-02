@@ -5,7 +5,7 @@ export async function getServices() {
 
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.error || "Failed to fetch species");
+    throw new Error(err.error || "Failed to fetch service");
   }
 
   return res.json();

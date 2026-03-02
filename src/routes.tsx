@@ -30,7 +30,7 @@ export const router = createBrowserRouter([
         Component: Services,
       },
       {
-        path: 'species',
+        path: 'breeds',
         Component: Breeds,
       },
       {

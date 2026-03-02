@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createBreed, deleteBreed, updateBreed } from "@/api/breeds";
 import { useCreateBreed, useDeleteBreed, useUpdateBreed } from "./breeds";
+import { BREEDS_QUERY_KEY } from "@/constants";
 
 vi.mock("@tanstack/react-query", () => ({
   useMutation: vi.fn(),
@@ -36,7 +37,7 @@ describe("hooks/breeds", () => {
     vi.mocked(useMutation).mockImplementation((config: unknown) => config as never);
   });
 
-  it("useCreateBreed invalidates species after success", () => {
+  it("useCreateBreed invalidates breed after success", () => {
     const queryClient = createQueryClientMock();
     vi.mocked(useQueryClient).mockReturnValue(queryClient as never);
 
@@ -47,7 +48,7 @@ describe("hooks/breeds", () => {
 
     expect(mutation.mutationFn).toBe(createBreed);
     mutation.onSuccess();
-    expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: ["species"] });
+    expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: [BREEDS_QUERY_KEY] });
   });
 
   it("useUpdateBreed calls api and applies optimistic update lifecycle", async () => {
@@ -69,9 +70,9 @@ describe("hooks/breeds", () => {
     expect(updateBreed).toHaveBeenCalledWith(1, { name: "Goldendoodle" });
 
     const context = await mutation.onMutate(payload);
-    expect(queryClient.cancelQueries).toHaveBeenCalledWith({ queryKey: ["species"] });
+    expect(queryClient.cancelQueries).toHaveBeenCalledWith({ queryKey: [BREEDS_QUERY_KEY] });
     expect(context).toEqual({ previousBreeds });
-    expect(queryClient.setQueryData).toHaveBeenCalledWith(["species"], expect.any(Function));
+    expect(queryClient.setQueryData).toHaveBeenCalledWith([BREEDS_QUERY_KEY], expect.any(Function));
 
     const updater = queryClient.setQueryData.mock.calls[0][1] as (old: typeof previousBreeds) => typeof previousBreeds;
     const optimistic = updater(previousBreeds);
@@ -81,10 +82,10 @@ describe("hooks/breeds", () => {
     ]);
 
     mutation.onError(new Error("fail"), payload, { previousBreeds });
-    expect(queryClient.setQueryData).toHaveBeenCalledWith(["species"], previousBreeds);
+    expect(queryClient.setQueryData).toHaveBeenCalledWith([BREEDS_QUERY_KEY], previousBreeds);
 
     mutation.onSettled();
-    expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: ["species"] });
+    expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: [BREEDS_QUERY_KEY] });
   });
 
   it("useDeleteBreed calls api and applies optimistic delete lifecycle", async () => {
@@ -105,17 +106,17 @@ describe("hooks/breeds", () => {
     expect(deleteBreed).toHaveBeenCalledWith(1);
 
     const context = await mutation.onMutate(1);
-    expect(queryClient.cancelQueries).toHaveBeenCalledWith({ queryKey: ["species"] });
+    expect(queryClient.cancelQueries).toHaveBeenCalledWith({ queryKey: [BREEDS_QUERY_KEY] });
     expect(context).toEqual({ previousBreeds });
-    expect(queryClient.setQueryData).toHaveBeenCalledWith(["species"], expect.any(Function));
+    expect(queryClient.setQueryData).toHaveBeenCalledWith([BREEDS_QUERY_KEY], expect.any(Function));
 
     const updater = queryClient.setQueryData.mock.calls[0][1] as (old: typeof previousBreeds) => typeof previousBreeds;
     expect(updater(previousBreeds)).toEqual([{ id: 2, name: "Lab" }]);
 
     mutation.onError(new Error("fail"), 1, { previousBreeds });
-    expect(queryClient.setQueryData).toHaveBeenCalledWith(["species"], previousBreeds);
+    expect(queryClient.setQueryData).toHaveBeenCalledWith([BREEDS_QUERY_KEY], previousBreeds);
 
     mutation.onSettled();
-    expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: ["species"] });
+    expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: [BREEDS_QUERY_KEY] });
   });
 });

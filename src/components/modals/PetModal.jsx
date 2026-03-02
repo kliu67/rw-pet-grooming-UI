@@ -115,7 +115,7 @@ export default function PetModal({
     return (
       (petData?.name || "").trim() !== current.name.trim() ||
       (petData?.owner || "") !== current.owner ||
-      (petData?.breed || "") !== current.species ||
+      (petData?.breed || "") !== current.breed ||
       (petData?.weightClass || "") !== current.weightClass && !!current.weightClass
     );
   };
@@ -127,7 +127,7 @@ export default function PetModal({
     !hasValidationErrors &&
     form.name &&
     form.owner &&
-    form.species &&
+    form.breed &&
     ((mode === "edit" && hasChanges(form)) || mode === "create");
 
   // ---------- Reset form when editing another row ----------
@@ -136,13 +136,13 @@ export default function PetModal({
     setForm({
       name: petData?.name || "",
       owner: petData?.owner ||  "",
-      species: petData?.breed || "",
+      breed: petData?.breed || "",
       weightClass: petData?.weightClass|| ""
     });
     setErrors({
       name: "",
       owner: "",
-      species: "",
+      breed: "",
       weightClass: ""
     });
 
@@ -167,8 +167,8 @@ export default function PetModal({
             if(petData.owner.id !== form.owner.id){
               delta.owner = form.owner.id
             }
-            if(petData.breed !== form.species){
-              delta.species = form.species.id
+            if(petData.breed !== form.breed){
+              delta.breed = form.breed.id
             }
             if(petData.weightClass.id !== form.weightClass?.id){
               delta.weightClassId = form.weightClass.id
@@ -241,7 +241,7 @@ export default function PetModal({
             <DropdownMenu id="breed">
               <DropdownMenuTrigger asChild>
                 <button className="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-                  {form.species ? form.species.name : inputs.breed.placeholder} <span aria-hidden="true">▼</span>
+                  {form.breed ? form.breed.name : inputs.breed.placeholder} <span aria-hidden="true">▼</span>
                 </button>
               </DropdownMenuTrigger>
 
@@ -255,7 +255,7 @@ export default function PetModal({
                     <DropdownMenuItem onSelect={() => {
                         setForm((prev) => ({
                           ...prev,
-                          species: breed,
+                          breed: breed,
                         }));
                     }}>
                       {breed.name}
