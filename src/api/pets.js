@@ -27,7 +27,7 @@ export async function createPet(data) {
 
 export async function updatePet(id, data) {
   const res = await fetch(`${API_URL}/api/pets/${id}`, {
-    method: "PUT", // or PATCH depending on backend
+    method: "PATCH", // or PATCH depending on backend
     headers: {
       "Content-Type": "application/json",
     },

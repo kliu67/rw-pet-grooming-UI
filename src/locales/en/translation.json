@@ -104,10 +104,15 @@
         "edit": "Edit pet",
         "search": "Search pets...",
         "placeholderText": {
-            "name": "First name",
-            "owner": "Last name",
-            "breed": "Breed",
-            "weightClass": "Weight Class"
+            "name": "Name",
+            "owner": "Select owner",
+            "breed": "Select breed",
+            "weightClass": "Select weight class"
+        },
+        "errors":{
+            "nameLengthViolation": "Pet name length must be between 0 and \"{{max}}\" characters",
+            "notEmpty": "\"{{input}}\" field cannot be empty",
+            "loading": "Error loading pets"
         }
     }
 }

@@ -8,7 +8,7 @@ import { getBreeds } from "@/api/breeds";
 import { getWeightClasses } from "@/api/weightClasses";
 import { useTranslation } from "react-i18next";
 import { useModal } from "@/components/modals/ModalProvider";
-import ServiceModal from "@/components/modals/ServiceModal";
+import PetModal from "@/components/modals/PetModal";
 import { Table as PetTable } from "@/components/Table";
 import { MODAL_TYPES } from "@/components/modals/modalRegistry";
 import { useCreatePet, useUpdatePet, useDeletePet } from "@/hooks/pets";
@@ -53,7 +53,7 @@ export const Pets = () => {
   });
 
   const {
-    data: breedsData = [],
+    data: breedData = [],
     isLoading: breedsIsLoading,
     error: breedsError
   } = useQuery({
@@ -62,7 +62,7 @@ export const Pets = () => {
   });
 
   const {
-    data: clientsData = [],
+    data: clientData = [],
     isLoading: clientsIsLoading,
     error: clientsError
   } = useQuery({
@@ -108,8 +108,8 @@ export const Pets = () => {
         : false;
 
   const pets = petsData.map((pet) => {
-    const owner = clientsData.find((client) => client.id === pet.owner);
-    const breed = breedsData.find((breed) => breed.id === pet.species);
+    const owner = clientData.find((client) => client.id === pet.owner);
+    const breed = breedData.find((breed) => breed.id === pet.species);
     const weightClass = weightClassData.find(
       (wc) => wc.id === pet.weight_class_id
     );
@@ -117,11 +117,13 @@ export const Pets = () => {
       id: pet.id,
       name: pet.name,
       species: breed?.name || t("general.notFound"),
-      owner:
-        (owner && `${owner.last_name}, ${owner.first_name}`) ||
+      owner: owner,
+      ownerDisplayName: (owner && `${owner.last_name}, ${owner.first_name}`) ||
         t("general.notFound"),
-      breed: breed?.name || t("general.notFound"),
-      weightClass: weightClass?.label || t("general.notFound"),
+      breed: breed,
+      breedDisplayName: breed?.name || t("general.notFound"),
+      weightClass: weightClass,
+      weightClassDisplayName: weightClass?.label || t("general.notFound"),
       uuid: pet.uuid,
       createdAt: pet.created_at,
       updatedAt: pet.updated_at
@@ -138,7 +140,7 @@ export const Pets = () => {
   const handleAction = React.useCallback(
     (action = "", pet = {}) => {
       if (action === "create" || action === "edit") {
-        (setMode(action), setService(pet));
+        (setMode(action), setPet(pet));
         setIsOpen(true);
       }
 
@@ -156,7 +158,7 @@ export const Pets = () => {
           isLoading: deletePetMutation.isPending,
           serverError: deletePetMutation.error?.message,
           entityName: pet.name || "",
-          entityType: "service"
+          entityType: "pet"
         });
       }
     },
@@ -188,15 +190,15 @@ export const Pets = () => {
         header: t('columns.name'),
         cell: (info) => info.getValue()
       }),
-      columnHelper.accessor("owner", {
+      columnHelper.accessor("ownerDisplayName", {
         header: t('columns.owner'),
         cell: (info) => info.getValue()
       }),
-      columnHelper.accessor("breed", {
+      columnHelper.accessor("breedDisplayName", {
         header: t('columns.breed'),
         cell: (info) => info.getValue()
       }),
-      columnHelper.accessor("weightClass", {
+      columnHelper.accessor("weightClassDisplayName", {
         header: t('columns.weightClass'),
         cell: (info) => info.getValue()
       }),
@@ -277,13 +279,16 @@ export const Pets = () => {
           <PetTable data={filteredPets} columns={columns} />
         </div>
         {isOpen && (
-          <ServiceModal
+          <PetModal
             mode={mode || "create"}
             inputs={petInputs}
             onSubmit={handleSubmit}
-            serviceData={pet}
+            petData={pet}
             onClose={() => setIsOpen(false)}
             isLoading={isSubmitting}
+            weightClassData={weightClassData}
+            clientData={clientData}
+            breedData={breedData}
           />
         )}
       </div>
