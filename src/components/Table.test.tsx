@@ -13,7 +13,7 @@ const columnHelper = createColumnHelper<Row>();
 
 describe("Table", () => {
   it("renders rows and paginates to next/previous pages", () => {
-    const data = Array.from({ length: 11 }, (_, i) => ({
+    const data = Array.from({ length: 26 }, (_, i) => ({
       id: i + 1,
       name: `Service ${i + 1}`
     }));
@@ -27,10 +27,10 @@ describe("Table", () => {
     render(<Table data={data} columns={columns} />);
 
     expect(screen.getByText("Service 1")).toBeInTheDocument();
-    expect(screen.queryByText("Service 11")).not.toBeInTheDocument();
+    expect(screen.queryByText("Service 26")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByText("Next"));
-    expect(screen.getByText("Service 11")).toBeInTheDocument();
+    expect(screen.getByText("Service 26")).toBeInTheDocument();
     expect(screen.queryByText("Service 1")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByText("Prev"));
