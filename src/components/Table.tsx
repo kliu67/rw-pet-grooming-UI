@@ -22,7 +22,12 @@ export const Table = ({ data, columns }) => {
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel()
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState:{
+      pagination:{
+        pageSize:25
+      }
+    }
   });
 
   /* ---------------- UI ---------------- */
