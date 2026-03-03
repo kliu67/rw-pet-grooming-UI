@@ -7,6 +7,7 @@ import { Clients } from './pages/Clients';
 import { Services } from './pages/Services';
 import { Breeds } from './pages/Breeds';
 import { Pets } from './pages/Pets';
+import { ServiceConfigurations } from './pages/ServiceConfigurations'
 
 export const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ export const router = createBrowserRouter([
       {
         path: 'services',
         Component: Services,
+      },
+      {
+        path: 'serviceConfigurations',
+        Component: ServiceConfigurations,
       },
       {
         path: 'breeds',

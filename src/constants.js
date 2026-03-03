@@ -3,6 +3,7 @@ export const MAX_SERVICE_NAME_LENGTH = 60;
 export const MAX_SERVICE_DESC_LENGTH = 200;
 export const MIN_SERVICE_BASE_PRICE_VALUE = 0;
 export const MAX_SERVICE_BASE_PRICE_VALUE = 99999999.99;
+export const SERVICES_QUERY_KEY = "services";
 
 //breed constants
 export const BREEDS_QUERY_KEY = "breeds";
@@ -22,3 +23,6 @@ export const PETS_QUERY_KEY = "pets";
 
 //weight classes
 export const WEIGHT_CLASSES_QUERY_KEY = "weightClasses";
+
+//service configurations
+export const SERVICE_CONFIGURATIONS_QUERY_KEY = "serviceConfigurations";
