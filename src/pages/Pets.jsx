@@ -1,24 +1,16 @@
 import React, { useState } from "react";
 import { Plus, Search } from "lucide-react";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useQuery } from "@tanstack/react-query";
-import { getPets } from "../api/pets";
-import { getClients } from "@/api/clients";
-import { getBreeds } from "@/api/breeds";
-import { getWeightClasses } from "@/api/weightClasses";
 import { useTranslation } from "react-i18next";
 import { useModal } from "@/components/modals/ModalProvider";
 import PetModal from "@/components/modals/PetModal";
 import { Table as PetTable } from "@/components/Table";
 import { MODAL_TYPES } from "@/components/modals/modalRegistry";
-import { useCreatePet, useUpdatePet, useDeletePet } from "@/hooks/pets";
+import { usePets, useCreatePet, useUpdatePet, useDeletePet } from "@/hooks/pets";
+import { useClients } from "@/hooks/clients";
+import { useBreeds } from "@/hooks/breeds";
+import { useWeightClasses } from "@/hooks/weightClasses"
 import { RowActionsMenu } from "@/components/RowActionDropdown";
-import {
-  PETS_QUERY_KEY,
-  WEIGHT_CLASSES_QUERY_KEY,
-  CLIENTS_QUERY_KEY,
-  BREEDS_QUERY_KEY
-} from "@/constants";
 
 const columnHelper = createColumnHelper();
 
@@ -38,37 +30,25 @@ export const Pets = () => {
     data: petsData = [],
     isLoading: petsIsLoading,
     error: petsError
-  } = useQuery({
-    queryKey: [PETS_QUERY_KEY],
-    queryFn: getPets
-  });
+  } = usePets();
 
   const {
     data: weightClassesData = [],
     isLoading: weightClassesIsLoading,
     error: weightClassesError
-  } = useQuery({
-    queryKey: [WEIGHT_CLASSES_QUERY_KEY],
-    queryFn: getWeightClasses
-  });
+  } = useWeightClasses();
 
   const {
     data: breedsData = [],
     isLoading: breedsIsLoading,
     error: breedsError
-  } = useQuery({
-    queryKey: [BREEDS_QUERY_KEY],
-    queryFn: getBreeds
-  });
+  } = useBreeds();
 
   const {
     data: clientsData = [],
     isLoading: clientsIsLoading,
     error: clientsError
-  } = useQuery({
-    queryKey: [CLIENTS_QUERY_KEY],
-    queryFn: getClients
-  });
+  } = useClients();
 
   const isLoading = petsIsLoading || weightClassesIsLoading || breedsIsLoading || clientsIsLoading;
   const isError = petsError || weightClassesError || breedsError || clientsError

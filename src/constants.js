@@ -1,3 +1,5 @@
+//
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 //service constants
 export const MAX_SERVICE_NAME_LENGTH = 60;
 export const MAX_SERVICE_DESC_LENGTH = 200;
@@ -26,3 +28,9 @@ export const WEIGHT_CLASSES_QUERY_KEY = "weightClasses";
 
 //service configurations
 export const SERVICE_CONFIGURATIONS_QUERY_KEY = "serviceConfigurations";
+
+//appointments
+export const APPOINTMENTS_QUERY_KEY = "appointments";
+
+//stylists
+export const STYLISTS_QUERY_KEY = "stylists";

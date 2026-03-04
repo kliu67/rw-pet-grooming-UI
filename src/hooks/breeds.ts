@@ -1,6 +1,14 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createBreed, updateBreed, deleteBreed } from "@/api/breeds";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getBreeds, createBreed, updateBreed, deleteBreed } from "@/api/breeds";
 import { BREEDS_QUERY_KEY } from "@/constants";
+
+export function useBreeds() {
+  return useQuery({
+    queryKey: [BREEDS_QUERY_KEY],
+    queryFn: getBreeds
+  });
+}
+
 export function useCreateBreed() {
   const queryClient = useQueryClient();
 

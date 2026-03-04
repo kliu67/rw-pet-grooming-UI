@@ -1,6 +1,13 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createPet, updatePet, deletePet } from "@/api/pets";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getPets, createPet, updatePet, deletePet } from "@/api/pets";
 import { PETS_QUERY_KEY } from "@/constants";
+
+export function usePets() {
+  return useQuery({
+    queryKey: [PETS_QUERY_KEY],
+    queryFn: getPets
+  });
+}
 
 export function useCreatePet() {
   const queryClient = useQueryClient();

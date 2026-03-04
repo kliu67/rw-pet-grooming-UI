@@ -9,10 +9,6 @@ vi.mock("react-i18next", () => ({
   })
 }));
 
-vi.mock("@tanstack/react-query", () => ({
-  useQuery: vi.fn()
-}));
-
 const openModal = vi.fn();
 const closeModal = vi.fn();
 
@@ -26,8 +22,13 @@ vi.mock("@/components/modals/ModalProvider", () => ({
 const createMutateAsync = vi.fn();
 const updateMutateAsync = vi.fn();
 const deleteMutateAsync = vi.fn();
+const usePetsMock = vi.fn();
+const useClientsMock = vi.fn();
+const useBreedsMock = vi.fn();
+const useWeightClassesMock = vi.fn();
 
 vi.mock("@/hooks/pets", () => ({
+  usePets: () => usePetsMock(),
   useCreatePet: () => ({
     mutateAsync: createMutateAsync,
     isPending: false
@@ -42,8 +43,20 @@ vi.mock("@/hooks/pets", () => ({
   })
 }));
 
+vi.mock("@/hooks/clients", () => ({
+  useClients: () => useClientsMock()
+}));
+
+vi.mock("@/hooks/breeds", () => ({
+  useBreeds: () => useBreedsMock()
+}));
+
+vi.mock("@/hooks/weightClasses", () => ({
+  useWeightClasses: () => useWeightClassesMock()
+}));
+
 vi.mock("@/components/Table", () => ({
-  Table: ({ data, columns = [] }) => {
+  Table: ({ data = [], columns = [] }) => {
     const actionsCol = columns.find((c) => c.id === "actions");
 
     return (
@@ -128,8 +141,6 @@ const mockWeightClasses = [
   { id: 200, label: "Large" }
 ];
 
-import { useQuery } from "@tanstack/react-query";
-
 function mockAllQueries({
   petsData = mockPets,
   clientsData = mockClients,
@@ -144,27 +155,25 @@ function mockAllQueries({
   breedsError = null,
   weightClassesError = null
 } = {}) {
-  useQuery.mockImplementation(({ queryKey }) => {
-    const key = queryKey?.[0];
-
-    if (key === "pets") {
-      return { data: petsData, isLoading: petsIsLoading, error: petsError };
-    }
-    if (key === "clients") {
-      return { data: clientsData, isLoading: clientsIsLoading, error: clientsError };
-    }
-    if (key === "breeds") {
-      return { data: breedsData, isLoading: breedsIsLoading, error: breedsError };
-    }
-    if (key === "weightClasses") {
-      return {
-        data: weightClassesData,
-        isLoading: weightClassesIsLoading,
-        error: weightClassesError
-      };
-    }
-
-    return { data: [], isLoading: false, error: null };
+  usePetsMock.mockReturnValue({
+    data: petsData,
+    isLoading: petsIsLoading,
+    error: petsError
+  });
+  useClientsMock.mockReturnValue({
+    data: clientsData,
+    isLoading: clientsIsLoading,
+    error: clientsError
+  });
+  useBreedsMock.mockReturnValue({
+    data: breedsData,
+    isLoading: breedsIsLoading,
+    error: breedsError
+  });
+  useWeightClassesMock.mockReturnValue({
+    data: weightClassesData,
+    isLoading: weightClassesIsLoading,
+    error: weightClassesError
   });
 }
 

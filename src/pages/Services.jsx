@@ -3,18 +3,17 @@ import { Plus, Search } from "lucide-react";
 import {
   createColumnHelper,
 } from "@tanstack/react-table";
-import { useQuery } from "@tanstack/react-query";
-import { getServices } from "../api/services";
 import { useTranslation } from "react-i18next";
 import { useModal } from "@/components/modals/ModalProvider";
 import ServiceModal from "@/components/modals/ServiceModal";
 import { Table as ServiceTable } from "@/components/Table";
 import { MODAL_TYPES } from "@/components/modals/modalRegistry";
 import {
+  useServices,
   useCreateService,
   useUpdateService,
   useDeleteService
-} from "@/hooks/service";
+} from "@/hooks/services";
 import { RowActionsMenu } from "@/components/RowActionDropdown";
 
 const columnHelper = createColumnHelper();
@@ -35,10 +34,7 @@ export const Services = () => {
     data = [],
     isLoading,
     error
-  } = useQuery({
-    queryKey: ["services"],
-    queryFn: getServices
-  });
+  } = useServices();
 
   const serviceInputs = React.useMemo(
     () => ({

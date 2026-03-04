@@ -5,16 +5,12 @@ import {
 } from "lucide-react";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
-
-import { useQuery } from "@tanstack/react-query";
-import { getBreeds } from "../api/breeds";
 import { useModal } from "@/components/modals/ModalProvider.jsx";
 import { MODAL_TYPES } from "@/components/modals/modalRegistry.js";
 import { RowActionsMenu } from "@/components/RowActionDropdown";
 import { Table as BreedTable } from "@/components/Table";
-import { useCreateBreed, useUpdateBreed, useDeleteBreed } from "@/hooks/breeds";
+import { useBreeds,useCreateBreed, useUpdateBreed, useDeleteBreed } from "@/hooks/breeds";
 import BreedModal from "@/components/modals/BreedModal";
-import { BREEDS_QUERY_KEY } from "@/constants";
 
 const columnHelper = createColumnHelper();
 
@@ -33,10 +29,7 @@ export const Breeds = () => {
     data = [],
     isLoading,
     error
-  } = useQuery({
-    queryKey: [BREEDS_QUERY_KEY],
-    queryFn: getBreeds
-  });
+  } = useBreeds();
 
   //inputs
   const breedInputs = React.useMemo(

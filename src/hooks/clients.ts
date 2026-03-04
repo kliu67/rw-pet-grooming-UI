@@ -1,5 +1,13 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createClient, updateClient, deleteClient } from "@/api/clients";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createClient, updateClient, deleteClient, getClients } from "@/api/clients";
+import { CLIENTS_QUERY_KEY } from "@/constants";
+
+export function useClients() {
+  return useQuery({
+    queryKey: [CLIENTS_QUERY_KEY],
+    queryFn: getClients
+  });
+}
 
 export function useCreateClient() {
   const queryClient = useQueryClient();

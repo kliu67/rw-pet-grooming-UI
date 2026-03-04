@@ -1,20 +1,12 @@
 import React, { useState } from "react";
 import { Search } from "lucide-react";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useQuery } from "@tanstack/react-query";
-import { getServices } from "../api/services";
-import { getBreeds } from "@/api/breeds";
-import { getWeightClasses } from "@/api/weightClasses";
-import { getServiceConfigurations } from "../api/serviceConfigurations";
+import { useBreeds } from "@/hooks/breeds";
+import { useWeightClasses } from "@/hooks/weightClasses";
+import { useServiceConfigurations } from "@/hooks/serviceConfigurations";
+import { useServices } from "@/hooks/services";
 import { useTranslation } from "react-i18next";
 import { Table as ServiceTable } from "@/components/Table";
-
-import {
-  SERVICE_CONFIGURATIONS_QUERY_KEY,
-  SERVICES_QUERY_KEY,
-  BREEDS_QUERY_KEY,
-  WEIGHT_CLASSES_QUERY_KEY
-} from "@/constants";
 
 const columnHelper = createColumnHelper();
 
@@ -27,37 +19,25 @@ export const ServiceConfigurations = () => {
     data: serviceConfigurationsData = [],
     isLoading: serviceConfigurationsIsLoading,
     error: serviceConfigurationsError
-  } = useQuery({
-    queryKey: [SERVICE_CONFIGURATIONS_QUERY_KEY],
-    queryFn: getServiceConfigurations
-  });
+  } = useServiceConfigurations();
 
   const {
     data: servicesData = [],
     isLoading: servicesIsLoading,
     error: servicesError
-  } = useQuery({
-    queryKey: [SERVICES_QUERY_KEY],
-    queryFn: getServices
-  });
+  } = useServices();
 
   const {
     data: breedsData = [],
     isLoading: breedsIsLoading,
     error: breedsError
-  } = useQuery({
-    queryKey: [BREEDS_QUERY_KEY],
-    queryFn: getBreeds
-  });
+  } = useBreeds();
 
   const {
     data: weightClassesData = [],
     isLoading: weightClassesIsLoading,
     error: weightClassesError
-  } = useQuery({
-    queryKey: [WEIGHT_CLASSES_QUERY_KEY],
-    queryFn: getWeightClasses
-  });
+  } = useWeightClasses();
 
   const isLoading =
     serviceConfigurationsIsLoading ||

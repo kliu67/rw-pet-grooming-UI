@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createService, deleteService, updateService } from "@/api/services";
-import { useCreateService, useDeleteService, useUpdateService } from "./service";
+import { useCreateService, useDeleteService, useUpdateService } from "./services";
 
 vi.mock("@tanstack/react-query", () => ({
   useMutation: vi.fn(),
