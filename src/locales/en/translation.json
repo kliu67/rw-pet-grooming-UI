@@ -8,7 +8,8 @@
         "edit": "Edit",
         "update": "Update",
         "delete": "Delete",
-        "create": "Create"
+        "create": "Create",
+        "select": "Select"
     },
     "columns":{
         "id": "ID",
@@ -77,16 +78,16 @@
         "edit": "Edit client",
         "search": "Search clients...",
         "placeholderText": {
-            "first_name": "First name",
-            "last_name": "Last name",
+            "firstName": "First name",
+            "lastName": "Last name",
             "phone": "Phone",
             "email": "Email",
             "description": "Description"
         },
 
         "errors":{
-            "first_name": "First name length must be between 0 and \"{{max}}\" characters",
-            "last_name": "First name length must be between 0 and \"{{max}}\" characters",
+            "firstName": "First name length must be between 0 and \"{{max}}\" characters",
+            "lastName": "First name length must be between 0 and \"{{max}}\" characters",
             "phone": "phone length must be between 0 and \"{{max}}\" and consist of numbers and '-' only",
             "email": "Email length must be between 0 and \"{{max}}\" characters and be in valid format",
             "description": "Description cannot be longer than 200 characters.",
@@ -119,6 +120,32 @@
         "search": "Search configurations...",
         "errors":{
             "loading": "Error loading service configurations"
+        }
+    },
+    "appointments": {
+        "heading": "Appointments",
+        "subheading": "Manage appointments",
+        "search": "Search appointments...",
+        "add": "Add appointment",
+        "create": "Create appointment",
+        "edit": "Edit appointment",
+        "delete": "Delete appointment",
+        "errors":{
+            "notEmpty": "\"{{input}}\" field cannot be empty",
+            "loading": "Error loading appointments"
+        },
+        "displayName": {
+            "client": "Client",
+            "pet": "Pet",
+            "service": "Service",
+            "breed": "Breed",
+            "stylist": "Stylist"
+        },
+        "placeholderText": {
+            "client": "Select Client",
+            "pet": "Select Pet",
+            "service": "Select Service",
+            "breed": "Select Breed"
         }
     }
 }
