@@ -10,16 +10,24 @@
         "delete": "Delete",
         "create": "Create"
     },
+    "columns":{
+        "id": "ID",
+        "name": "Name",
+        "owner": "Owner",
+        "breed": "Breed",
+        "weightClass": "Weight Class",
+        "uuid": "UUID",
+        "service": "Service",
+        "isActive": "Active",
+        "price": "Price",
+        "duration": "Duration",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at"
+    },
     "DeleteModal":{
         "title" : "Delete {{entity}}",
         "confirmDelete": "Are you sure you want to delete the {{entity}} \"{{entity_name}}\"? To confirm, type the name of the service in the field below.",
         "warning": "Note: This action cannot be undone."
-    },
-    "species":{
-        "title": "Species",
-        "subtitle": "Manage your species",
-        "add": "Add species",
-        "search": "Search species..."
     },
     "services":{
         "heading": "Services",
@@ -63,7 +71,7 @@
 
     "clients": {
         "heading": "Clients",
-        "subheding": "Manage your clients",
+        "subheading": "Manage your clients",
         "add": "Add client",
         "create": "Create client",
         "edit": "Edit client",
@@ -84,6 +92,33 @@
             "description": "Description cannot be longer than 200 characters.",
             "notEmpty": "\"{{input}}\" field cannot be empty",
             "loading": "Error loading clients"
+        }
+    },
+    "pets":{
+        "heading": "Pets",
+        "subheading": "Manage your pets",
+        "add": "Add pet",
+        "create": "Create pet",
+        "edit": "Edit pet",
+        "search": "Search pets...",
+        "placeholderText": {
+            "name": "Name",
+            "owner": "Select owner",
+            "breed": "Select breed",
+            "weightClass": "Select weight class"
+        },
+        "errors":{
+            "nameLengthViolation": "Pet name length must be between 0 and \"{{max}}\" characters",
+            "notEmpty": "\"{{input}}\" field cannot be empty",
+            "loading": "Error loading pets"
+        }
+    },
+    "serviceConfigurations": {
+        "heading": "Service Configurations",
+        "subheading": "View service configurations",
+        "search": "Search configurations...",
+        "errors":{
+            "loading": "Error loading service configurations"
         }
     }
 }

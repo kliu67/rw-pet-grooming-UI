@@ -1,18 +1,17 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
-export async function getClients() {
-  const res = await fetch(`${API_URL}/api/users`);
+export async function getPets() {
+  const res = await fetch(`${API_URL}/api/pets`);
 
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.error || "Failed to fetch clients");
+    throw new Error(err.error || "Failed to fetch Pets");
   }
 
   return res.json();
 }
 
-export async function createClient(data) {
-  const res = await fetch(`${API_URL}/api/users`, {
+export async function createPet(data) {
+  const res = await fetch(`${API_URL}/api/pets`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -26,9 +25,9 @@ export async function createClient(data) {
   return res.json();
 }
 
-export async function updateClient(id, data) {
-  const res = await fetch(`${API_URL}/api/users/${id}`, {
-    method: "PUT", // or PATCH depending on backend
+export async function updatePet(id, data) {
+  const res = await fetch(`${API_URL}/api/pets/${id}`, {
+    method: "PATCH", // or PATCH depending on backend
     headers: {
       "Content-Type": "application/json",
     },
@@ -37,20 +36,20 @@ export async function updateClient(id, data) {
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
-    throw new Error(error?.message || "Failed to update client");
+    throw new Error(error?.message || "Failed to update pet");
   }
 
   return res.json();
 }
 
-export async function deleteClient(id) {
-  const res = await fetch(`${API_URL}/api/users/${id}`, {
+export async function deletePet(id) {
+  const res = await fetch(`${API_URL}/api/pets/${id}`, {
     method: "DELETE",
   });
 
   if (!res.ok) {
     const error = await res.json().catch(() => null);
-    throw new Error(error?.message || "Failed to delete client");
+    throw new Error(error?.message || "Failed to delete pet");
   }
 
   try {

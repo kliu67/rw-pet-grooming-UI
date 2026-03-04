@@ -9,10 +9,6 @@ vi.mock("react-i18next", () => ({
   })
 }));
 
-vi.mock("@tanstack/react-query", () => ({
-  useQuery: vi.fn()
-}));
-
 const openModal = vi.fn();
 const closeModal = vi.fn();
 
@@ -26,8 +22,10 @@ vi.mock("@/components/modals/ModalProvider", () => ({
 const createMutateAsync = vi.fn();
 const updateMutateAsync = vi.fn();
 const deleteMutateAsync = vi.fn();
+const useClientsMock = vi.fn();
 
 vi.mock("@/hooks/clients", () => ({
+  useClients: () => useClientsMock(),
   useCreateClient: () => ({
     mutateAsync: createMutateAsync,
     isPending: false
@@ -43,7 +41,7 @@ vi.mock("@/hooks/clients", () => ({
 }));
 
 vi.mock("@/components/Table", () => ({
-  Table: ({ data, columns = [] }) => {
+  Table: ({ data = [], columns = [] }) => {
     const actionsCol = columns.find((c) => c.id === "actions");
 
     return (
@@ -109,7 +107,17 @@ const mockClients = [
   }
 ];
 
-import { useQuery } from "@tanstack/react-query";
+function mockClientsQuery({
+  data = mockClients,
+  isLoading = false,
+  error = null
+} = {}) {
+  useClientsMock.mockReturnValue({
+    data,
+    isLoading,
+    error
+  });
+}
 
 describe("Clients", () => {
   beforeEach(() => {
@@ -117,25 +125,21 @@ describe("Clients", () => {
   });
 
   it("shows loading state", () => {
-    useQuery.mockReturnValue({ data: [], isLoading: true, error: null });
+    mockClientsQuery({ data: [], isLoading: true });
 
     render(<Clients />);
     expect(screen.getByText("general.loading")).toBeInTheDocument();
   });
 
   it("shows error state", () => {
-    useQuery.mockReturnValue({ data: [], isLoading: false, error: true });
+    mockClientsQuery({ data: [], error: true });
 
     render(<Clients />);
     expect(screen.getByText("clients.errors.loading")).toBeInTheDocument();
   });
 
   it("renders clients in table", () => {
-    useQuery.mockReturnValue({
-      data: mockClients,
-      isLoading: false,
-      error: null
-    });
+    mockClientsQuery();
 
     render(<Clients />);
     expect(screen.getByText("Jane Doe")).toBeInTheDocument();
@@ -143,11 +147,7 @@ describe("Clients", () => {
   });
 
   it("filters clients by search", () => {
-    useQuery.mockReturnValue({
-      data: mockClients,
-      isLoading: false,
-      error: null
-    });
+    mockClientsQuery();
 
     render(<Clients />);
     fireEvent.change(screen.getByPlaceholderText("Search clients..."), {
@@ -159,11 +159,7 @@ describe("Clients", () => {
   });
 
   it("submits create client", async () => {
-    useQuery.mockReturnValue({
-      data: mockClients,
-      isLoading: false,
-      error: null
-    });
+    mockClientsQuery();
 
     render(<Clients />);
     fireEvent.click(screen.getByText("clients.add"));
@@ -181,11 +177,7 @@ describe("Clients", () => {
   });
 
   it("submits edit client", async () => {
-    useQuery.mockReturnValue({
-      data: mockClients,
-      isLoading: false,
-      error: null
-    });
+    mockClientsQuery();
 
     render(<Clients />);
     fireEvent.click(screen.getAllByText("edit")[0]);
@@ -206,11 +198,7 @@ describe("Clients", () => {
   });
 
   it("opens and confirms delete modal", async () => {
-    useQuery.mockReturnValue({
-      data: mockClients,
-      isLoading: false,
-      error: null
-    });
+    mockClientsQuery();
 
     render(<Clients />);
     fireEvent.click(screen.getAllByText("delete")[0]);

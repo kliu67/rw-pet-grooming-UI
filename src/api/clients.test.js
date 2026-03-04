@@ -57,7 +57,7 @@ describe("api/clients", () => {
       json: vi.fn().mockRejectedValue(new Error("invalid json"))
     });
 
-    await expect(updateClient(1, { first_name: "Janet" })).rejects.toThrow("Failed to update service");
+    await expect(updateClient(1, { first_name: "Janet" })).rejects.toThrow("Failed to update client");
     expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/users/1", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },

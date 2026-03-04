@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import { Plus, Search } from "lucide-react";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useQuery } from "@tanstack/react-query";
-import { createClient, deleteClient, getClients } from "../api/clients";
 import { useTranslation } from "react-i18next";
 import { useModal } from "@/components/modals/ModalProvider";
 import ClientModal from "@/components/modals/ClientModal";
 import { Table as ClientTable } from "@/components/Table";
 import { MODAL_TYPES } from "@/components/modals/modalRegistry";
 import {
+  useClients,
   useCreateClient,
   useUpdateClient,
   useDeleteClient
@@ -33,10 +32,7 @@ export const Clients = () => {
     data = [],
     isLoading,
     error
-  } = useQuery({
-    queryKey: ["clients"],
-    queryFn: getClients
-  });
+  } = useClients();
 
   const clientInputs = React.useMemo(
     () => ({

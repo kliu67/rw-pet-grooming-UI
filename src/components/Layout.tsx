@@ -1,5 +1,5 @@
-import React from 'react';
-import { Outlet, NavLink, useLocation } from 'react-router';
+import React from "react";
+import { Outlet, NavLink, useLocation } from "react-router";
 import {
   LayoutDashboard,
   Calendar,
@@ -7,19 +7,33 @@ import {
   Scissors,
   LogOut,
   Menu,
-} from 'lucide-react';
-import { useState } from 'react';
-import { cn } from '../lib/utils'; // Assuming utility exists or I'll create it
+  Dog,
+  File
+} from "lucide-react";
+import { useState } from "react";
+import { cn } from "../lib/utils"; // Assuming utility exists or I'll create it
 
-const Sidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+const Sidebar = ({
+  isOpen,
+  onClose
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) => {
   const location = useLocation();
 
   const navItems = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-    { name: 'Appointments', path: '/appointments', icon: Calendar },
-    { name: 'Clients', path: '/clients', icon: Users },
-    { name: 'Services', path: '/services', icon: Scissors },
-    { name: 'Species', path: '/species', icon: Scissors },
+    { name: "Dashboard", path: "/", icon: LayoutDashboard },
+    { name: "Appointments", path: "/appointments", icon: Calendar },
+    { name: "Clients", path: "/clients", icon: Users },
+    { name: "Services", path: "/services", icon: Scissors },
+    {
+      name: "Service Configurations",
+      path: "/serviceConfigurations",
+      icon: File
+    },
+    { name: "Breeds", path: "/breeds", icon: Scissors },
+    { name: "Pets", path: "/pets", icon: Dog }
   ];
 
   return (
