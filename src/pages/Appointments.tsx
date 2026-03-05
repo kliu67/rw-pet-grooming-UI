@@ -166,10 +166,10 @@ export const Appointments = () => {
         displayName: t("appointments.displayName.service"),
         placeholder: t("appointments.placeholderText.service")
       },
-        breed: {
-        name: "breed",
-        displayName: t("appointments.displayName.breed"),
-        placeholder: t("appointments.placeholderText.breed")
+        stylist: {
+        name: "stylist",
+        displayName: t("appointments.displayName.stylist"),
+        placeholder: t("appointments.placeholderText.stylist")
       }
     }),
     [t]
@@ -485,6 +485,7 @@ export const Appointments = () => {
             isLoading={isSubmitting}
             configs={configsData}
             clients={clientsData}
+            services={servicesData}
             breeds={breedsData}
             pets={petsData}
             stylists={stylistsData}

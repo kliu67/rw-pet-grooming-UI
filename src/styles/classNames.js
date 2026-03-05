@@ -1,0 +1,1 @@
+export const DROPDOWN_BUTTON = "inline-flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-60" ;

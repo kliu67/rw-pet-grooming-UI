@@ -1,7 +1,7 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export async function getServiceConfigurations() {
-  const res = await fetch(`${API_URL}/api/serviceConfigurations`);
+  const res = await fetch(`${API_URL}/api/serviceConfigurations/all`);
 
   if (!res.ok) {
     const err = await res.json();

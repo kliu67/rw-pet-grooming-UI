@@ -1,6 +1,5 @@
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState, useEffect, useMemo, useCallback } from "react";
 import { Search } from "lucide-react";
-
 import { useTranslation } from "react-i18next";
 import { MAX_PET_NAME_LENGTH } from "@/constants";
 import {
@@ -10,6 +9,13 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
+
+import { DROPDOWN_BUTTON } from "@/styles/classNames";
+import { getNameLexicalOrder, getNameStandard } from "@/utils";
+import { useAvailabiltyById } from "@/hooks/availability";
+import { useTimeOffById } from "@/hooks/timeOffs";
+import { getOpenTimeRanges, useOpenTimeRanges } from "@/hooks/openTimeRanges";
+import { Calendar } from "../ui/calendar";
 
 export const DropdownSearch = ({ searchTerm, onChange }) => {
   return (
@@ -34,6 +40,7 @@ export default function AppointmentModal({
   mode,
   onSubmit,
   configs,
+  services,
   clients,
   breeds,
   pets,
@@ -46,17 +53,31 @@ export default function AppointmentModal({
   const [isDirty, setIsDirty] = useState(false);
   const [errors, setErrors] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
-
-  const { t } = useTranslation();
   const [serverError, setServerError] = useState(null);
-
+  const [petsById, setPetsById] = useState(pets);
+  const [appointmentAt, setAppointmentAt] = useState();
+  const [date, setDate] = useState();
+  const [stylistId, setStylistId] = useState();
+  const [calendarMonth, setCalendarMonth] = useState(new Date());
+  const { t } = useTranslation();
   const isEdit = mode === "edit";
   const hasValidationErrors = errors.name;
-
   const modalTexts = {
     heading: isEdit ? t("pets.edit") : t("pets.create"),
     primaryButtonLabel: isEdit ? t("general.update") : t("general.create")
   };
+
+  const filteredServices = services.filter(
+    (service) =>
+      service.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredStylists = stylists.filter(
+    (stylist) =>
+      stylist.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      stylist.last_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const filteredClients = clients.filter(
     (client) =>
@@ -64,16 +85,28 @@ export default function AppointmentModal({
       client.last_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredPets = pets.filter(
-    (pet) => pet.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredPets = petsById.filter((pet) =>
+    pet.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  //   const filteredBreeds = breeds.filter((breed) =>
-  //     breed.name.toLowerCase().includes(searchTerm.toLowerCase())
-  //   );
-  //   const filteredWeightClasses = weightClassData.filter((wc) =>
-  //     wc.label?.toLowerCase().includes(searchTerm.toLowerCase())
-  //   );
+  //queries
+  const {
+    data: availabilityData = [],
+    isLoading: availabilityIsLoading,
+    error: availabilityError
+  } = useAvailabiltyById(stylistId);
+
+  const {
+    data: timeOffsData = [],
+    isLoading: timeOffsIsLoading,
+    error: timeOffsError
+  } = useTimeOffById(stylistId);
+
+  const openTimeRanges = useOpenTimeRanges({
+    availabilityData,
+    timeOffsData,
+    date
+  });
 
   const validateFields = (field, value) => {
     if (isDirty) {
@@ -126,6 +159,77 @@ export default function AppointmentModal({
     // );
   };
 
+  function getDaysInMonth(year, monthIndex) {
+    var date = new Date(year, monthIndex, 1);
+    var days = [];
+    while (date.getMonth() === monthIndex) {
+      days.push(new Date(date)); // Push a copy of the date object
+      date.setDate(date.getDate() + 1);
+    }
+    return days;
+  }
+  const monthAvailability = useMemo(() => {
+    if (!availabilityData?.length) return [];
+
+    const thisMonth = calendarMonth.getMonth();
+    const thisYear = calendarMonth.getFullYear();
+
+    return getDaysInMonth(thisYear, thisMonth).map((day) =>
+      getOpenTimeRanges({
+        availabilityData,
+        timeOffsData,
+        date: day
+      }),
+    );
+  }, [availabilityData, timeOffsData, calendarMonth]);
+
+  const monthBookableDates = useMemo(() => {
+    if (!availabilityData?.length) return new Set();
+
+    const thisMonth = calendarMonth.getMonth();
+    const thisYear = calendarMonth.getFullYear();
+    const monthDays = getDaysInMonth(thisYear, thisMonth);
+
+    return new Set(
+      monthDays
+        .filter((_, index) => monthAvailability[index]?.length > 0)
+        .map((day) => day.toDateString()),
+    );
+  }, [availabilityData, calendarMonth, monthAvailability]);
+
+  const isDateDisabled = useCallback(
+    (day) => {
+      if (!form.stylist) return true;
+
+      const todayDate = new Date();
+      const normalizedToday = new Date(
+        todayDate.getFullYear(),
+        todayDate.getMonth(),
+        todayDate.getDate(),
+      );
+      const normalizedDay = new Date(day.getFullYear(), day.getMonth(), day.getDate());
+
+      if (normalizedDay < normalizedToday) return true;
+
+      if (availabilityIsLoading || timeOffsIsLoading || availabilityError || timeOffsError) {
+        return false;
+      }
+
+      if (!availabilityData?.length) return true;
+
+      return !monthBookableDates.has(normalizedDay.toDateString());
+    },
+    [
+      form.stylist,
+      availabilityIsLoading,
+      timeOffsIsLoading,
+      availabilityError,
+      timeOffsError,
+      availabilityData,
+      monthBookableDates
+    ],
+  );
+  
   const canSubmit =
     !isLoading &&
     !hasValidationErrors &&
@@ -187,109 +291,215 @@ export default function AppointmentModal({
         >
           {/* Header */}
 
-          {/* client */}
-          <div className="mt-4 mb-4">
-            <label className="mr-2" htmlFor="client">{inputs.client.displayName}</label>
-            {/* {errors.first_name && touched.first_name && (
+          {/* service */}
+          <div className="flex">
+            <div className="mt-4 mb-4 w-1/2">
+              <label className="mr-2" htmlFor="pet">
+                {inputs.service.displayName}
+              </label>
+              <DropdownMenu id="service">
+                <DropdownMenuTrigger asChild>
+                  <button className={DROPDOWN_BUTTON}>
+                    {form.service ? form.service.name : t("general.select")}{" "}
+                    <span aria-hidden="true">&#9662;</span>
+                  </button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="end">
+                  {filteredServices.map((service) => (
+                    <Fragment key={service.id}>
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setForm((prev) => ({
+                            ...prev,
+                            service
+                          }));
+                        }}
+                      >
+                        {service.name}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </Fragment>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {/* stylist */}
+            <div className="mt-4 mb-4 w-1/2">
+              <label className="mr-2" htmlFor="stylist">
+                {inputs.stylist.displayName}
+              </label>
+              <DropdownMenu id="stylist">
+                <DropdownMenuTrigger asChild>
+                  <button className={DROPDOWN_BUTTON}>
+                    {form.stylist
+                      ? getNameStandard(form.stylist)
+                      : t("general.select")}{" "}
+                    <span aria-hidden="true">&#9662;</span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownSearch
+                    searchTerm={searchTerm}
+                    onChange={handleSearchChange}
+                  ></DropdownSearch>
+                  {filteredStylists.map((stylist) => (
+                    <Fragment key={stylist.id}>
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setForm((prev) => ({
+                            ...prev,
+                            stylist
+                          }));
+                          setStylistId(stylist.id);
+                        }}
+                      >
+                        {getNameStandard(stylist)}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </Fragment>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+
+          <div className="flex">
+            {/* client */}
+            <div className="mt-4 mb-4 w-1/2">
+              <label className="mr-2" htmlFor="client">
+                {inputs.client.displayName}
+              </label>
+              {/* {errors.first_name && touched.first_name && (
               <p className="text-sm text-red-600 mt-1">{errors.first_name}</p>
-            )} */}
-            <DropdownMenu id="client">
-              <DropdownMenuTrigger asChild>
-                <button className="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-                  {form.client
-                    ? `${form.client.last_name}, ${form.client.first_name}`
-                    : t('general.select')}{" "}
-                  <span aria-hidden="true">&#9662;</span>
-                </button>
-              </DropdownMenuTrigger>
+              )} */}
+              <DropdownMenu id="client">
+                <DropdownMenuTrigger asChild>
+                  <button className={DROPDOWN_BUTTON}>
+                    {form.client
+                      ? getNameLexicalOrder(form.client)
+                      : t("general.select")}{" "}
+                    <span aria-hidden="true">&#9662;</span>
+                  </button>
+                </DropdownMenuTrigger>
 
-              <DropdownMenuContent align="end">
-                <DropdownSearch
-                  searchTerm={searchTerm}
-                  onChange={handleSearchChange}
-                ></DropdownSearch>
-                {filteredClients.map((client) => (
-                  <Fragment key={client.id}>
-                    <DropdownMenuItem
-                      onSelect={() => {
-                        setForm((prev) => ({
-                          ...prev,
-                          client: client
-                        }));
-                      }}
-                    >{`${client.last_name}, ${client.first_name}`}</DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </Fragment>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <DropdownMenuContent align="end">
+                  <DropdownSearch
+                    searchTerm={searchTerm}
+                    onChange={handleSearchChange}
+                  ></DropdownSearch>
+                  {filteredClients.map((client) => (
+                    <Fragment key={client.id}>
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setForm((prev) => ({
+                            ...prev,
+                            client: client
+                          }));
+                          setPetsById(
+                            pets.filter((pet) => pet.owner === client.id)
+                          );
+                        }}
+                      >
+                        {getNameLexicalOrder(client)}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </Fragment>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {/* pet */}
+            <div className="mt-4 mb-4 w-1/2">
+              <label className="mr-2" htmlFor="pet">
+                {inputs.pet.displayName}
+              </label>
+              <DropdownMenu id="pet">
+                <DropdownMenuTrigger disabled={!form?.client} asChild>
+                  <button className={DROPDOWN_BUTTON} disabled={!form?.client}>
+                    {form.pet ? form.pet.name : t("general.select")}{" "}
+                    <span aria-hidden="true">&#9662;</span>
+                  </button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="end">
+                  <DropdownSearch
+                    searchTerm={searchTerm}
+                    onChange={handleSearchChange}
+                  ></DropdownSearch>
+                  {filteredPets.map((pet) => (
+                    <Fragment key={pet.id}>
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setForm((prev) => ({
+                            ...prev,
+                            pet: pet
+                          }));
+                        }}
+                      >
+                        {pet.name}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </Fragment>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
-          <div className="mt-4 mb-4">
-            <label className="mr-2" htmlFor="pet">{inputs.pet.displayName}</label>
-            <DropdownMenu id="pet">
-              <DropdownMenuTrigger asChild>
-                <button className="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-                  {form.pet ? form.pet.name : t('general.select')}{" "}
-                  <span aria-hidden="true">&#9662;</span>
-                </button>
-              </DropdownMenuTrigger>
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            month={calendarMonth}
+            onMonthChange={setCalendarMonth}
+            className="rounded-md border"
+            disabled={isDateDisabled}
+          />
+          {date && (
+            <div className="mt-4 rounded-md border p-3">
+              <p className="text-sm font-medium mb-2">Open time ranges</p>
 
-              <DropdownMenuContent align="end">
-                <DropdownSearch
-                  searchTerm={searchTerm}
-                  onChange={handleSearchChange}
-                ></DropdownSearch>
-                {filteredPets.map((pet) => (
-                  <Fragment key={pet.id}>
-                    <DropdownMenuItem
-                      onSelect={() => {
-                        setForm((prev) => ({
-                          ...prev,
-                          pet: pet
-                        }));
-                      }}
-                    >
-                      {pet.name}
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </Fragment>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+              {(availabilityIsLoading || timeOffsIsLoading) && (
+                <p className="text-sm text-gray-500">Loading availability...</p>
+              )}
 
-          {/* <div className="mt-4 mb-4">
-            <DropdownMenu id="weightClass">
-              <DropdownMenuTrigger asChild>
-                <button className="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-                  {form.weightClass
-                    ? form.weightClass.label
-                    : inputs.weightClass.placeholder}{" "}
-                  <span aria-hidden="true">&#9662;</span>
-                </button>
-              </DropdownMenuTrigger>
+              {(availabilityError || timeOffsError) && (
+                <p className="text-sm text-red-600">
+                  Failed to load availability data.
+                </p>
+              )}
 
-              <DropdownMenuContent align="end">
-                {filteredWeightClasses.map((wc) => (
-                  <Fragment key={wc.id}>
-                    <DropdownMenuItem
-                      onSelect={() => {
-                        setForm((prev) => ({
-                          ...prev,
-                          weightClass: wc
-                        }));
-                      }}
-                    >
-                      {wc.label}
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </Fragment>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div> */}
+              {!availabilityIsLoading &&
+                !timeOffsIsLoading &&
+                !availabilityError &&
+                !timeOffsError &&
+                openTimeRanges.length === 0 && (
+                  <p className="text-sm text-gray-500">
+                    No open ranges for this date.
+                  </p>
+                )}
 
+              {!availabilityIsLoading &&
+                !timeOffsIsLoading &&
+                !availabilityError &&
+                !timeOffsError &&
+                openTimeRanges.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {openTimeRanges.map((range) => (
+                      <span
+                        key={`${range.start}-${range.end}`}
+                        className="text-xs bg-gray-100 px-2 py-1 rounded-md"
+                      >
+                        {range.start} - {range.end}
+                      </span>
+                    ))}
+                  </div>
+                )}
+            </div>
+          )}
           {/* Server Error */}
           {serverError && (
             <p className="text-red-500 text-sm mb-2">

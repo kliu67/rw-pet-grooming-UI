@@ -34,3 +34,9 @@ export const APPOINTMENTS_QUERY_KEY = "appointments";
 
 //stylists
 export const STYLISTS_QUERY_KEY = "stylists";
+
+//availability
+export const AVAILABILITY_QUERY_KEY = "avaialability";
+
+//time-offs
+export const TIMEOFFS_QUERY_KEY = "timeOffs";
