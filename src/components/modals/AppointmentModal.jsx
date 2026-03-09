@@ -16,6 +16,10 @@ import { useAvailabiltyById } from "@/hooks/availability";
 import { useTimeOffById } from "@/hooks/timeOffs";
 import { getOpenTimeRanges, useOpenTimeRanges } from "@/hooks/openTimeRanges";
 import { Calendar } from "../ui/calendar";
+import {
+  computeDateTimeIntervals,
+  computeIntervals
+} from "@/hooks/timeIntervals";
 
 export const DropdownSearch = ({ searchTerm, onChange }) => {
   return (
@@ -49,7 +53,11 @@ export default function AppointmentModal({
 }) {
   //States
   const [form, setForm] = useState({});
-  const [touched, setTouched] = useState({});
+  const [client, setClient] = useState();
+  const [pet, setPet] = useState();
+  const [stylist, setStylist] = useState();
+  const [service, setService] = useState();
+  const [touched, setTouched] = useState();
   const [isDirty, setIsDirty] = useState(false);
   const [errors, setErrors] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
@@ -59,6 +67,8 @@ export default function AppointmentModal({
   const [date, setDate] = useState();
   const [stylistId, setStylistId] = useState();
   const [calendarMonth, setCalendarMonth] = useState(new Date());
+  const [timeIntervals, setTimeIntervals] = useState([]);
+  const [config, setConfig] = useState();
   const { t } = useTranslation();
   const isEdit = mode === "edit";
   const hasValidationErrors = errors.name;
@@ -179,7 +189,7 @@ export default function AppointmentModal({
         availabilityData,
         timeOffsData,
         date: day
-      }),
+      })
     );
   }, [availabilityData, timeOffsData, calendarMonth]);
 
@@ -193,25 +203,34 @@ export default function AppointmentModal({
     return new Set(
       monthDays
         .filter((_, index) => monthAvailability[index]?.length > 0)
-        .map((day) => day.toDateString()),
+        .map((day) => day.toDateString())
     );
   }, [availabilityData, calendarMonth, monthAvailability]);
 
   const isDateDisabled = useCallback(
     (day) => {
-      if (!form.stylist) return true;
+      if (!stylist) return true;
 
       const todayDate = new Date();
       const normalizedToday = new Date(
         todayDate.getFullYear(),
         todayDate.getMonth(),
-        todayDate.getDate(),
+        todayDate.getDate()
       );
-      const normalizedDay = new Date(day.getFullYear(), day.getMonth(), day.getDate());
+      const normalizedDay = new Date(
+        day.getFullYear(),
+        day.getMonth(),
+        day.getDate()
+      );
 
       if (normalizedDay < normalizedToday) return true;
 
-      if (availabilityIsLoading || timeOffsIsLoading || availabilityError || timeOffsError) {
+      if (
+        availabilityIsLoading ||
+        timeOffsIsLoading ||
+        availabilityError ||
+        timeOffsError
+      ) {
         return false;
       }
 
@@ -227,9 +246,9 @@ export default function AppointmentModal({
       timeOffsError,
       availabilityData,
       monthBookableDates
-    ],
+    ]
   );
-  
+
   const canSubmit =
     !isLoading &&
     !hasValidationErrors &&
@@ -256,6 +275,41 @@ export default function AppointmentModal({
     setServerError(null);
   }, []);
 
+  useEffect(() => {
+    if (service && pet) {
+      setConfig(
+        ...configs.filter(
+          (c) =>
+            c.breed_id === pet.breed &&
+            c.service_id === service.id &&
+            c.weight_class_id === pet.weight_class_id
+        )
+      );
+    }
+  }, [service, pet]);
+
+  useEffect(() => {
+    if (config) {
+      setForm((prev) => ({
+        ...prev,
+        service_configuration_id: config.id
+      }));
+    }
+  }, [config]);
+
+  useEffect(() => {
+    if (openTimeRanges && date && config) {
+      console.log(openTimeRanges);
+      // openTimeRanges.forEach((range) => computeIntervals(range, date, 90));
+      setTimeIntervals(
+        ...openTimeRanges.map((range) =>
+          // computeIntervals(range, date, config.duration_minutes)
+          computeDateTimeIntervals(range, date, config.duration_minutes)
+        )
+      );
+    }
+  }, [date]);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
@@ -265,28 +319,31 @@ export default function AppointmentModal({
       <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-xl p-6">
         <form
           onSubmit={async (e) => {
-            // e.preventDefault();
-            // if (!canSubmit) return;
-            // let delta = {};
-            // if (petData?.name !== form?.name?.trim()) {
-            //   delta.name = form.name.trim();
-            // }
-            // if (petData?.owner?.id !== form?.owner?.id) {
-            //   delta.owner = form.owner.id;
-            // }
-            // if (petData?.breed?.id !== form?.breed?.id) {
-            //   delta.breed = form.breed.id;
-            // }
-            // if (petData?.weightClass?.id !== form.weightClass?.id) {
-            //   delta.weightClassId = form.weightClass.id;
-            // }
-            // try {
-            //   await onSubmit(delta);
-            //   setServerError(null);
-            //   onClose();
-            // } catch (err) {
-            //   setServerError(err);
-            // }
+            e.preventDefault();
+            if (!canSubmit) return;
+            let delta = {};
+            if (appointment?.client_id !== form?.client_id) {
+              delta.client_id = form?.client_id
+            }
+            if (appointment?.pet_id !== form?.pet_id) {
+              delta.pet_id = form?.pet_id
+            }
+            if (appointment?.service_id !== form?.service_id) {
+              delta.service_id = form?.service_id
+            }
+            if (appointment?.service_configuration_id !== form?.service_configuration_id) {
+              delta.service_configuration_id = form?.service_configuration_id
+            }
+            if (appointment?.stylist_id !== form?.stylist_id) {
+              delta.stylist_id = form?.stylist_id
+            }
+            try {
+              await onSubmit(delta);
+              setServerError(null);
+              onClose();
+            } catch (err) {
+              setServerError(err);
+            }
           }}
         >
           {/* Header */}
@@ -300,7 +357,7 @@ export default function AppointmentModal({
               <DropdownMenu id="service">
                 <DropdownMenuTrigger asChild>
                   <button className={DROPDOWN_BUTTON}>
-                    {form.service ? form.service.name : t("general.select")}{" "}
+                    {service ? service.name : t("general.select")}{" "}
                     <span aria-hidden="true">&#9662;</span>
                   </button>
                 </DropdownMenuTrigger>
@@ -310,9 +367,10 @@ export default function AppointmentModal({
                     <Fragment key={service.id}>
                       <DropdownMenuItem
                         onSelect={() => {
+                          setService(service);
                           setForm((prev) => ({
                             ...prev,
-                            service
+                            service_id: service.id
                           }));
                         }}
                       >
@@ -333,9 +391,7 @@ export default function AppointmentModal({
               <DropdownMenu id="stylist">
                 <DropdownMenuTrigger asChild>
                   <button className={DROPDOWN_BUTTON}>
-                    {form.stylist
-                      ? getNameStandard(form.stylist)
-                      : t("general.select")}{" "}
+                    {stylist ? getNameStandard(stylist) : t("general.select")}{" "}
                     <span aria-hidden="true">&#9662;</span>
                   </button>
                 </DropdownMenuTrigger>
@@ -348,9 +404,10 @@ export default function AppointmentModal({
                     <Fragment key={stylist.id}>
                       <DropdownMenuItem
                         onSelect={() => {
+                          setStylist(stylist);
                           setForm((prev) => ({
                             ...prev,
-                            stylist
+                            stylist_id: stylist.id
                           }));
                           setStylistId(stylist.id);
                         }}
@@ -371,19 +428,13 @@ export default function AppointmentModal({
               <label className="mr-2" htmlFor="client">
                 {inputs.client.displayName}
               </label>
-              {/* {errors.first_name && touched.first_name && (
-              <p className="text-sm text-red-600 mt-1">{errors.first_name}</p>
-              )} */}
               <DropdownMenu id="client">
                 <DropdownMenuTrigger asChild>
                   <button className={DROPDOWN_BUTTON}>
-                    {form.client
-                      ? getNameLexicalOrder(form.client)
-                      : t("general.select")}{" "}
+                    {client ? getNameLexicalOrder(client) : t("general.select")}{" "}
                     <span aria-hidden="true">&#9662;</span>
                   </button>
                 </DropdownMenuTrigger>
-
                 <DropdownMenuContent align="end">
                   <DropdownSearch
                     searchTerm={searchTerm}
@@ -393,9 +444,10 @@ export default function AppointmentModal({
                     <Fragment key={client.id}>
                       <DropdownMenuItem
                         onSelect={() => {
+                          setClient(client);
                           setForm((prev) => ({
                             ...prev,
-                            client: client
+                            client_id: client.id
                           }));
                           setPetsById(
                             pets.filter((pet) => pet.owner === client.id)
@@ -417,13 +469,12 @@ export default function AppointmentModal({
                 {inputs.pet.displayName}
               </label>
               <DropdownMenu id="pet">
-                <DropdownMenuTrigger disabled={!form?.client} asChild>
-                  <button className={DROPDOWN_BUTTON} disabled={!form?.client}>
-                    {form.pet ? form.pet.name : t("general.select")}{" "}
+                <DropdownMenuTrigger disabled={!client} asChild>
+                  <button className={DROPDOWN_BUTTON} disabled={!client}>
+                    {pet ? pet.name : t("general.select")}{" "}
                     <span aria-hidden="true">&#9662;</span>
                   </button>
                 </DropdownMenuTrigger>
-
                 <DropdownMenuContent align="end">
                   <DropdownSearch
                     searchTerm={searchTerm}
@@ -433,9 +484,10 @@ export default function AppointmentModal({
                     <Fragment key={pet.id}>
                       <DropdownMenuItem
                         onSelect={() => {
+                          setPet(pet);
                           setForm((prev) => ({
                             ...prev,
-                            pet: pet
+                            pet_id: pet.id
                           }));
                         }}
                       >
@@ -448,58 +500,80 @@ export default function AppointmentModal({
               </DropdownMenu>
             </div>
           </div>
-
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            month={calendarMonth}
-            onMonthChange={setCalendarMonth}
-            className="rounded-md border"
-            disabled={isDateDisabled}
-          />
-          {date && (
-            <div className="mt-4 rounded-md border p-3">
-              <p className="text-sm font-medium mb-2">Open time ranges</p>
-
-              {(availabilityIsLoading || timeOffsIsLoading) && (
-                <p className="text-sm text-gray-500">Loading availability...</p>
-              )}
-
-              {(availabilityError || timeOffsError) && (
-                <p className="text-sm text-red-600">
-                  Failed to load availability data.
-                </p>
-              )}
-
-              {!availabilityIsLoading &&
-                !timeOffsIsLoading &&
-                !availabilityError &&
-                !timeOffsError &&
-                openTimeRanges.length === 0 && (
-                  <p className="text-sm text-gray-500">
-                    No open ranges for this date.
-                  </p>
-                )}
-
-              {!availabilityIsLoading &&
-                !timeOffsIsLoading &&
-                !availabilityError &&
-                !timeOffsError &&
-                openTimeRanges.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {openTimeRanges.map((range) => (
-                      <span
-                        key={`${range.start}-${range.end}`}
-                        className="text-xs bg-gray-100 px-2 py-1 rounded-md"
-                      >
-                        {range.start} - {range.end}
-                      </span>
-                    ))}
-                  </div>
-                )}
+          <div class="flex">
+            <div className="w-1/2">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                month={calendarMonth}
+                onMonthChange={setCalendarMonth}
+                className="rounded-md border"
+                disabled={isDateDisabled}
+              />
             </div>
-          )}
+            <div className="w-1/2">
+              {date && (
+                <div className="rounded-md border p-3">
+                  <p className="text-sm font-medium mb-2">Open time ranges</p>
+
+                  {(availabilityIsLoading || timeOffsIsLoading) && (
+                    <p className="text-sm text-gray-500">
+                      Loading availability...
+                    </p>
+                  )}
+
+                  {(availabilityError || timeOffsError) && (
+                    <p className="text-sm text-red-600">
+                      Failed to load availability data.
+                    </p>
+                  )}
+
+                  {!availabilityIsLoading &&
+                    !timeOffsIsLoading &&
+                    !availabilityError &&
+                    !timeOffsError &&
+                    openTimeRanges.length === 0 && (
+                      <p className="text-sm text-gray-500">
+                        No open ranges for this date.
+                      </p>
+                    )}
+
+                  {!availabilityIsLoading &&
+                    !timeOffsIsLoading &&
+                    !availabilityError &&
+                    !timeOffsError &&
+                    openTimeRanges.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {/* {openTimeRanges.map((range) => (
+                          <span
+                            key={`${range.start}-${range.end}`}
+                            className="text-xs bg-gray-100 px-2 py-1 rounded-md"
+                          >
+                            {range.start} - {range.end}
+                          </span>
+                        ))} */}
+                        {timeIntervals?.length > 0 &&
+                          timeIntervals.map((time) => (
+                            <div className="w-full">
+                              <button
+                                type="button"
+                                className={DROPDOWN_BUTTON}
+                                onClick={() => {
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    startTime: time.start
+                                  }));
+                                }}
+                              >{`${time.startString} - ${time.endString}`}</button>
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                </div>
+              )}
+            </div>
+          </div>
           {/* Server Error */}
           {serverError && (
             <p className="text-red-500 text-sm mb-2">

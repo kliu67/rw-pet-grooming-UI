@@ -10,7 +10,7 @@ export async function getTimeOffs() {
   return res.json();
 }
 
-export async function getTimeOffById(id) {
+export async function getTimeOffByStylistId(id) {
   const res = await fetch(`${API_URL}/api/timeOffs/stylist/${id}`);
 
   if (!res.ok) {
