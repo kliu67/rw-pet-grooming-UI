@@ -1,5 +1,6 @@
 //
 export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+export const INTERVAL_MINUTES = 10;
 //service constants
 export const MAX_SERVICE_NAME_LENGTH = 60;
 export const MAX_SERVICE_DESC_LENGTH = 200;

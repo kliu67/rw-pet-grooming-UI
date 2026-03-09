@@ -1,7 +1,7 @@
 import { Fragment, useState, useEffect, useMemo, useCallback } from "react";
 import { Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { MAX_PET_NAME_LENGTH } from "@/constants";
+import { MAX_PET_NAME_LENGTH, INTERVAL_MINUTES } from "@/constants";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -66,7 +66,7 @@ export default function AppointmentModal({
   const [date, setDate] = useState();
   const [timeSelected, setTimeSelected] = useState('');
   const [calendarMonth, setCalendarMonth] = useState(new Date());
-  const [timeIntervals, setTimeIntervals] = useState([]);
+  // const [timeIntervals, setTimeIntervals] = useState([]);
   const [config, setConfig] = useState('');
   const { t } = useTranslation();
   const isEdit = mode === "edit";
@@ -260,24 +260,8 @@ export default function AppointmentModal({
     form.breed &&
     ((mode === "edit" && hasChanges(form)) || mode === "create");
 
-  // ---------- Reset form when editing another row ----------
-  useEffect(() => {
-    setForm({
-      //   name: petData?.name || "",
-      //   owner: petData?.owner || "",
-      //   breed: petData?.breed || "",
-      //   weightClass: petData?.weightClass || ""
-    });
-    setErrors({
-      name: "",
-      owner: "",
-      breed: "",
-      weightClass: ""
-    });
 
-    setServerError(null);
-  }, []);
-
+  //sets a new service config whenever service or pet changes
   useEffect(() => {
     if (service && pet) {
       setConfig(
@@ -288,31 +272,37 @@ export default function AppointmentModal({
             c.weight_class_id === pet.weight_class_id
         )
       );
-    }
-    else setConfig('');
-  }, [service, pet, client]);
-
-  useEffect(() => {
-    if (config) {
       setForm((prev) => ({
         ...prev,
         service_configuration_id: config.id
       }));
-    }
-  }, [config]);
 
-  useEffect(() => {
-    if (openTimeRanges && date && config) {
-      console.log(openTimeRanges);
-      // openTimeRanges.forEach((range) => computeIntervals(range, date, 90));
-      setTimeIntervals(
-        ...openTimeRanges.map((range) =>
-          // computeIntervals(range, date, config.duration_minutes)
-          computeDateTimeIntervals(range, date, config.duration_minutes)
-        )
-      );
     }
-  }, [config, date]);
+    else setConfig('');
+  }, [service, pet, client]);
+
+  //whenever config, date or stylist changes, compute new date time intervals;
+  const timeIntervals = useMemo(() => {
+  if (!openTimeRanges || !date || !config) return [];
+
+  return openTimeRanges.flatMap((range) =>
+    computeDateTimeIntervals(
+      range,
+      date,
+      config.duration_minutes,
+      INTERVAL_MINUTES
+    )
+  );
+}, [openTimeRanges, date, config]);
+  // useEffect(() => {
+  //   if (openTimeRanges && date && config) {
+  //     setTimeIntervals(
+  //       ...openTimeRanges.map((range) =>
+  //         computeDateTimeIntervals(range, date, config.duration_minutes, INTERVAL_MINUTES)
+  //       )
+  //     );
+  //   }
+  // }, [config, date, stylist]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -321,7 +311,7 @@ export default function AppointmentModal({
 
       {/* Modal */}
       {/* <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-xl p-6"> */}
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[85vh] flex flex-col">
+      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col">
 
         {/* Header */}
         <div className="px-6 py-4 border-b">
@@ -384,7 +374,7 @@ export default function AppointmentModal({
                           onSelect={() => {
                             if (serv.id !== service?.id) {
                               setService(serv);
-                                setForm((prev) => {
+                              setForm((prev) => {
                                 const { startTime, ...rest } = prev;
                                 return {
                                   ...rest,
@@ -540,7 +530,7 @@ export default function AppointmentModal({
             </div>
             {/* calendar */}
             <div className="flex gap-4">
-              <div className="w-1/2 flex-shrink-0">
+              <div className="w-2/5 flex-shrink-0">
                 <Calendar
                   mode="single"
                   selected={date}
@@ -551,10 +541,18 @@ export default function AppointmentModal({
                   disabled={isDateDisabled}
                 />
               </div>
-              <div className="w-1/2">
+              <div className="w-3/5">
                 {date && (
                   <div className="rounded-md border p-3 h-[300px] overflow-y-auto">
                     <p className="text-sm font-medium mb-2">Open time ranges</p>
+                    {openTimeRanges.map((range) => (
+                      <p
+                        key={`${range.start}-${range.end}`}
+                        className="text-xs bg-gray-100 px-2 py-1 rounded-md"
+                      >
+                        {range.start} - {range.end}
+                      </p>
+                    ))}
 
                     {(availabilityIsLoading || timeOffsIsLoading) && (
                       <p className="text-sm text-gray-500">
@@ -577,17 +575,17 @@ export default function AppointmentModal({
                           No open ranges for this date.
                         </p>
                       )}
-
                     {!availabilityIsLoading &&
                       !timeOffsIsLoading &&
                       !availabilityError &&
                       !timeOffsError &&
                       openTimeRanges.length > 0 && (
                         <div className="flex flex-wrap gap-2 overflow-y-auto">
+
+
                           {timeIntervals?.length > 0 &&
                             timeIntervals.map((time) => (
-                              <div className={`px-3 py-2 rounded-md border text-left 
-                                              ${isTimeDisabled ? TIME_BTN_DISABLED : TIME_BTN_ACTIVE} 
+                              <div className={`${isTimeDisabled ? TIME_BTN_DISABLED : TIME_BTN_ACTIVE} 
                                 ${timeSelected === time.start
                                   ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-200"
                                   : "bg-white hover:bg-gray-100"}`}>
@@ -611,7 +609,7 @@ export default function AppointmentModal({
                                       }));
                                     }
                                   }}
-                                >{`${time.startString} - ${time.endString}`}</button>
+                                >{`${time.startStrAMPM} - ${time.endStrAMPM}`}</button>
                               </div>
                             ))}
                         </div>

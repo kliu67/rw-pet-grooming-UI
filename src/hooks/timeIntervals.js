@@ -46,46 +46,58 @@ export const computeIntervals = (timeRange, date, intMinutes) => {
 
 
 const toHourString = (date) => {
-    let hour = date.getHours();
-    return hour < 10? `0${hour}` : `${hour}`
+  let hour = date.getHours();
+  return hour < 10 ? `0${hour}` : `${hour}`
 }
 
 const toMinuteString = (date) => {
-    let minute = date.getMinutes();
-    return minute < 10? `0${minute}` : `${minute}`;
+  let minute = date.getMinutes();
+  return minute < 10 ? `0${minute}` : `${minute}`;
 }
-export const computeDateTimeIntervals = (timeRange, date, intMinutes) => {
+export const computeDateTimeIntervals = (timeRange, date, durationMinutes, intervalMinutes) => {
   const { start, end } = timeRange;
-  let startTimeMin =
+  let rangeStart =
     date.getHours() * 60 +
     date.getMinutes() +
     Number(start.substring(0, 2)) * 60 +
     Number(start.substring(3, 5));
-  let endTimeMin =
+  let rangeEnd =
     date.getHours() * 60 +
     date.getMinutes() +
     Number(end.substring(0, 2)) * 60 +
     Number(end.substring(3, 5));
+  
 
   const intervals = [];
-  while ((endTimeMin - startTimeMin) >= intMinutes) {
 
-    let start = new Date(date);
-    start.setHours(Math.trunc(startTimeMin / 60));
-    start.setMinutes(startTimeMin % 60);
+    while ((rangeEnd - rangeStart) >= durationMinutes) {
 
-    let end = new Date(date);
-    end.setHours(Math.trunc((startTimeMin + intMinutes) / 60));
-    end.setMinutes((startTimeMin + intMinutes) % 60);
+      let start = new Date(date);
+      start.setHours(Math.trunc(rangeStart / 60));
+      start.setMinutes(rangeStart % 60);
 
-    let interval = {
-      start, end,
-      startString: `${toHourString(start)}:${toMinuteString(start)}`,
-      endString: `${toHourString(end)}:${toMinuteString(end)}`
-    };
-    intervals.push(interval);
-    startTimeMin += intMinutes;
-  }
+      let end = new Date(date);
+      end.setHours(Math.trunc((rangeStart + durationMinutes) / 60));
+      end.setMinutes((rangeStart + durationMinutes) % 60);
+
+      let interval = {
+        start, end,
+        startStr24Hr: `${toHourString(start)}:${toMinuteString(start)}`,
+        endStr24Hr: `${toHourString(end)}:${toMinuteString(end)}`,
+        startStrAMPM: computeAMPMTimeString(start),
+        endStrAMPM: computeAMPMTimeString(end)
+        
+      };
+      intervals.push(interval);
+      rangeStart += intervalMinutes;
+    }
+
 
   return intervals;
 };
+
+export const computeAMPMTimeString = (date) => {
+  const hour = date.getHours();
+  const minute = date.getMinutes();
+  return `${toHourString(date)}:${toMinuteString(date)}${hour >= 12? 'PM':'AM'}`;
+}
