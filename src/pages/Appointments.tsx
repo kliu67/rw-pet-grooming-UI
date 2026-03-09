@@ -240,7 +240,7 @@ export const Appointments = () => {
       });
     }
 
-    return createPetMutation.mutateAsync(formData);
+    return createAppMutation.mutateAsync(formData);
   };
 
   const columns = React.useMemo(

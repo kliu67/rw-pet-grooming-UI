@@ -9,8 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
-
-import { DROPDOWN_BUTTON } from "@/styles/classNames";
+import { DROPDOWN_BUTTON, TIME_BTN_ACTIVE, TIME_BTN_DISABLED } from "@/styles/classNames";
 import { getNameLexicalOrder, getNameStandard } from "@/utils";
 import { useAvailabiltyById } from "@/hooks/availability";
 import { useTimeOffById } from "@/hooks/timeOffs";
@@ -65,10 +64,10 @@ export default function AppointmentModal({
   const [petsById, setPetsById] = useState(pets);
   const [appointmentAt, setAppointmentAt] = useState();
   const [date, setDate] = useState();
-  const [stylistId, setStylistId] = useState();
+  const [timeSelected, setTimeSelected] = useState('');
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [timeIntervals, setTimeIntervals] = useState([]);
-  const [config, setConfig] = useState();
+  const [config, setConfig] = useState('');
   const { t } = useTranslation();
   const isEdit = mode === "edit";
   const hasValidationErrors = errors.name;
@@ -104,13 +103,13 @@ export default function AppointmentModal({
     data: availabilityData = [],
     isLoading: availabilityIsLoading,
     error: availabilityError
-  } = useAvailabiltyById(stylistId);
+  } = useAvailabiltyById(stylist?.id);
 
   const {
     data: timeOffsData = [],
     isLoading: timeOffsIsLoading,
     error: timeOffsError
-  } = useTimeOffById(stylistId);
+  } = useTimeOffById(stylist?.id);
 
   const openTimeRanges = useOpenTimeRanges({
     availabilityData,
@@ -207,9 +206,10 @@ export default function AppointmentModal({
     );
   }, [availabilityData, calendarMonth, monthAvailability]);
 
+  const isTimeDisabled = !stylist || !config;
   const isDateDisabled = useCallback(
     (day) => {
-      if (!stylist) return true;
+      if (isTimeDisabled) return true;
 
       const todayDate = new Date();
       const normalizedToday = new Date(
@@ -239,7 +239,10 @@ export default function AppointmentModal({
       return !monthBookableDates.has(normalizedDay.toDateString());
     },
     [
-      form.stylist,
+      stylist,
+      pet,
+      service,
+      config,
       availabilityIsLoading,
       timeOffsIsLoading,
       availabilityError,
@@ -286,7 +289,8 @@ export default function AppointmentModal({
         )
       );
     }
-  }, [service, pet]);
+    else setConfig('');
+  }, [service, pet, client]);
 
   useEffect(() => {
     if (config) {
@@ -308,7 +312,7 @@ export default function AppointmentModal({
         )
       );
     }
-  }, [date]);
+  }, [config, date]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -316,8 +320,17 @@ export default function AppointmentModal({
       <div className="absolute inset-0 bg-black/50" />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-xl p-6">
+      {/* <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-xl p-6"> */}
+      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[85vh] flex flex-col">
+
+        {/* Header */}
+        <div className="px-6 py-4 border-b">
+          <h2 className="text-lg font-semibold">
+            {modalTexts.title}
+          </h2>
+        </div>
         <form
+          className="flex-1 overflow-y-auto px-6 py-4"
           onSubmit={async (e) => {
             e.preventDefault();
             if (!canSubmit) return;
@@ -348,243 +361,278 @@ export default function AppointmentModal({
         >
           {/* Header */}
 
-          {/* service */}
-          <div className="flex">
-            <div className="mt-4 mb-4 w-1/2">
-              <label className="mr-2" htmlFor="pet">
-                {inputs.service.displayName}
-              </label>
-              <DropdownMenu id="service">
-                <DropdownMenuTrigger asChild>
-                  <button className={DROPDOWN_BUTTON}>
-                    {service ? service.name : t("general.select")}{" "}
-                    <span aria-hidden="true">&#9662;</span>
-                  </button>
-                </DropdownMenuTrigger>
+          <div className="flex-1 overflow-y-auto">
 
-                <DropdownMenuContent align="end">
-                  {filteredServices.map((service) => (
-                    <Fragment key={service.id}>
-                      <DropdownMenuItem
-                        onSelect={() => {
-                          setService(service);
-                          setForm((prev) => ({
-                            ...prev,
-                            service_id: service.id
-                          }));
-                        }}
-                      >
-                        {service.name}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </Fragment>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <div className="flex">
+              {/* service */}
+              <div className="mt-4 mb-4 w-1/2">
+                <label className="mr-2" htmlFor="pet">
+                  {inputs.service.displayName}
+                </label>
+                <DropdownMenu id="service">
+                  <DropdownMenuTrigger asChild>
+                    <button className={DROPDOWN_BUTTON}>
+                      {service ? service.name : t("general.select")}{" "}
+                      <span aria-hidden="true">&#9662;</span>
+                    </button>
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent align="end">
+                    {filteredServices.map((serv) => (
+                      <Fragment key={serv.id}>
+                        <DropdownMenuItem
+                          onSelect={() => {
+                            if (serv.id !== service?.id) {
+                              setService(serv);
+                                setForm((prev) => {
+                                const { startTime, ...rest } = prev;
+                                return {
+                                  ...rest,
+                                  service_id: serv.id
+                                }; // startTime and pet removed
+                              });
+                            }
+                          }}
+                        >
+                          {serv.name}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </Fragment>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              {/* stylist */}
+              <div className="mt-4 mb-4 w-1/2">
+                <label className="mr-2" htmlFor="stylist">
+                  {inputs.stylist.displayName}
+                </label>
+                <DropdownMenu id="stylist">
+                  <DropdownMenuTrigger asChild>
+                    <button className={DROPDOWN_BUTTON}>
+                      {stylist ? getNameStandard(stylist) : t("general.select")}{" "}
+                      <span aria-hidden="true">&#9662;</span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownSearch
+                      searchTerm={searchTerm}
+                      onChange={handleSearchChange}
+                    ></DropdownSearch>
+                    {filteredStylists.map((sty) => (
+                      <Fragment key={sty.id}>
+                        <DropdownMenuItem
+                          onSelect={() => {
+                            if (sty.id !== stylist?.id) {
+                              setStylist(sty);
+                              setForm((prev) => {
+                                const { startTime, ...rest } = prev;
+                                return {
+                                  ...rest,
+                                  stylist_id: sty.id
+                                }; // startTime and pet removed
+                              });
+                            }
+                          }}
+                        >
+                          {getNameStandard(sty)}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </Fragment>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
 
-            {/* stylist */}
-            <div className="mt-4 mb-4 w-1/2">
-              <label className="mr-2" htmlFor="stylist">
-                {inputs.stylist.displayName}
-              </label>
-              <DropdownMenu id="stylist">
-                <DropdownMenuTrigger asChild>
-                  <button className={DROPDOWN_BUTTON}>
-                    {stylist ? getNameStandard(stylist) : t("general.select")}{" "}
-                    <span aria-hidden="true">&#9662;</span>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownSearch
-                    searchTerm={searchTerm}
-                    onChange={handleSearchChange}
-                  ></DropdownSearch>
-                  {filteredStylists.map((stylist) => (
-                    <Fragment key={stylist.id}>
-                      <DropdownMenuItem
-                        onSelect={() => {
-                          setStylist(stylist);
-                          setForm((prev) => ({
-                            ...prev,
-                            stylist_id: stylist.id
-                          }));
-                          setStylistId(stylist.id);
-                        }}
-                      >
-                        {getNameStandard(stylist)}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </Fragment>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <div className="flex">
+              {/* client */}
+              <div className="mt-4 mb-4 w-1/2">
+                <label className="mr-2" htmlFor="client">
+                  {inputs.client.displayName}
+                </label>
+                <DropdownMenu id="client">
+                  <DropdownMenuTrigger asChild>
+                    <button className={DROPDOWN_BUTTON}>
+                      {client ? getNameLexicalOrder(client) : t("general.select")}{" "}
+                      <span aria-hidden="true">&#9662;</span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownSearch
+                      searchTerm={searchTerm}
+                      onChange={handleSearchChange}
+                    ></DropdownSearch>
+                    {filteredClients.map((cl) => (
+                      <Fragment key={cl.id}>
+                        <DropdownMenuItem
+                          onSelect={() => {
+                            if (cl.id !== client?.id) {
+                              setClient(cl);
+                              setPet('');
+                              setPetsById(
+                                pets.filter((pet) => pet.owner === cl.id)
+                              );
+                              setForm((prev) => {
+                                const { startTime, pet_id, ...rest } = prev;
+                                return {
+                                  ...rest,
+                                  client_id: cl.id
+                                }; // startTime and pet removed
+                              });
+                            }
+                          }}
+                        >
+                          {getNameLexicalOrder(cl)}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </Fragment>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              {/* pet */}
+              <div className="mt-4 mb-4 w-1/2">
+                <label className="mr-2" htmlFor="pet">
+                  {inputs.pet.displayName}
+                </label>
+                <DropdownMenu id="pet">
+                  <DropdownMenuTrigger disabled={!client} asChild>
+                    <button className={DROPDOWN_BUTTON} disabled={!client}>
+                      {pet ? pet.name : t("general.select")}{" "}
+                      <span aria-hidden="true">&#9662;</span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownSearch
+                      searchTerm={searchTerm}
+                      onChange={handleSearchChange}
+                    ></DropdownSearch>
+                    {filteredPets.map((p) => (
+                      <Fragment key={p.id}>
+                        <DropdownMenuItem
+                          onSelect={() => {
+                            //clear startimte
+                            if (p.id !== pet?.id) {
+                              setTimeSelected('');
+                              setPet(p);
+                              setForm((prev) => {
+                                const { startTime, ...rest } = prev;
+                                return {
+                                  ...rest,
+                                  pet_id: p.id
+                                }; // startTime removed
+                              });
+                            }
+                          }
+                          }
+                        >
+                          {p.name}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </Fragment>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
-          </div>
+            {/* calendar */}
+            <div className="flex gap-4">
+              <div className="w-1/2 flex-shrink-0">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  month={calendarMonth}
+                  onMonthChange={setCalendarMonth}
+                  className="rounded-md border"
+                  disabled={isDateDisabled}
+                />
+              </div>
+              <div className="w-1/2">
+                {date && (
+                  <div className="rounded-md border p-3 h-[300px] overflow-y-auto">
+                    <p className="text-sm font-medium mb-2">Open time ranges</p>
 
-          <div className="flex">
-            {/* client */}
-            <div className="mt-4 mb-4 w-1/2">
-              <label className="mr-2" htmlFor="client">
-                {inputs.client.displayName}
-              </label>
-              <DropdownMenu id="client">
-                <DropdownMenuTrigger asChild>
-                  <button className={DROPDOWN_BUTTON}>
-                    {client ? getNameLexicalOrder(client) : t("general.select")}{" "}
-                    <span aria-hidden="true">&#9662;</span>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownSearch
-                    searchTerm={searchTerm}
-                    onChange={handleSearchChange}
-                  ></DropdownSearch>
-                  {filteredClients.map((client) => (
-                    <Fragment key={client.id}>
-                      <DropdownMenuItem
-                        onSelect={() => {
-                          setClient(client);
-                          setForm((prev) => ({
-                            ...prev,
-                            client_id: client.id
-                          }));
-                          setPetsById(
-                            pets.filter((pet) => pet.owner === client.id)
-                          );
-                        }}
-                      >
-                        {getNameLexicalOrder(client)}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </Fragment>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            {/* pet */}
-            <div className="mt-4 mb-4 w-1/2">
-              <label className="mr-2" htmlFor="pet">
-                {inputs.pet.displayName}
-              </label>
-              <DropdownMenu id="pet">
-                <DropdownMenuTrigger disabled={!client} asChild>
-                  <button className={DROPDOWN_BUTTON} disabled={!client}>
-                    {pet ? pet.name : t("general.select")}{" "}
-                    <span aria-hidden="true">&#9662;</span>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownSearch
-                    searchTerm={searchTerm}
-                    onChange={handleSearchChange}
-                  ></DropdownSearch>
-                  {filteredPets.map((pet) => (
-                    <Fragment key={pet.id}>
-                      <DropdownMenuItem
-                        onSelect={() => {
-                          setPet(pet);
-                          setForm((prev) => ({
-                            ...prev,
-                            pet_id: pet.id
-                          }));
-                        }}
-                      >
-                        {pet.name}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </Fragment>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-          <div class="flex">
-            <div className="w-1/2">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                month={calendarMonth}
-                onMonthChange={setCalendarMonth}
-                className="rounded-md border"
-                disabled={isDateDisabled}
-              />
-            </div>
-            <div className="w-1/2">
-              {date && (
-                <div className="rounded-md border p-3">
-                  <p className="text-sm font-medium mb-2">Open time ranges</p>
-
-                  {(availabilityIsLoading || timeOffsIsLoading) && (
-                    <p className="text-sm text-gray-500">
-                      Loading availability...
-                    </p>
-                  )}
-
-                  {(availabilityError || timeOffsError) && (
-                    <p className="text-sm text-red-600">
-                      Failed to load availability data.
-                    </p>
-                  )}
-
-                  {!availabilityIsLoading &&
-                    !timeOffsIsLoading &&
-                    !availabilityError &&
-                    !timeOffsError &&
-                    openTimeRanges.length === 0 && (
+                    {(availabilityIsLoading || timeOffsIsLoading) && (
                       <p className="text-sm text-gray-500">
-                        No open ranges for this date.
+                        Loading availability...
                       </p>
                     )}
 
-                  {!availabilityIsLoading &&
-                    !timeOffsIsLoading &&
-                    !availabilityError &&
-                    !timeOffsError &&
-                    openTimeRanges.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {/* {openTimeRanges.map((range) => (
-                          <span
-                            key={`${range.start}-${range.end}`}
-                            className="text-xs bg-gray-100 px-2 py-1 rounded-md"
-                          >
-                            {range.start} - {range.end}
-                          </span>
-                        ))} */}
-                        {timeIntervals?.length > 0 &&
-                          timeIntervals.map((time) => (
-                            <div className="w-full">
-                              <button
-                                type="button"
-                                className={DROPDOWN_BUTTON}
-                                onClick={() => {
-                                  setForm((prev) => ({
-                                    ...prev,
-                                    startTime: time.start
-                                  }));
-                                }}
-                              >{`${time.startString} - ${time.endString}`}</button>
-                            </div>
-                          ))}
-                      </div>
+                    {(availabilityError || timeOffsError) && (
+                      <p className="text-sm text-red-600">
+                        Failed to load availability data.
+                      </p>
                     )}
-                </div>
-              )}
+
+                    {!availabilityIsLoading &&
+                      !timeOffsIsLoading &&
+                      !availabilityError &&
+                      !timeOffsError &&
+                      openTimeRanges.length === 0 && (
+                        <p className="text-sm text-gray-500">
+                          No open ranges for this date.
+                        </p>
+                      )}
+
+                    {!availabilityIsLoading &&
+                      !timeOffsIsLoading &&
+                      !availabilityError &&
+                      !timeOffsError &&
+                      openTimeRanges.length > 0 && (
+                        <div className="flex flex-wrap gap-2 overflow-y-auto">
+                          {timeIntervals?.length > 0 &&
+                            timeIntervals.map((time) => (
+                              <div className={`px-3 py-2 rounded-md border text-left 
+                                              ${isTimeDisabled ? TIME_BTN_DISABLED : TIME_BTN_ACTIVE} 
+                                ${timeSelected === time.start
+                                  ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-200"
+                                  : "bg-white hover:bg-gray-100"}`}>
+                                <button
+                                  type="button"
+                                  // disabled={isDateDisabled}
+                                  disabled={!stylist || !config}
+                                  onClick={() => {
+                                    if (timeSelected === time.start) {
+                                      setTimeSelected('');
+                                      setForm((prev) => {
+                                        const { startTime, ...rest } = prev;
+                                        return rest; // startTime removed
+                                      });
+                                    }
+                                    else {
+                                      setTimeSelected(time.start);
+                                      setForm((prev) => ({
+                                        ...prev,
+                                        startTime: time.start
+                                      }));
+                                    }
+                                  }}
+                                >{`${time.startString} - ${time.endString}`}</button>
+                              </div>
+                            ))}
+                        </div>
+                      )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-          {/* Server Error */}
-          {serverError && (
-            <p className="text-red-500 text-sm mb-2">
-              {serverError?.error ||
-                serverError?.message ||
-                "Failed to save pet"}
-            </p>
-          )}
+
 
           {/* Footer */}
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2 px-6 py-4 border-t">
+            {/* Server Error */}
+            {serverError && (
+              <p className="text-red-500 text-sm mb-2">
+                {serverError?.error ||
+                  serverError?.message ||
+                  "Failed to save pet"}
+              </p>
+            )}
             <button
               type="button"
               onClick={onClose}
