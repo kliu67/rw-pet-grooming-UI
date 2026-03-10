@@ -10,3 +10,13 @@ export const isValidEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
+
+export const getNameLexicalOrder = (person) => {
+  const{first_name, last_name} = person;
+  return [last_name, first_name].filter(Boolean).join(", ") || "-";
+}
+
+export const getNameStandard = (person) =>{
+  const {first_name, last_name} = person;
+  return [first_name, last_name].filter(Boolean).join(" ") || "-";
+} 

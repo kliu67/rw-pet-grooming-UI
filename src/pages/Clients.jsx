@@ -40,15 +40,15 @@ export const Clients = () => {
         id: "clients-first_name",
         name: "first_name",
         displayName: "First Name",
-        placeholder: t("clients.placeholderText.first_name"),
-        errorMsg: t("clients.errors.first_name")
+        placeholder: t("clients.placeholderText.firstName"),
+        errorMsg: t("clients.errors.firstName")
       },
       last_name: {
         id: "clients-last_name",
         name: "last_name",
         displayName: "Last Name",
-        placeholder: t("clients.placeholderText.last_name"),
-        errorMsg: t("clients.errors.last_name")
+        placeholder: t("clients.placeholderText.lastName"),
+        errorMsg: t("clients.errors.lastName")
       },
       phone: {
         id: "clients-phone",
