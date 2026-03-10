@@ -9,7 +9,8 @@
         "update": "Update",
         "delete": "Delete",
         "create": "Create",
-        "select": "Select"
+        "select": "Select",
+        "remarks": "Remarks"
     },
     "columns":{
         "id": "ID",
@@ -139,13 +140,16 @@
             "pet": "Pet",
             "service": "Service",
             "breed": "Breed",
-            "stylist": "Stylist"
+            "stylist": "Stylist",
+            "date": "Date",
+            "time": "Time"
         },
         "placeholderText": {
             "client": "Select Client",
             "pet": "Select Pet",
             "service": "Select Service",
-            "breed": "Select Breed"
+            "breed": "Select Breed",
+            "remarks": "Enter Remarks"
         }
     }
 }

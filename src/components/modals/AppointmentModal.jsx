@@ -9,33 +9,22 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
-import { DROPDOWN_BUTTON, TIME_BTN_ACTIVE, TIME_BTN_DISABLED } from "@/styles/classNames";
+import {
+  DROPDOWN_BUTTON,
+  TIME_BTN_ACTIVE,
+  TIME_BTN_DISABLED
+} from "@/styles/classNames";
 import { getNameLexicalOrder, getNameStandard } from "@/utils";
 import { useAvailabiltyById } from "@/hooks/availability";
 import { useTimeOffById } from "@/hooks/timeOffs";
 import { getOpenTimeRanges, useOpenTimeRanges } from "@/hooks/openTimeRanges";
 import { Calendar } from "../ui/calendar";
+import { DropdownSearch } from "../DrowndownSearch";
 import {
   computeDateTimeIntervals,
-  computeIntervals
+  getDaysInMonth
 } from "@/hooks/timeIntervals";
 
-export const DropdownSearch = ({ searchTerm, onChange }) => {
-  return (
-    <div className="p-4 border-b border-gray-200 flex flex-col sm:flex-row gap-4 justify-between items-center">
-      <div className="relative w-full sm:w-96">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-        <input
-          type="text"
-          placeholder="search..."
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-          value={searchTerm}
-          onChange={(e) => onChange(e)}
-        />
-      </div>
-    </div>
-  );
-};
 export default function AppointmentModal({
   onClose,
   inputs,
@@ -52,23 +41,23 @@ export default function AppointmentModal({
 }) {
   //States
   const [form, setForm] = useState({});
+  const [service, setService] = useState();
+  const [stylist, setStylist] = useState();
   const [client, setClient] = useState();
   const [pet, setPet] = useState();
-  const [stylist, setStylist] = useState();
-  const [service, setService] = useState();
+  const [config, setConfig] = useState("");
+  const [date, setDate] = useState();
   const [touched, setTouched] = useState();
   const [isDirty, setIsDirty] = useState(false);
   const [errors, setErrors] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [serverError, setServerError] = useState(null);
   const [petsById, setPetsById] = useState(pets);
-  const [appointmentAt, setAppointmentAt] = useState();
-  const [date, setDate] = useState();
-  const [timeSelected, setTimeSelected] = useState('');
+  const [timeSelected, setTimeSelected] = useState("");
   const [calendarMonth, setCalendarMonth] = useState(new Date());
-  // const [timeIntervals, setTimeIntervals] = useState([]);
-  const [config, setConfig] = useState('');
+
   const { t } = useTranslation();
+
   const isEdit = mode === "edit";
   const hasValidationErrors = errors.name;
   const modalTexts = {
@@ -168,15 +157,6 @@ export default function AppointmentModal({
     // );
   };
 
-  function getDaysInMonth(year, monthIndex) {
-    var date = new Date(year, monthIndex, 1);
-    var days = [];
-    while (date.getMonth() === monthIndex) {
-      days.push(new Date(date)); // Push a copy of the date object
-      date.setDate(date.getDate() + 1);
-    }
-    return days;
-  }
   const monthAvailability = useMemo(() => {
     if (!availabilityData?.length) return [];
 
@@ -205,6 +185,20 @@ export default function AppointmentModal({
         .map((day) => day.toDateString())
     );
   }, [availabilityData, calendarMonth, monthAvailability]);
+
+  //whenever config, date or stylist changes, compute new date time intervals;
+  const timeIntervals = useMemo(() => {
+    if (!openTimeRanges || !date || !config) return [];
+
+    return openTimeRanges.flatMap((range) =>
+      computeDateTimeIntervals(
+        range,
+        date,
+        config.duration_minutes,
+        INTERVAL_MINUTES
+      )
+    );
+  }, [openTimeRanges, date, config, stylist]);
 
   const isTimeDisabled = !stylist || !config;
   const isDateDisabled = useCallback(
@@ -255,54 +249,34 @@ export default function AppointmentModal({
   const canSubmit =
     !isLoading &&
     !hasValidationErrors &&
-    form.name &&
-    form.owner &&
-    form.breed &&
+    form.client_id &&
+    form.pet_id &&
+    form.stylist_id &&
+    form.service_configuration_id &&
+    form.service_id &&
+    form.startTime &&
     ((mode === "edit" && hasChanges(form)) || mode === "create");
-
 
   //sets a new service config whenever service or pet changes
   useEffect(() => {
     if (service && pet) {
-      setConfig(
-        ...configs.filter(
-          (c) =>
-            c.breed_id === pet.breed &&
-            c.service_id === service.id &&
-            c.weight_class_id === pet.weight_class_id
-        )
+      const matchedConfig = configs.find(
+        (c) =>
+          c.breed_id === pet.breed &&
+          c.service_id === service.id &&
+          c.weight_class_id === pet.weight_class_id
       );
-      setForm((prev) => ({
-        ...prev,
-        service_configuration_id: config.id
-      }));
 
-    }
-    else setConfig('');
+      if (matchedConfig) {
+        setConfig(matchedConfig);
+
+        setForm((prev) => ({
+          ...prev,
+          service_configuration_id: matchedConfig.id
+        }));
+      }
+    } else setConfig("");
   }, [service, pet, client]);
-
-  //whenever config, date or stylist changes, compute new date time intervals;
-  const timeIntervals = useMemo(() => {
-  if (!openTimeRanges || !date || !config) return [];
-
-  return openTimeRanges.flatMap((range) =>
-    computeDateTimeIntervals(
-      range,
-      date,
-      config.duration_minutes,
-      INTERVAL_MINUTES
-    )
-  );
-}, [openTimeRanges, date, config]);
-  // useEffect(() => {
-  //   if (openTimeRanges && date && config) {
-  //     setTimeIntervals(
-  //       ...openTimeRanges.map((range) =>
-  //         computeDateTimeIntervals(range, date, config.duration_minutes, INTERVAL_MINUTES)
-  //       )
-  //     );
-  //   }
-  // }, [config, date, stylist]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -311,13 +285,10 @@ export default function AppointmentModal({
 
       {/* Modal */}
       {/* <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-xl p-6"> */}
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col">
-
+      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[85vh] flex flex-col">
         {/* Header */}
         <div className="px-6 py-4 border-b">
-          <h2 className="text-lg font-semibold">
-            {modalTexts.title}
-          </h2>
+          <h2 className="text-lg font-semibold">{modalTexts.title}</h2>
         </div>
         <form
           className="flex-1 overflow-y-auto px-6 py-4"
@@ -326,19 +297,30 @@ export default function AppointmentModal({
             if (!canSubmit) return;
             let delta = {};
             if (appointment?.client_id !== form?.client_id) {
-              delta.client_id = form?.client_id
+              delta.client_id = form?.client_id;
             }
             if (appointment?.pet_id !== form?.pet_id) {
-              delta.pet_id = form?.pet_id
+              delta.pet_id = form?.pet_id;
             }
             if (appointment?.service_id !== form?.service_id) {
-              delta.service_id = form?.service_id
+              delta.service_id = form?.service_id;
             }
-            if (appointment?.service_configuration_id !== form?.service_configuration_id) {
-              delta.service_configuration_id = form?.service_configuration_id
+            if (
+              appointment?.service_configuration_id !==
+              form?.service_configuration_id
+            ) {
+              delta.service_configuration_id = form?.service_configuration_id;
             }
             if (appointment?.stylist_id !== form?.stylist_id) {
-              delta.stylist_id = form?.stylist_id
+              delta.stylist_id = form?.stylist_id;
+            }
+
+            if (appointment?.start_time !== form?.startTime) {
+              delta.start_time = form?.startTime;
+            }
+
+            if (appointment?.description !== form?.description) {
+              delta.description = form?.description;
             }
             try {
               await onSubmit(delta);
@@ -352,10 +334,9 @@ export default function AppointmentModal({
           {/* Header */}
 
           <div className="flex-1 overflow-y-auto">
-
             <div className="flex">
               {/* service */}
-              <div className="mt-4 mb-4 w-1/2">
+              <div className="mt-4 mb-4 w-1/4">
                 <label className="mr-2" htmlFor="pet">
                   {inputs.service.displayName}
                 </label>
@@ -394,7 +375,7 @@ export default function AppointmentModal({
               </div>
 
               {/* stylist */}
-              <div className="mt-4 mb-4 w-1/2">
+              <div className="mt-4 mb-4 w-1/4">
                 <label className="mr-2" htmlFor="stylist">
                   {inputs.stylist.displayName}
                 </label>
@@ -434,18 +415,18 @@ export default function AppointmentModal({
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-            </div>
 
-            <div className="flex">
               {/* client */}
-              <div className="mt-4 mb-4 w-1/2">
+              <div className="mt-4 mb-4 w-1/4">
                 <label className="mr-2" htmlFor="client">
                   {inputs.client.displayName}
                 </label>
                 <DropdownMenu id="client">
                   <DropdownMenuTrigger asChild>
                     <button className={DROPDOWN_BUTTON}>
-                      {client ? getNameLexicalOrder(client) : t("general.select")}{" "}
+                      {client
+                        ? getNameLexicalOrder(client)
+                        : t("general.select")}{" "}
                       <span aria-hidden="true">&#9662;</span>
                     </button>
                   </DropdownMenuTrigger>
@@ -460,7 +441,7 @@ export default function AppointmentModal({
                           onSelect={() => {
                             if (cl.id !== client?.id) {
                               setClient(cl);
-                              setPet('');
+                              setPet("");
                               setPetsById(
                                 pets.filter((pet) => pet.owner === cl.id)
                               );
@@ -484,7 +465,7 @@ export default function AppointmentModal({
               </div>
 
               {/* pet */}
-              <div className="mt-4 mb-4 w-1/2">
+              <div className="mt-4 mb-4 w-1/4">
                 <label className="mr-2" htmlFor="pet">
                   {inputs.pet.displayName}
                 </label>
@@ -506,7 +487,7 @@ export default function AppointmentModal({
                           onSelect={() => {
                             //clear startimte
                             if (p.id !== pet?.id) {
-                              setTimeSelected('');
+                              setTimeSelected("");
                               setPet(p);
                               setForm((prev) => {
                                 const { startTime, ...rest } = prev;
@@ -516,8 +497,7 @@ export default function AppointmentModal({
                                 }; // startTime removed
                               });
                             }
-                          }
-                          }
+                          }}
                         >
                           {p.name}
                         </DropdownMenuItem>
@@ -528,9 +508,34 @@ export default function AppointmentModal({
                 </DropdownMenu>
               </div>
             </div>
+            <div className="w-full mb-2">
+              {/* <div className="mb-6"> */}
+              <label
+                htmlFor="remarks"
+                className="block text-sm font-medium mb-1"
+              >
+                {t("general.remarks")}
+              </label>
+              <input
+                id="remarks"
+                name="remarks"
+                value={form.description}
+                onChange={(e) => {
+                  setForm((prev) => ({
+                    ...prev,
+                    description: e.target.value
+                  }));
+                }}
+                placeholder={t("appointments.placeholderText.remarks")}
+                rows={3}
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {/* </div> */}
+            </div>
             {/* calendar */}
             <div className="flex gap-4">
-              <div className="w-2/5 flex-shrink-0">
+              <div className="w-1/3 flex-shrink-0">
+                <label>{t("appointments.displayName.date")}</label>
                 <Calendar
                   mode="single"
                   selected={date}
@@ -541,7 +546,9 @@ export default function AppointmentModal({
                   disabled={isDateDisabled}
                 />
               </div>
-              <div className="w-3/5">
+              <div className="w-2/3">
+                <label>{t("appointments.displayName.time")}</label>
+                {!date && <div className="h-full">select a date</div>}
                 {date && (
                   <div className="rounded-md border p-3 h-[300px] overflow-y-auto">
                     <p className="text-sm font-medium mb-2">Open time ranges</p>
@@ -581,27 +588,28 @@ export default function AppointmentModal({
                       !timeOffsError &&
                       openTimeRanges.length > 0 && (
                         <div className="flex flex-wrap gap-2 overflow-y-auto">
-
-
                           {timeIntervals?.length > 0 &&
                             timeIntervals.map((time) => (
-                              <div className={`${isTimeDisabled ? TIME_BTN_DISABLED : TIME_BTN_ACTIVE} 
-                                ${timeSelected === time.start
-                                  ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-200"
-                                  : "bg-white hover:bg-gray-100"}`}>
+                              <div
+                                className={`${isTimeDisabled ? TIME_BTN_DISABLED : TIME_BTN_ACTIVE} 
+                                ${
+                                  timeSelected === time.start
+                                    ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-200"
+                                    : "bg-white hover:bg-gray-100"
+                                }`}
+                              >
                                 <button
                                   type="button"
                                   // disabled={isDateDisabled}
                                   disabled={!stylist || !config}
                                   onClick={() => {
                                     if (timeSelected === time.start) {
-                                      setTimeSelected('');
+                                      setTimeSelected("");
                                       setForm((prev) => {
                                         const { startTime, ...rest } = prev;
                                         return rest; // startTime removed
                                       });
-                                    }
-                                    else {
+                                    } else {
                                       setTimeSelected(time.start);
                                       setForm((prev) => ({
                                         ...prev,
@@ -619,7 +627,6 @@ export default function AppointmentModal({
               </div>
             </div>
           </div>
-
 
           {/* Footer */}
           <div className="flex justify-end gap-2 px-6 py-4 border-t">
