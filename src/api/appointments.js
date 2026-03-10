@@ -27,8 +27,8 @@ export async function createAppointment(data) {
 }
 
 export async function updateAppointment(id, data) {
-  const res = await fetch(`${API_URL}/api/appointments/${id}`, {
-    method: "PUT", // or PATCH depending on backend
+  const res = await fetch(`${API_URL}/api/appointments/${id}/update`, {
+    method: "PATCH", // or PATCH depending on backend
     headers: {
       "Content-Type": "application/json",
     },

@@ -84,9 +84,8 @@ const StatusBadge = ({ status }: { status: string }) => {
   };
   return (
     <span
-      className={`px-3 py-1 rounded-full text-xs font-medium ${
-        styles[status as keyof typeof styles] || "bg-gray-100 text-gray-700"
-      }`}
+      className={`px-3 py-1 rounded-full text-xs font-medium ${styles[status as keyof typeof styles] || "bg-gray-100 text-gray-700"
+        }`}
     >
       {status}
     </span>
@@ -156,17 +155,17 @@ export const Appointments = () => {
         displayName: t("appointments.displayName.client"),
         placeholder: t("appointments.placeholderText.client")
       },
-        pet: {
+      pet: {
         name: "pet",
         displayName: t("appointments.displayName.pet"),
         placeholder: t("appointments.placeholderText.pet")
       },
-        service: {
+      service: {
         name: "service",
         displayName: t("appointments.displayName.service"),
         placeholder: t("appointments.placeholderText.service")
       },
-        stylist: {
+      stylist: {
         name: "stylist",
         displayName: t("appointments.displayName.stylist"),
         placeholder: t("appointments.placeholderText.stylist")
@@ -243,8 +242,32 @@ export const Appointments = () => {
     return createAppMutation.mutateAsync(formData);
   };
 
+  const formatDateTimeCell = (value: string | Date | null | undefined) => {
+    if (!value) return "-";
+
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(date.getTime()) ? "-" : date.toLocaleString();
+  };
+
   const columns = React.useMemo(
     () => [
+
+
+      //ACTIONS COLUMN
+      columnHelper.display({
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }) => {
+          const rowApp = row.original;
+
+          return (
+            <RowActionsMenu
+              onEdit={() => handleAction("edit", rowApp)}
+              onDelete={() => handleAction("delete", rowApp)}
+            />
+          );
+        }
+      }),
       columnHelper.accessor("id", {
         header: "ID",
         cell: (info) => info.getValue()
@@ -291,11 +314,11 @@ export const Appointments = () => {
       ),
       columnHelper.accessor("startTime", {
         header: "startTime",
-        cell: (info) => info.getValue()
+        cell: (info) => formatDateTimeCell(info.getValue())
       }),
       columnHelper.accessor("endTime", {
         header: "endTime",
-        cell: (info) => info.getValue()
+        cell: (info) => formatDateTimeCell(info.getValue())
       }),
       columnHelper.accessor("durationSnapshot", {
         header: "durationSnapshot",
@@ -318,23 +341,8 @@ export const Appointments = () => {
           const v = info.getValue();
           return v ? new Date(v).toLocaleDateString() : "-";
         }
-      }),
-
-      //ACTIONS COLUMN
-      columnHelper.display({
-        id: "actions",
-        header: "",
-        cell: ({ row }) => {
-          const rowApp = row.original;
-
-          return (
-            <RowActionsMenu
-              onEdit={() => handleAction("edit", rowApp)}
-              onDelete={() => handleAction("delete", rowApp)}
-            />
-          );
-        }
       })
+
     ],
     []
   );
@@ -352,13 +360,18 @@ export const Appointments = () => {
   const appointments = appData.map((app) => {
     const client = clientsById.get(app.client_id);
     const config = configsById.get(app.service_configuration_id);
-    const service = config ? servicesById.get(config.service_id) : undefined;
+    const service = servicesById.get(app.service_id);
     const stylist = stylistsById.get(app.stylist_id);
     const pet = petsById.get(app.pet_id);
     const breed = config ? breedsById.get(config.breed_id) : undefined;
 
     return {
       id: app.id,
+      client_id: app.client_id,
+      pet_id: app.pet_id,
+      service_id: app.service_id,
+      service_configuration_id: app.service_configuration_id,
+      stylist_id: app.stylist_id,
       client: client,
       service,
       pet,
@@ -368,6 +381,7 @@ export const Appointments = () => {
       stylist,
       startTime: app.start_time,
       endTime: app.end_time,
+      description: app.description,
       durationSnapshot: app.duration_snapshot,
       uuid: app.uuid,
       createdAt: app.created_at,
@@ -480,7 +494,7 @@ export const Appointments = () => {
             mode={mode || "create"}
             inputs={appointmentInputs}
             onSubmit={handleSubmit}
-            appointment={appointment}
+            row={appointment}
             onClose={() => setIsOpen(false)}
             isLoading={isSubmitting}
             configs={configsData}

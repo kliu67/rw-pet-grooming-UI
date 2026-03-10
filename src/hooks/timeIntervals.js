@@ -20,6 +20,9 @@ export const getDaysInMonth = (year, monthIndex) => {
 
 export const computeDateTimeIntervals = (timeRange, date, durationMinutes, intervalMinutes) => {
   const { start, end } = timeRange;
+  date.setHours(0);
+  date.setMinutes(0);
+  date.setMilliseconds(0);
   let rangeStart =
     date.getHours() * 60 +
     date.getMinutes() +

@@ -20,3 +20,7 @@ export const getNameStandard = (person) =>{
   const {first_name, last_name} = person;
   return [first_name, last_name].filter(Boolean).join(" ") || "-";
 } 
+
+export const isObjectNotEmpty = (obj) => {
+  return obj && typeof obj === 'object' && Object.keys(obj).length > 0;
+}

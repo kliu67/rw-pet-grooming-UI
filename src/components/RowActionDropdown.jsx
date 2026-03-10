@@ -27,7 +27,7 @@ export const RowActionsMenu = ({ onEdit, onDelete }) => {
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute right-0 mt-2 w-36 bg-white border rounded-lg shadow-lg z-50">
+        <div className="relative right-0 mt-2 w-36 bg-white border rounded-lg shadow-lg z-50">
           <button
             onClick={() => {
               setOpen(false);
