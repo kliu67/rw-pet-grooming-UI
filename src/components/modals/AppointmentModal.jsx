@@ -283,14 +283,11 @@ export default function AppointmentModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/50" />
-
       {/* Modal */}
-      {/* <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-xl p-6"> */}
       <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[85vh] flex flex-col">
         {/* Header */}
-        
         <div className="px-6 py-4 border-b">
-          <h2 className="text-lg font-semibold">{modalTexts.title}</h2>
+          <h2 className="text-lg font-semibold">{modalTexts.heading}</h2>
         </div>
         <form
           className="flex-1 overflow-y-auto px-6 py-4"
@@ -333,8 +330,6 @@ export default function AppointmentModal({
             }
           }}
         >
-          {/* Header */}
-
           <div className="flex-1 overflow-y-auto">
             <div className="flex">
               {/* service */}
