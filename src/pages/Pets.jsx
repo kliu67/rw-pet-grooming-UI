@@ -210,7 +210,6 @@ export const Pets = () => {
         header: "",
         cell: ({ row }) => {
           const pet = row.original;
-
           return (
             <RowActionsMenu
               onEdit={() => handleAction("edit", pet)}

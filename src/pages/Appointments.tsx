@@ -202,7 +202,7 @@ export const Appointments = () => {
 
   /* ---------------- CREATE AND EDIT ACTION HANDLER ---------------- */
   const handleAction = React.useCallback(
-    (action = "", pet = {}) => {
+    (action = "", appointment = {}) => {
       if (action === "create" || action === "edit") {
         (setMode(action), setAppointment(appointment));
         setIsOpen(true);
@@ -318,23 +318,23 @@ export const Appointments = () => {
           const v = info.getValue();
           return v ? new Date(v).toLocaleDateString() : "-";
         }
-      })
+      }),
 
       //ACTIONS COLUMN
-      // columnHelper.display({
-      //   id: "actions",
-      //   header: "",
-      //   cell: ({ row }) => {
-      //     const client = row.original;
+      columnHelper.display({
+        id: "actions",
+        header: "",
+        cell: ({ row }) => {
+          const rowApp = row.original;
 
-      //     return (
-      //       <RowActionsMenu
-      //         onEdit={() => handleAction("edit", client)}
-      //         onDelete={() => handleAction("delete", client)}
-      //       />
-      //     );
-      //   }
-      // })
+          return (
+            <RowActionsMenu
+              onEdit={() => handleAction("edit", rowApp)}
+              onDelete={() => handleAction("delete", rowApp)}
+            />
+          );
+        }
+      })
     ],
     []
   );

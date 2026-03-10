@@ -28,7 +28,7 @@ import {
 export default function AppointmentModal({
   onClose,
   inputs,
-  appointment = {},
+  appointment: rowAppointment = {},
   mode,
   onSubmit,
   configs,
@@ -295,30 +295,30 @@ export default function AppointmentModal({
             e.preventDefault();
             if (!canSubmit) return;
             let delta = {};
-            if (appointment?.client_id !== form?.client_id) {
+            if (rowAppointment?.client_id !== form?.client_id) {
               delta.client_id = form?.client_id;
             }
-            if (appointment?.pet_id !== form?.pet_id) {
+            if (rowAppointment?.pet_id !== form?.pet_id) {
               delta.pet_id = form?.pet_id;
             }
-            if (appointment?.service_id !== form?.service_id) {
+            if (rowAppointment?.service_id !== form?.service_id) {
               delta.service_id = form?.service_id;
             }
             if (
-              appointment?.service_configuration_id !==
+              rowAppointment?.service_configuration_id !==
               form?.service_configuration_id
             ) {
               delta.service_configuration_id = form?.service_configuration_id;
             }
-            if (appointment?.stylist_id !== form?.stylist_id) {
+            if (rowAppointment?.stylist_id !== form?.stylist_id) {
               delta.stylist_id = form?.stylist_id;
             }
 
-            if (appointment?.start_time !== form?.startTime) {
+            if (rowAppointment?.start_time !== form?.startTime) {
               delta.start_time = form?.startTime;
             }
 
-            if (appointment?.description !== form?.description) {
+            if (rowAppointment?.description !== form?.description) {
               delta.description = form?.description;
             }
             try {
