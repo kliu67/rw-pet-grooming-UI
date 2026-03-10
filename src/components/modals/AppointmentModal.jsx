@@ -61,7 +61,7 @@ export default function AppointmentModal({
   const isEdit = mode === "edit";
   const hasValidationErrors = errors.name;
   const modalTexts = {
-    heading: isEdit ? t("pets.edit") : t("pets.create"),
+    heading: isEdit ? t("pets.edit") : t("appointments.create"),
     primaryButtonLabel: isEdit ? t("general.update") : t("general.create")
   };
 
@@ -147,6 +147,7 @@ export default function AppointmentModal({
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
+  
   const hasChanges = (current) => {
     // return (
     //   (petData?.name || "").trim() !== current.name.trim() ||
@@ -287,6 +288,7 @@ export default function AppointmentModal({
       {/* <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-xl p-6"> */}
       <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[85vh] flex flex-col">
         {/* Header */}
+        
         <div className="px-6 py-4 border-b">
           <h2 className="text-lg font-semibold">{modalTexts.title}</h2>
         </div>
@@ -518,14 +520,9 @@ export default function AppointmentModal({
               </label>
               <input
                 id="remarks"
-                name="remarks"
+                name="description"
                 value={form.description}
-                onChange={(e) => {
-                  setForm((prev) => ({
-                    ...prev,
-                    description: e.target.value
-                  }));
-                }}
+                onChange={handleChange}
                 placeholder={t("appointments.placeholderText.remarks")}
                 rows={3}
                 className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
