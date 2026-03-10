@@ -8,7 +8,7 @@ const toMinuteString = (date) => {
   return minute < 10 ? `0${minute}` : `${minute}`;
 }
 
-export const getDaysInMonth(year, monthIndex) => {
+export const getDaysInMonth = (year, monthIndex) => {
   var date = new Date(year, monthIndex, 1);
   var days = [];
   while (date.getMonth() === monthIndex) {
