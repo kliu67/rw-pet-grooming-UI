@@ -649,7 +649,7 @@ export default function AppointmentModal({
               <p className="text-red-500 text-sm mb-2">
                 {serverError?.error ||
                   serverError?.message ||
-                  "Failed to save pet"}
+                  "Failed to save Failed to save appointment"}
               </p>
             )}
             <button

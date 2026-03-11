@@ -5,7 +5,7 @@ import {
   useAppointments,
   useCreateAppointment,
   useUpdateAppointment,
-  useDeleteAppointment
+  useDeleteAppointment,
 } from "@/hooks/appointments";
 import { useClients } from "@/hooks/clients";
 import { useBreeds } from "@/hooks/breeds";
@@ -26,7 +26,8 @@ import {
   MoreHorizontal,
   Plus,
   Search,
-  XCircle
+  XCircle,
+  Menu,
 } from "lucide-react";
 
 const columnHelper = createColumnHelper();
@@ -41,7 +42,7 @@ const initialAppointments = [
     date: "2023-10-25",
     time: "10:00 AM",
     status: "Confirmed",
-    amount: "$85.00"
+    amount: "$85.00",
   },
   {
     id: 2,
@@ -51,7 +52,7 @@ const initialAppointments = [
     date: "2023-10-25",
     time: "11:30 AM",
     status: "Pending",
-    amount: "$45.00"
+    amount: "$45.00",
   },
   {
     id: 3,
@@ -61,7 +62,7 @@ const initialAppointments = [
     date: "2023-10-26",
     time: "09:15 AM",
     status: "Completed",
-    amount: "$25.00"
+    amount: "$25.00",
   },
   {
     id: 4,
@@ -71,8 +72,8 @@ const initialAppointments = [
     date: "2023-10-26",
     time: "02:00 PM",
     status: "Cancelled",
-    amount: "$90.00"
-  }
+    amount: "$90.00",
+  },
 ];
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -80,12 +81,13 @@ const StatusBadge = ({ status }: { status: string }) => {
     Confirmed: "bg-green-100 text-green-700",
     Pending: "bg-yellow-100 text-yellow-700",
     Completed: "bg-blue-100 text-blue-700",
-    Cancelled: "bg-red-100 text-red-700"
+    Cancelled: "bg-red-100 text-red-700",
   };
   return (
     <span
-      className={`px-3 py-1 rounded-full text-xs font-medium ${styles[status as keyof typeof styles] || "bg-gray-100 text-gray-700"
-        }`}
+      className={`px-3 py-1 rounded-full text-xs font-medium ${
+        styles[status as keyof typeof styles] || "bg-gray-100 text-gray-700"
+      }`}
     >
       {status}
     </span>
@@ -109,41 +111,41 @@ export const Appointments = () => {
   const {
     data: appData = [],
     isLoading: appIsLoading,
-    error: appError
+    error: appError,
   } = useAppointments();
 
   const {
     data: clientsData = [],
     isLoading: clientsIsLoading,
-    error: clientsError
+    error: clientsError,
   } = useClients();
 
   const {
     data: breedsData = [],
     isLoading: breedsIsLoading,
-    error: breedsError
+    error: breedsError,
   } = useBreeds();
   const {
     data: servicesData = [],
     isLoading: servicesIsLoading,
-    error: servicesError
+    error: servicesError,
   } = useServices();
   const {
     data: petsData = [],
     isLoading: petsIsLoading,
-    error: petsError
+    error: petsError,
   } = usePets();
 
   const {
     data: stylistsData = [],
     isLoading: stylistsIsLoading,
-    error: stylistsError
+    error: stylistsError,
   } = useStylists();
 
   const {
     data: configsData = [],
     isLoading: configsIsLoading,
-    error: configsError
+    error: configsError,
   } = useServiceConfigurations();
 
   //inputs
@@ -153,25 +155,25 @@ export const Appointments = () => {
       client: {
         name: "client",
         displayName: t("appointments.displayName.client"),
-        placeholder: t("appointments.placeholderText.client")
+        placeholder: t("appointments.placeholderText.client"),
       },
       pet: {
         name: "pet",
         displayName: t("appointments.displayName.pet"),
-        placeholder: t("appointments.placeholderText.pet")
+        placeholder: t("appointments.placeholderText.pet"),
       },
       service: {
         name: "service",
         displayName: t("appointments.displayName.service"),
-        placeholder: t("appointments.placeholderText.service")
+        placeholder: t("appointments.placeholderText.service"),
       },
       stylist: {
         name: "stylist",
         displayName: t("appointments.displayName.stylist"),
-        placeholder: t("appointments.placeholderText.stylist")
-      }
+        placeholder: t("appointments.placeholderText.stylist"),
+      },
     }),
-    [t]
+    [t],
   );
 
   const isLoading =
@@ -221,11 +223,11 @@ export const Appointments = () => {
           isLoading: deleteAppMutation.isPending,
           serverError: deleteAppMutation.error?.message,
           entityName: appointment.id || "",
-          entityType: "appointment"
+          entityType: "appointment",
         });
       }
     },
-    [openModal, closeModal, deleteAppMutation]
+    [openModal, closeModal, deleteAppMutation],
   );
 
   const handleSubmit = async (formData) => {
@@ -235,7 +237,7 @@ export const Appointments = () => {
       }
       return updateAppMutation.mutateAsync({
         id: appointment.id,
-        data: formData
+        data: formData,
       });
     }
 
@@ -251,12 +253,13 @@ export const Appointments = () => {
 
   const columns = React.useMemo(
     () => [
-
-
       //ACTIONS COLUMN
       columnHelper.display({
         id: "actions",
-        header: "Actions",
+        header: <Menu />,
+        size: 20,
+        minSize: 20,
+        maxSize: 40,
         cell: ({ row }) => {
           const rowApp = row.original;
 
@@ -266,11 +269,14 @@ export const Appointments = () => {
               onDelete={() => handleAction("delete", rowApp)}
             />
           );
-        }
+        },
       }),
       columnHelper.accessor("id", {
         header: "ID",
-        cell: (info) => info.getValue()
+        size: 20,
+        minSize: 20,
+        maxSize: 120,
+        cell: (info) => info.getValue(),
       }),
       columnHelper.accessor(
         (row) =>
@@ -279,28 +285,57 @@ export const Appointments = () => {
             .join(" ") || "-",
         {
           header: "clientName",
-          cell: (info) => info.getValue()
-        }
+          size: 100,
+          minSize: 60,
+          maxSize: 160,
+          cell: (info) => info.getValue(),
+        },
       ),
       columnHelper.accessor((row) => row.service?.name ?? "-", {
         header: "serviceName",
-        cell: (info) => info.getValue()
+        size: 120,
+        minSize: 60,
+        maxSize: 160,
+        cell: (info) => info.getValue(),
       }),
       columnHelper.accessor((row) => row.pet?.name ?? "-", {
         header: "petName",
-        cell: (info) => info.getValue()
+        size: 120,
+        minSize: 60,
+        maxSize: 180,
+        cell: (info) => info.getValue(),
+      }),
+      columnHelper.accessor("startTime", {
+        header: "startTime",
+        size: 210,
+        minSize: 100,
+        maxSize: 210,
+        cell: (info) => formatDateTimeCell(info.getValue()),
+      }),
+      columnHelper.accessor("endTime", {
+        header: "endTime",
+        size: 210,
+        minSize: 100,
+        maxSize: 210,
+        cell: (info) => formatDateTimeCell(info.getValue()),
       }),
       columnHelper.accessor("status", {
         header: "status",
-        cell: (info) => <StatusBadge status={info.getValue()} />
+        size: 100,
+        minSize: 60,
+        maxSize: 120,
+        cell: (info) => <StatusBadge status={info.getValue()} />,
       }),
-      columnHelper.accessor((row) => row.breed?.name ?? "-", {
-        header: "breedName",
-        cell: (info) => info.getValue()
-      }),
+      // columnHelper.accessor((row) => row.breed?.name ?? "-", {
+      //   header: "breedName",
+      //   cell: (info) => info.getValue(),
+      // }),
       columnHelper.accessor("priceSnapshot", {
-        header: "priceSnapshot",
-        cell: (info) => info.getValue()
+        header: "price",
+        size: 100,
+        minSize: 60,
+        maxSize: 120,
+        cell: (info) => info.getValue(),
       }),
       columnHelper.accessor(
         (row) =>
@@ -308,43 +343,38 @@ export const Appointments = () => {
             .filter(Boolean)
             .join(" ") || "-",
         {
-          header: "stylistName",
-          cell: (info) => info.getValue()
-        }
+          header: "stylist",
+          size: 100,
+          minSize: 60,
+          maxSize: 160,
+          cell: (info) => info.getValue(),
+        },
       ),
-      columnHelper.accessor("startTime", {
-        header: "startTime",
-        cell: (info) => formatDateTimeCell(info.getValue())
-      }),
-      columnHelper.accessor("endTime", {
-        header: "endTime",
-        cell: (info) => formatDateTimeCell(info.getValue())
-      }),
+
       columnHelper.accessor("durationSnapshot", {
         header: "durationSnapshot",
-        cell: (info) => info.getValue()
+        cell: (info) => info.getValue(),
       }),
       columnHelper.accessor("uuid", {
         header: "uuid",
-        cell: (info) => info.getValue()
+        cell: (info) => info.getValue(),
       }),
       columnHelper.accessor("createdAt", {
         header: "Created",
         cell: (info) => {
           const v = info.getValue();
           return v ? new Date(v).toLocaleDateString() : "-";
-        }
+        },
       }),
       columnHelper.accessor("updatedAt", {
         header: "Updated",
         cell: (info) => {
           const v = info.getValue();
           return v ? new Date(v).toLocaleDateString() : "-";
-        }
-      })
-
+        },
+      }),
     ],
-    []
+    [],
   );
 
   if (isLoading) return <p>{t("general.loading")}</p>;
@@ -385,7 +415,7 @@ export const Appointments = () => {
       durationSnapshot: app.duration_snapshot,
       uuid: app.uuid,
       createdAt: app.created_at,
-      updatedAt: app.updated_at
+      updatedAt: app.updated_at,
     };
   });
 
@@ -399,7 +429,7 @@ export const Appointments = () => {
       (app.service?.name ?? "")
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      app.stylistName.toLowerCase().includes(searchTerm.toLowerCase())
+      app.stylistName.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
