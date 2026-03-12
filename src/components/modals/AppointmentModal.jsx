@@ -1,22 +1,22 @@
 import { Fragment, useState, useEffect, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { MAX_PET_NAME_LENGTH, INTERVAL_MINUTES } from "@/constants";
+import { MAX_APPOINTMENTS_DESC_LENGTH, INTERVAL_MINUTES } from "@/constants";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import {
   DROPDOWN_BUTTON,
   TIME_BTN_ACTIVE,
-  TIME_BTN_DISABLED,
+  TIME_BTN_DISABLED
 } from "@/styles/classNames";
 import {
   getNameLexicalOrder,
   getNameStandard,
-  isObjectNotEmpty,
+  isObjectNotEmpty
 } from "@/utils";
 import { useAvailabiltyById } from "@/hooks/availability";
 import { useTimeOffById } from "@/hooks/timeOffs";
@@ -25,8 +25,20 @@ import { Calendar } from "../ui/calendar";
 import { DropdownSearch } from "../DrowndownSearch";
 import {
   computeDateTimeIntervals,
-  getDaysInMonth,
+  getDaysInMonth
 } from "@/hooks/timeIntervals";
+
+const filterAppointments = (appointmentsData = [], stylist_id, date) => {
+  return appointmentsData.filter((app) => {
+    const startDateTime = new Date(app.startTime);
+    return (
+      app.stylist_id === stylist_id &&
+      startDateTime.getDate() === date.getDate() &&
+      startDateTime.getMonth() === date.getMonth() &&
+      startDateTime.getFullYear() === date.getFullYear()
+    );
+  });
+};
 
 export default function AppointmentModal({
   onClose,
@@ -39,7 +51,8 @@ export default function AppointmentModal({
   clients,
   pets,
   stylists,
-  isLoading,
+  appointmentsData = [],
+  isLoading
 }) {
   //States
   const [form, setForm] = useState({});
@@ -48,13 +61,17 @@ export default function AppointmentModal({
   const [client, setClient] = useState(row.client);
   const [pet, setPet] = useState(row.pet);
   const [config, setConfig] = useState();
-  const [date, setDate] = useState(new Date(row.startTime));
+  const [date, setDate] = useState(
+    row.startTime ? new Date(row.startTime) : ""
+  );
   const [touched, setTouched] = useState();
   const [isDirty, setIsDirty] = useState(false);
   const [errors, setErrors] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [serverError, setServerError] = useState(null);
-  const [petsById, setPetsById] = useState(pets);
+  const [petsById, setPetsById] = useState(
+    pets.filter((pet) => pet.owner === client?.id)
+  );
   const [timeSelected, setTimeSelected] = useState(() => {
     return !!row.startTime ? new Date(row.startTime) : new Date();
   });
@@ -62,61 +79,73 @@ export default function AppointmentModal({
     return !!row.startTime ? new Date(row.startTime) : new Date();
   });
 
+  const [appointments, setAppointments] = useState(() =>
+    filterAppointments(appointmentsData, stylist?.id, date)
+  );
+
   const { t } = useTranslation();
 
   const isEdit = mode === "edit";
-  const hasValidationErrors = errors.name;
+  const hasValidationErrors = errors.description;
   const modalTexts = {
-    heading: isEdit ? t("pets.edit") : t("appointments.create"),
-    primaryButtonLabel: isEdit ? t("general.update") : t("general.create"),
+    heading: isEdit ? t("appointments.edit") : t("appointments.create"),
+    primaryButtonLabel: isEdit ? t("general.update") : t("general.create")
   };
 
   const filteredServices = services.filter(
     (service) =>
       service.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      service.description?.toLowerCase().includes(searchTerm.toLowerCase()),
+      service.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredStylists = stylists.filter(
     (stylist) =>
       stylist.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      stylist.last_name?.toLowerCase().includes(searchTerm.toLowerCase()),
+      stylist.last_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredClients = clients.filter(
     (client) =>
       client.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.last_name?.toLowerCase().includes(searchTerm.toLowerCase()),
+      client.last_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredPets = petsById.filter((pet) =>
-    pet.name?.toLowerCase().includes(searchTerm.toLowerCase()),
+    pet.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   //queries
   const {
     data: availabilityData = [],
     isLoading: availabilityIsLoading,
-    error: availabilityError,
+    error: availabilityError
   } = useAvailabiltyById(stylist?.id);
 
   const {
     data: timeOffsData = [],
     isLoading: timeOffsIsLoading,
-    error: timeOffsError,
+    error: timeOffsError
   } = useTimeOffById(stylist?.id);
 
   const openTimeRanges = useOpenTimeRanges({
     availabilityData,
     timeOffsData,
-    date,
+    appointments: appointmentsData
+      .filter((app) => app.stylist_id === stylist?.id)
+      .map((app) => ({
+        startTime: app.startTime,
+        endTime: app.effectiveEndTime
+      })),
+    date
   });
 
   const validateFields = (field, value) => {
     if (isDirty) {
       if (field === "description") {
-        if (value && value.length > MAX_CLIENT_DESC_LENGTH) {
-          return t("clients.errors.description");
+        if (value && value.length > MAX_APPOINTMENTS_DESC_LENGTH) {
+          return t("appointments.errors.description", {
+            max: MAX_APPOINTMENTS_DESC_LENGTH
+          });
         } else {
           return "";
         }
@@ -129,20 +158,15 @@ export default function AppointmentModal({
     const { name, value } = e.target;
     setServerError(null);
     setIsDirty(true);
-
     const errorMsg = validateFields(name, value);
-
     setErrors((prev) => ({
       ...prev,
-      [name]: errorMsg,
+      [name]: errorMsg
     }));
-    setForm((prev) => {
-      const { description, ...rest } = prev;
-      if (value === "") {
-        return { ...rest };
-      }
-      return { ...prev, [name]: value };
-    });
+    setForm((prev) => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSearchChange = (e) => {
@@ -191,15 +215,22 @@ export default function AppointmentModal({
 
     const thisMonth = calendarMonth.getMonth();
     const thisYear = calendarMonth.getFullYear();
+    const appointmentsByStylist = appointmentsData
+      .filter((app) => app.stylist_id === stylist?.id)
+      .map((app) => ({
+        startTime: app.startTime,
+        endTime: app.effectiveEndTime
+      }));
 
     return getDaysInMonth(thisYear, thisMonth).map((day) =>
       getOpenTimeRanges({
         availabilityData,
         timeOffsData,
-        date: day,
-      }),
+        appointments: appointmentsByStylist,
+        date: day
+      })
     );
-  }, [availabilityData, timeOffsData, calendarMonth]);
+  }, [availabilityData, appointments, timeOffsData, calendarMonth]);
 
   const monthBookableDates = useMemo(() => {
     if (!availabilityData?.length) return new Set();
@@ -211,7 +242,7 @@ export default function AppointmentModal({
     return new Set(
       monthDays
         .filter((_, index) => monthAvailability[index]?.length > 0)
-        .map((day) => day.toDateString()),
+        .map((day) => day.toDateString())
     );
   }, [availabilityData, calendarMonth, monthAvailability]);
 
@@ -224,8 +255,8 @@ export default function AppointmentModal({
         range,
         date,
         config.duration_minutes,
-        INTERVAL_MINUTES,
-      ),
+        INTERVAL_MINUTES
+      )
     );
   }, [openTimeRanges, date, config, stylist]);
 
@@ -238,12 +269,12 @@ export default function AppointmentModal({
       const normalizedToday = new Date(
         todayDate.getFullYear(),
         todayDate.getMonth(),
-        todayDate.getDate(),
+        todayDate.getDate()
       );
       const normalizedDay = new Date(
         day.getFullYear(),
         day.getMonth(),
-        day.getDate(),
+        day.getDate()
       );
 
       if (normalizedDay < normalizedToday) return true;
@@ -271,8 +302,8 @@ export default function AppointmentModal({
       availabilityError,
       timeOffsError,
       availabilityData,
-      monthBookableDates,
-    ],
+      monthBookableDates
+    ]
   );
 
   //sets a new service config whenever service or pet changes
@@ -282,7 +313,7 @@ export default function AppointmentModal({
         (c) =>
           c.breed_id === pet.breed &&
           c.service_id === service.id &&
-          c.weight_class_id === pet.weight_class_id,
+          c.weight_class_id === pet.weight_class_id
       );
 
       if (matchedConfig) {
@@ -290,12 +321,22 @@ export default function AppointmentModal({
         if (form.service_id || form.pet_id) {
           setForm((prev) => ({
             ...prev,
-            service_configuration_id: matchedConfig.id,
+            service_configuration_id: matchedConfig.id
           }));
         }
       }
     } else setConfig("");
   }, [service, pet, client]);
+  useEffect(() => {
+    setForm({
+      description: row?.description
+    });
+    setErrors({
+      description: ""
+    });
+
+    setServerError(null);
+  }, [row]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -373,7 +414,7 @@ export default function AppointmentModal({
                                 const { startTime, ...rest } = prev;
                                 return {
                                   ...rest,
-                                  service_id: serv.id,
+                                  service_id: serv.id
                                 }; // startTime and pet removed
                               });
                             }
@@ -415,7 +456,7 @@ export default function AppointmentModal({
                                 const { startTime, ...rest } = prev;
                                 return {
                                   ...rest,
-                                  stylist_id: sty.id,
+                                  stylist_id: sty.id
                                 }; // startTime removed
                               });
                             }
@@ -457,13 +498,13 @@ export default function AppointmentModal({
                               setClient(cl);
                               setPet("");
                               setPetsById(
-                                pets.filter((pet) => pet.owner === cl.id),
+                                pets.filter((pet) => pet.owner === cl.id)
                               );
                               setForm((prev) => {
                                 const { startTime, pet_id, ...rest } = prev;
                                 return {
                                   ...rest,
-                                  client_id: cl.id,
+                                  client_id: cl.id
                                 }; // startTime and pet removed
                               });
                             }
@@ -486,7 +527,7 @@ export default function AppointmentModal({
                 <DropdownMenu id="pet">
                   <DropdownMenuTrigger disabled={!client} asChild>
                     <button className={DROPDOWN_BUTTON} disabled={!client}>
-                      {pet ? pet.name : t("general.select")}{" "}
+                      {pet ? pet.name : t("general.select")}
                       <span aria-hidden="true">&#9662;</span>
                     </button>
                   </DropdownMenuTrigger>
@@ -507,7 +548,7 @@ export default function AppointmentModal({
                                 const { startTime, ...rest } = prev;
                                 return {
                                   ...rest,
-                                  pet_id: p.id,
+                                  pet_id: p.id
                                 }; // startTime removed
                               });
                             }
@@ -533,7 +574,7 @@ export default function AppointmentModal({
               <input
                 id="remarks"
                 name="description"
-                value={form.description}
+                value={form.description ?? ""}
                 onChange={handleChange}
                 placeholder={t("appointments.placeholderText.remarks")}
                 rows={3}
@@ -557,10 +598,16 @@ export default function AppointmentModal({
               </div>
               <div className="w-2/3">
                 <label>{t("appointments.displayName.time")}</label>
-                {!date && <div className="h-full">select a date</div>}
-                {date && (
+                {(!date || !stylist) && (
+                  <div className="h-full">
+                    {t("appointments.dateTimeSelector.selectDateAndStylist")}
+                  </div>
+                )}
+                {date && stylist && (
                   <div className="rounded-md border p-3 h-[300px] overflow-y-auto">
-                    <p className="text-sm font-medium mb-2">Open time ranges</p>
+                    <p className="text-sm font-medium mb-2">
+                      {t("appointments.dateTimeSelector.openTimeRanges")}
+                    </p>
                     {openTimeRanges.map((range) => (
                       <p
                         key={`${range.start}-${range.end}`}
@@ -627,7 +674,7 @@ export default function AppointmentModal({
                                       setTimeSelected(time.start);
                                       setForm((prev) => ({
                                         ...prev,
-                                        startTime: time.start,
+                                        startTime: time.start
                                       }));
                                     }
                                   }}

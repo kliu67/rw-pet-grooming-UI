@@ -1,6 +1,12 @@
 const toHourString = (date) => {
   let hour = date.getHours();
-  return hour < 10 ? `0${hour}` : `${hour}`
+  if (hour < 10){
+    return `0${hour}`;
+  }
+  if (hour > 12){
+    return `${hour - 12}`;
+  }
+  return `${hour}`
 }
 
 const toMinuteString = (date) => {
@@ -17,6 +23,12 @@ export const getDaysInMonth = (year, monthIndex) => {
   }
   return days;
 }
+
+export const computeAMPMTimeString = (date) => {
+  const hour = date.getHours();
+  return `${toHourString(date)}:${toMinuteString(date)}${hour >= 12? 'PM':'AM'}`;
+}
+
 
 export const computeDateTimeIntervals = (timeRange, date, durationMinutes, intervalMinutes) => {
   const { start, end } = timeRange;
@@ -63,8 +75,3 @@ export const computeDateTimeIntervals = (timeRange, date, durationMinutes, inter
   return intervals;
 };
 
-export const computeAMPMTimeString = (date) => {
-  const hour = date.getHours();
-  const minute = date.getMinutes();
-  return `${toHourString(date)}:${toMinuteString(date)}${hour >= 12? 'PM':'AM'}`;
-}

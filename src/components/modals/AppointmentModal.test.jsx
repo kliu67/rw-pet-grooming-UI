@@ -61,8 +61,8 @@ vi.mock("@/hooks/timeIntervals", () => ({
   getDaysInMonth: () => [new Date("2026-03-15T00:00:00")],
   computeDateTimeIntervals: () => [
     {
-      start: "2026-03-15T09:00:00.000Z",
-      end: "2026-03-15T10:00:00.000Z",
+      start: new Date("2026-03-15T09:00:00.000Z"),
+      end: new Date("2026-03-15T10:00:00.000Z"),
       startStrAMPM: "09:00AM",
       endStrAMPM: "10:00AM"
     }
@@ -103,7 +103,7 @@ const configs = [
 const baseProps = {
   onClose: vi.fn(),
   inputs,
-  appointment: {},
+  row: {},
   mode: "create",
   onSubmit: vi.fn(),
   configs,
@@ -112,7 +112,23 @@ const baseProps = {
   breeds: [],
   pets,
   stylists,
+  appointmentsData: [],
   isLoading: false
+};
+
+const editRow = {
+  id: 10,
+  client_id: 3,
+  pet_id: 4,
+  service_id: 1,
+  service_configuration_id: 5,
+  stylist_id: 2,
+  startTime: "2026-03-15T09:00:00.000Z",
+  description: "Existing notes",
+  client: clients[0],
+  pet: pets[0],
+  service: services[0],
+  stylist: stylists[0]
 };
 
 const selectRequiredFields = () => {
@@ -144,7 +160,7 @@ describe("AppointmentModal", () => {
         service_id: 1,
         service_configuration_id: 5,
         stylist_id: 2,
-        start_time: "2026-03-15T09:00:00.000Z",
+        startTime: "2026-03-15T09:00:00.000Z",
         description: "Nail trim add-on"
       });
     });
@@ -177,5 +193,49 @@ describe("AppointmentModal", () => {
       expect(screen.getByText("Unable to save appointment")).toBeInTheDocument();
     });
     expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("disables edit submit until a change is made", () => {
+    render(
+      <AppointmentModal
+        {...baseProps}
+        mode="edit"
+        row={editRow}
+      />
+    );
+
+    expect(screen.getByDisplayValue("Existing notes")).toBeInTheDocument();
+    expect(screen.getByText("general.update")).toBeDisabled();
+  });
+
+  it("submits only changed edit fields and closes modal", async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const onClose = vi.fn();
+
+    render(
+      <AppointmentModal
+        {...baseProps}
+        mode="edit"
+        row={editRow}
+        onSubmit={onSubmit}
+        onClose={onClose}
+      />
+    );
+
+    fireEvent.change(
+      screen.getByPlaceholderText("appointments.placeholderText.remarks"),
+      {
+        target: { value: "Updated notes" }
+      }
+    );
+
+    fireEvent.click(screen.getByText("general.update"));
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith({
+        description: "Updated notes"
+      });
+    });
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });
