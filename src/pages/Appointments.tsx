@@ -224,6 +224,7 @@ export const Appointments = () => {
           serverError: deleteAppMutation.error?.message,
           entityName: appointment.id || "",
           entityType: "appointment",
+          confirmMsg: t('appointments.confirmDelete')
         });
       }
     },
@@ -355,6 +356,12 @@ export const Appointments = () => {
         header: "durationSnapshot",
         cell: (info) => info.getValue(),
       }),
+
+            columnHelper.accessor("description", {
+        header: "description",
+        cell: (info) => info.getValue(),
+      }),
+
       columnHelper.accessor("uuid", {
         header: "uuid",
         cell: (info) => info.getValue(),
@@ -411,6 +418,7 @@ export const Appointments = () => {
       stylist,
       startTime: app.start_time,
       endTime: app.end_time,
+      effectiveEndTime: app.effective_end_time,
       description: app.description,
       durationSnapshot: app.duration_snapshot,
       uuid: app.uuid,
@@ -429,7 +437,8 @@ export const Appointments = () => {
       (app.service?.name ?? "")
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      app.stylistName.toLowerCase().includes(searchTerm.toLowerCase()),
+      app.stylist?.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.stylist?.last_name?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -532,6 +541,7 @@ export const Appointments = () => {
             services={servicesData}
             breeds={breedsData}
             pets={petsData}
+            appointmentsData={appointments}
             stylists={stylistsData}
           />
         )}
