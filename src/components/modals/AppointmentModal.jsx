@@ -11,7 +11,12 @@ import {
 import {
   DROPDOWN_BUTTON,
   TIME_BTN_ACTIVE,
-  TIME_BTN_DISABLED
+  TIME_BTN_DISABLED,
+  STATUS_BUTTON,
+  BOOKED,
+  DANGER,
+  COMPLETED,
+  UNSELECTED
 } from "@/styles/classNames";
 import {
   getNameLexicalOrder,
@@ -22,7 +27,7 @@ import { useAvailabiltyById } from "@/hooks/availability";
 import { useTimeOffById } from "@/hooks/timeOffs";
 import { getOpenTimeRanges, useOpenTimeRanges } from "@/hooks/openTimeRanges";
 import { Calendar } from "../ui/calendar";
-import { DropdownSearch } from "../DrowndownSearch";
+import { DropdownSearch } from "../DropdownSearch";
 import {
   computeDateTimeIntervals,
   getDaysInMonth
@@ -55,7 +60,9 @@ export default function AppointmentModal({
   isLoading
 }) {
   //States
-  const [form, setForm] = useState({});
+  const [form, setForm] = useState({
+    status: "booked"
+  });
   const [service, setService] = useState(row.service);
   const [stylist, setStylist] = useState(row.stylist);
   const [client, setClient] = useState(row.client);
@@ -64,7 +71,6 @@ export default function AppointmentModal({
   const [date, setDate] = useState(
     row.startTime ? new Date(row.startTime) : ""
   );
-  const [touched, setTouched] = useState();
   const [isDirty, setIsDirty] = useState(false);
   const [errors, setErrors] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
@@ -195,6 +201,7 @@ export default function AppointmentModal({
     client?.id === row.client?.id &&
     pet?.id === row.pet?.id &&
     form?.description === row.description &&
+    form?.status === row.status &&
     getTimestamp(timeSelected) === getTimestamp(row.startTime)
   );
 
@@ -306,6 +313,13 @@ export default function AppointmentModal({
     ]
   );
 
+  const handleStatusChange = (value) => {
+    setForm((prev) => ({
+      ...prev,
+      status: value
+    }));
+  };
+
   //sets a new service config whenever service or pet changes
   useEffect(() => {
     if (service && pet) {
@@ -327,14 +341,22 @@ export default function AppointmentModal({
       }
     } else setConfig("");
   }, [service, pet, client]);
+
   useEffect(() => {
     setForm({
-      description: row?.description
+      client_id: row?.client_id,
+      pet_id: row?.pet_id,
+      service_id: row?.service_id,
+      service_configuration_id: row?.service_configuration_id,
+      stylist_id: row?.stylist_id,
+      startTime: row?.startTime,
+      description: row?.description,
+      status: row?.status || "booked"
     });
     setErrors({
-      description: ""
+      description: "",
+      status: ""
     });
-
     setServerError(null);
   }, [row]);
 
@@ -378,6 +400,10 @@ export default function AppointmentModal({
 
             if (row?.description !== form?.description) {
               delta.description = form?.description;
+            }
+
+            if (row?.status !== form?.status) {
+              delta.status = form?.status;
             }
             try {
               await onSubmit(delta);
@@ -563,7 +589,7 @@ export default function AppointmentModal({
                 </DropdownMenu>
               </div>
             </div>
-            <div className="w-full mb-2">
+            <div className="w-1/2 mb-2">
               {/* <div className="mb-6"> */}
               <label
                 htmlFor="remarks"
@@ -582,6 +608,39 @@ export default function AppointmentModal({
               />
               {/* </div> */}
             </div>
+            <div className="w-1/2 mb-2">
+              {/* <div className="mb-6"> */}
+              <label
+                htmlFor="status"
+                className="block text-sm font-medium mb-1"
+              >
+                {t("general.remarks")}
+              </label>
+              <button
+                type="button"
+                onClick={() => handleStatusChange("booked")}
+                className={`${STATUS_BUTTON} ${form?.status === "booked" ? BOOKED : UNSELECTED}`}
+              >
+                Booked
+              </button>
+       
+              <button
+                type="button"
+                onClick={() => handleStatusChange("cancelled")}
+                className={`${STATUS_BUTTON} ${form?.status === "cancelled" ? DANGER : UNSELECTED}`}
+              >
+                Cancelled
+              </button>       
+              <button
+                type="button"
+                onClick={() => handleStatusChange("completed")}
+                className={`${STATUS_BUTTON} ${form?.status === "completed" ? COMPLETED : UNSELECTED}`}
+              >
+                Completed
+              </button>
+              {/* </button> */}
+              {/* </div> */}
+            </div>
             {/* calendar */}
             <div className="flex gap-4">
               <div className="w-1/3 flex-shrink-0">
@@ -598,93 +657,97 @@ export default function AppointmentModal({
               </div>
               <div className="w-2/3">
                 <label>{t("appointments.displayName.time")}</label>
-                {(!date || !stylist) && (
-                  <div className="h-full">
-                    {t("appointments.dateTimeSelector.selectDateAndStylist")}
-                  </div>
-                )}
-                {date && stylist && (
-                  <div className="rounded-md border p-3 h-[300px] overflow-y-auto">
-                    <p className="text-sm font-medium mb-2">
-                      {t("appointments.dateTimeSelector.openTimeRanges")}
-                    </p>
-                    {openTimeRanges.map((range) => (
-                      <p
-                        key={`${range.start}-${range.end}`}
-                        className="text-xs bg-gray-100 px-2 py-1 rounded-md"
-                      >
-                        {range.start} - {range.end}
+                <div className="rounded-md border p-3 h-[300px] overflow-y-auto">
+                  {(!date || !stylist) && (
+                    <div className="h-full pb-[25%] pt-[25%] flex justify-center font-semibold">
+                      {t("appointments.dateTimeSelector.selectDateAndStylist")}
+                    </div>
+                  )}
+                  {date && stylist && (
+                    <>
+                      <p className="text-sm font-medium mb-2">
+                        {t("appointments.dateTimeSelector.openTimeRanges")}
                       </p>
-                    ))}
 
-                    {(availabilityIsLoading || timeOffsIsLoading) && (
-                      <p className="text-sm text-gray-500">
-                        Loading availability...
-                      </p>
-                    )}
+                      {openTimeRanges.map((range) => (
+                        <p
+                          key={`${range.start}-${range.end}`}
+                          className="text-xs bg-gray-100 px-2 py-1 rounded-md"
+                        >
+                          {range.start} - {range.end}
+                        </p>
+                      ))}
 
-                    {(availabilityError || timeOffsError) && (
-                      <p className="text-sm text-red-600">
-                        Failed to load availability data.
-                      </p>
-                    )}
-
-                    {!availabilityIsLoading &&
-                      !timeOffsIsLoading &&
-                      !availabilityError &&
-                      !timeOffsError &&
-                      openTimeRanges.length === 0 && (
+                      {(availabilityIsLoading || timeOffsIsLoading) && (
                         <p className="text-sm text-gray-500">
-                          No open ranges for this date.
+                          Loading availability...
                         </p>
                       )}
-                    {!availabilityIsLoading &&
-                      !timeOffsIsLoading &&
-                      !availabilityError &&
-                      !timeOffsError &&
-                      openTimeRanges.length > 0 && (
-                        <div className="flex flex-wrap gap-2 overflow-y-auto">
-                          {timeIntervals?.length > 0 &&
-                            timeIntervals.map((time) => (
-                              <div
-                                key={time.start.toISOString()}
-                                className={`${isTimeDisabled ? TIME_BTN_DISABLED : TIME_BTN_ACTIVE} 
-                                ${
-                                  getTimestamp(timeSelected) ===
-                                  getTimestamp(time.start)
-                                    ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-200"
-                                    : "bg-white hover:bg-gray-100"
-                                }`}
-                              >
-                                <button
-                                  type="button"
-                                  // disabled={isDateDisabled}
-                                  disabled={!stylist || !config}
-                                  onClick={() => {
-                                    if (
-                                      getTimestamp(timeSelected) ===
-                                      getTimestamp(time.start)
-                                    ) {
-                                      setTimeSelected(null);
-                                      setForm((prev) => {
-                                        const { startTime, ...rest } = prev;
-                                        return rest; // startTime removed
-                                      });
-                                    } else {
-                                      setTimeSelected(time.start);
-                                      setForm((prev) => ({
-                                        ...prev,
-                                        startTime: time.start
-                                      }));
-                                    }
-                                  }}
-                                >{`${time.startStrAMPM} - ${time.endStrAMPM}`}</button>
-                              </div>
-                            ))}
-                        </div>
+
+                      {(availabilityError || timeOffsError) && (
+                        <p className="text-sm text-red-600">
+                          Failed to load availability data.
+                        </p>
                       )}
-                  </div>
-                )}
+
+                      {!availabilityIsLoading &&
+                        !timeOffsIsLoading &&
+                        !availabilityError &&
+                        !timeOffsError &&
+                        openTimeRanges.length === 0 && (
+                          <p className="text-sm text-gray-500">
+                            No open ranges for this date.
+                          </p>
+                        )}
+
+                      {!availabilityIsLoading &&
+                        !timeOffsIsLoading &&
+                        !availabilityError &&
+                        !timeOffsError &&
+                        openTimeRanges.length > 0 && (
+                          <div className="flex flex-wrap gap-2 overflow-y-auto">
+                            {timeIntervals?.length > 0 &&
+                              timeIntervals.map((time) => (
+                                <div
+                                  key={time.start.toISOString()}
+                                  className={`${isTimeDisabled ? TIME_BTN_DISABLED : TIME_BTN_ACTIVE} ${
+                                    getTimestamp(timeSelected) ===
+                                    getTimestamp(time.start)
+                                      ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-200"
+                                      : "bg-white hover:bg-gray-100"
+                                  }`}
+                                >
+                                  <button
+                                    type="button"
+                                    disabled={!stylist || !config}
+                                    onClick={() => {
+                                      if (
+                                        getTimestamp(timeSelected) ===
+                                        getTimestamp(time.start)
+                                      ) {
+                                        setTimeSelected(null);
+                                        setForm((prev) => {
+                                          const { startTime, ...rest } = prev;
+                                          return rest;
+                                        });
+                                      } else {
+                                        setTimeSelected(time.start);
+                                        setForm((prev) => ({
+                                          ...prev,
+                                          startTime: time.start
+                                        }));
+                                      }
+                                    }}
+                                  >
+                                    {`${time.startStrAMPM} - ${time.endStrAMPM}`}
+                                  </button>
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>

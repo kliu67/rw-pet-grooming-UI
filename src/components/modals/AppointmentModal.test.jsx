@@ -124,6 +124,7 @@ const editRow = {
   service_configuration_id: 5,
   stylist_id: 2,
   startTime: "2026-03-15T09:00:00.000Z",
+  status: "booked",
   description: "Existing notes",
   client: clients[0],
   pet: pets[0],
@@ -161,6 +162,7 @@ describe("AppointmentModal", () => {
         service_configuration_id: 5,
         stylist_id: 2,
         startTime: "2026-03-15T09:00:00.000Z",
+        status: "booked",
         description: "Nail trim add-on"
       });
     });
@@ -234,6 +236,39 @@ describe("AppointmentModal", () => {
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith({
         description: "Updated notes"
+      });
+    });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows the date/stylist empty state before selections are made", () => {
+    render(<AppointmentModal {...baseProps} />);
+
+    expect(
+      screen.getByText("appointments.dateTimeSelector.selectDateAndStylist")
+    ).toBeInTheDocument();
+  });
+
+  it("submits changed status in edit mode", async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const onClose = vi.fn();
+
+    render(
+      <AppointmentModal
+        {...baseProps}
+        mode="edit"
+        row={editRow}
+        onSubmit={onSubmit}
+        onClose={onClose}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Completed" }));
+    fireEvent.click(screen.getByText("general.update"));
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith({
+        status: "completed"
       });
     });
     expect(onClose).toHaveBeenCalledTimes(1);
