@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import {
   Card,
   CardContent,
@@ -35,6 +36,7 @@ import {
   lastNameRegex,
   firstNameRegex,
 } from "@/constants";
+import { useAuth } from "@/context/AuthContext";
 
 type LoginFormData = {
   email: string;
@@ -52,22 +54,35 @@ type RegisterFormValues = {
 
 type RegisterFormData = Omit<RegisterFormValues, "confirmPassword">;
 
-export const Login = () => {
+export const Authenticate = () => {
   const [activeTab, setActiveTab] = useState<string>("login");
 
-  const loginForm = useForm<LoginFormData>({mode: "onBlur", reValidateMode: "onChange"});
-  const registerForm = useForm<RegisterFormValues>({mode: "onBlur", reValidateMode: "onChange" });
+  const loginForm = useForm<LoginFormData>({
+    mode: "onBlur",
+    reValidateMode: "onChange",
+  });
+  const registerForm = useForm<RegisterFormValues>({
+    mode: "onBlur",
+    reValidateMode: "onChange",
+  });
   const { t } = useTranslation();
+  const { setAuth } = useAuth();
   const password = registerForm.watch("password");
 
   const createUserMutation = useCreateUser();
   const loginMutation = useLogin();
+  const navigate = useNavigate();
+
   const onLogin = async (data: LoginFormData) => {
     try {
       const result = await loginMutation.mutateAsync(data);
       console.log("Login:", { email: data.email });
       console.log("Login status:", result?.status);
+      const token = result?.data?.accessToken; // adjust to actual shape
+      const user = result?.data?.user;
+      setAuth(token ?? null, user ?? null);
       toast.success("Login successful!");
+      navigate("/");
     } catch (err) {
       if (err?.status === 401) {
         toast.error("Invalid email or password");
