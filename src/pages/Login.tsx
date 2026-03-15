@@ -19,7 +19,8 @@ import {
 } from "../components/ui/tabs";
 import { Toaster } from "../components/ui/sonner";
 import { toast } from "sonner";
-import { useCreateUser } from "@/hooks/users";
+import { useCreateUser } from "@/hooks/auth";
+import { useLogin } from "@/hooks/auth";
 import {
   MAX_EMAIL_LENGTH,
   MAX_FIRST_NAME_LENGTH,
@@ -60,10 +61,25 @@ export const Login = () => {
   const password = registerForm.watch("password");
 
   const createUserMutation = useCreateUser();
-  const onLogin = (data: LoginFormData) => {
-    console.log("Login:", data);
-    toast.success("Login successful! (Demo mode)");
-    // In a real app, this would authenticate with a backend
+  const loginMutation = useLogin();
+  const onLogin = async (data: LoginFormData) => {
+    try {
+      const result = await loginMutation.mutateAsync(data);
+      console.log("Login:", { email: data.email });
+      console.log("Login status:", result?.status);
+      toast.success("Login successful!");
+    } catch (err) {
+      if (err?.status === 401) {
+        toast.error("Invalid email or password");
+      } else if (err?.status === 400) {
+        toast.error("Invalid login request");
+      } else {
+        toast.error(
+          `Login failed: ${err?.status} - ${err?.message || err?.error}`,
+        );
+      }
+      console.log(err);
+    }
   };
 
   const onRegister = async (data: RegisterFormValues) => {
@@ -170,8 +186,15 @@ export const Login = () => {
                     )}
                   </div>
 
-                  <Button type="submit" className="w-full">
-                    Login
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={loginMutation.isPending}
+                    aria-busy={loginMutation.isPending}
+                  >
+                    {loginMutation.isPending
+                      ? `${t("login.login")}...`
+                      : t("login.login")}
                   </Button>
                 </form>
               </TabsContent>
@@ -360,8 +383,15 @@ export const Login = () => {
                     )}
                   </div>
 
-                  <Button type="submit" className="w-full">
-                    {t("login.createAccount")}
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={createUserMutation.isPending}
+                    aria-busy={createUserMutation.isPending}
+                  >
+                    {createUserMutation.isPending
+                      ? `${t("login.createAccount")}...`
+                      : t("login.createAccount")}
                   </Button>
                 </form>
               </TabsContent>

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { registerUser } from "@/api/users";
+import { loginUser, registerUser } from "@/api/auth";
 import { USERS_QUERY_KEY } from "@/constants";
 
 export function useCreateUser() {
@@ -11,5 +11,11 @@ export function useCreateUser() {
       // refresh services table
       queryClient.invalidateQueries({ queryKey: [USERS_QUERY_KEY] });
     },
+  });
+}
+
+export function useLogin() {
+  return useMutation({
+    mutationFn: loginUser,
   });
 }
