@@ -26,61 +26,19 @@ import {
   MoreHorizontal,
   Plus,
   Search,
-  XCircle
+  XCircle,
+  Menu
 } from "lucide-react";
 
 const columnHelper = createColumnHelper();
 
-// Mock data
-const initialAppointments = [
-  {
-    id: 1,
-    client: "Alice Johnson",
-    pet: "Bella",
-    service: "Full Grooming",
-    date: "2023-10-25",
-    time: "10:00 AM",
-    status: "Confirmed",
-    amount: "$85.00"
-  },
-  {
-    id: 2,
-    client: "Bob Smith",
-    pet: "Max",
-    service: "Bath & Brush",
-    date: "2023-10-25",
-    time: "11:30 AM",
-    status: "Pending",
-    amount: "$45.00"
-  },
-  {
-    id: 3,
-    client: "Carol White",
-    pet: "Lucy",
-    service: "Nail Trim",
-    date: "2023-10-26",
-    time: "09:15 AM",
-    status: "Completed",
-    amount: "$25.00"
-  },
-  {
-    id: 4,
-    client: "David Brown",
-    pet: "Charlie",
-    service: "Full Grooming",
-    date: "2023-10-26",
-    time: "02:00 PM",
-    status: "Cancelled",
-    amount: "$90.00"
-  }
-];
-
 const StatusBadge = ({ status }: { status: string }) => {
   const styles = {
+    booked: "bg-green-100 text-green-700",
     Confirmed: "bg-green-100 text-green-700",
     Pending: "bg-yellow-100 text-yellow-700",
-    Completed: "bg-blue-100 text-blue-700",
-    Cancelled: "bg-red-100 text-red-700"
+    completed: "bg-blue-100 text-blue-700",
+    cancelled: "bg-red-100 text-red-700"
   };
   return (
     <span
@@ -156,17 +114,17 @@ export const Appointments = () => {
         displayName: t("appointments.displayName.client"),
         placeholder: t("appointments.placeholderText.client")
       },
-        pet: {
+      pet: {
         name: "pet",
         displayName: t("appointments.displayName.pet"),
         placeholder: t("appointments.placeholderText.pet")
       },
-        service: {
+      service: {
         name: "service",
         displayName: t("appointments.displayName.service"),
         placeholder: t("appointments.placeholderText.service")
       },
-        stylist: {
+      stylist: {
         name: "stylist",
         displayName: t("appointments.displayName.stylist"),
         placeholder: t("appointments.placeholderText.stylist")
@@ -202,7 +160,7 @@ export const Appointments = () => {
 
   /* ---------------- CREATE AND EDIT ACTION HANDLER ---------------- */
   const handleAction = React.useCallback(
-    (action = "", pet = {}) => {
+    (action = "", appointment = {}) => {
       if (action === "create" || action === "edit") {
         (setMode(action), setAppointment(appointment));
         setIsOpen(true);
@@ -222,7 +180,8 @@ export const Appointments = () => {
           isLoading: deleteAppMutation.isPending,
           serverError: deleteAppMutation.error?.message,
           entityName: appointment.id || "",
-          entityType: "appointment"
+          entityType: "appointment",
+          confirmMsg: t("appointments.confirmDelete")
         });
       }
     },
@@ -243,10 +202,38 @@ export const Appointments = () => {
     return createAppMutation.mutateAsync(formData);
   };
 
+  const formatDateTimeCell = (value: string | Date | null | undefined) => {
+    if (!value) return "-";
+
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(date.getTime()) ? "-" : date.toLocaleString();
+  };
+
   const columns = React.useMemo(
     () => [
+      //ACTIONS COLUMN
+      columnHelper.display({
+        id: "actions",
+        header: <Menu />,
+        size: 20,
+        minSize: 20,
+        maxSize: 40,
+        cell: ({ row }) => {
+          const rowApp = row.original;
+
+          return (
+            <RowActionsMenu
+              onEdit={() => handleAction("edit", rowApp)}
+              onDelete={() => handleAction("delete", rowApp)}
+            />
+          );
+        }
+      }),
       columnHelper.accessor("id", {
         header: "ID",
+        size: 20,
+        minSize: 20,
+        maxSize: 120,
         cell: (info) => info.getValue()
       }),
       columnHelper.accessor(
@@ -256,27 +243,52 @@ export const Appointments = () => {
             .join(" ") || "-",
         {
           header: "clientName",
+          size: 100,
+          minSize: 60,
+          maxSize: 160,
           cell: (info) => info.getValue()
         }
       ),
       columnHelper.accessor((row) => row.service?.name ?? "-", {
         header: "serviceName",
+        size: 120,
+        minSize: 60,
+        maxSize: 160,
         cell: (info) => info.getValue()
       }),
       columnHelper.accessor((row) => row.pet?.name ?? "-", {
         header: "petName",
+        size: 120,
+        minSize: 60,
+        maxSize: 180,
         cell: (info) => info.getValue()
+      }),
+      columnHelper.accessor("startTime", {
+        header: "startTime",
+        size: 210,
+        minSize: 100,
+        maxSize: 210,
+        cell: (info) => formatDateTimeCell(info.getValue())
+      }),
+      columnHelper.accessor("endTime", {
+        header: "endTime",
+        size: 210,
+        minSize: 100,
+        maxSize: 210,
+        cell: (info) => formatDateTimeCell(info.getValue())
       }),
       columnHelper.accessor("status", {
         header: "status",
+        size: 100,
+        minSize: 60,
+        maxSize: 120,
         cell: (info) => <StatusBadge status={info.getValue()} />
       }),
-      columnHelper.accessor((row) => row.breed?.name ?? "-", {
-        header: "breedName",
-        cell: (info) => info.getValue()
-      }),
       columnHelper.accessor("priceSnapshot", {
-        header: "priceSnapshot",
+        header: "amount",
+        size: 100,
+        minSize: 60,
+        maxSize: 120,
         cell: (info) => info.getValue()
       }),
       columnHelper.accessor(
@@ -285,22 +297,27 @@ export const Appointments = () => {
             .filter(Boolean)
             .join(" ") || "-",
         {
-          header: "stylistName",
+          header: "stylist",
+          size: 100,
+          minSize: 60,
+          maxSize: 160,
           cell: (info) => info.getValue()
         }
       ),
-      columnHelper.accessor("startTime", {
-        header: "startTime",
-        cell: (info) => info.getValue()
-      }),
-      columnHelper.accessor("endTime", {
-        header: "endTime",
-        cell: (info) => info.getValue()
-      }),
+
       columnHelper.accessor("durationSnapshot", {
-        header: "durationSnapshot",
+        header: "Duration",
+        size: 80,
+        minSize: 80,
+        maxSize: 120,
         cell: (info) => info.getValue()
       }),
+
+      columnHelper.accessor("description", {
+        header: "description",
+        cell: (info) => info.getValue()
+      }),
+
       columnHelper.accessor("uuid", {
         header: "uuid",
         cell: (info) => info.getValue()
@@ -319,22 +336,6 @@ export const Appointments = () => {
           return v ? new Date(v).toLocaleDateString() : "-";
         }
       })
-
-      //ACTIONS COLUMN
-      // columnHelper.display({
-      //   id: "actions",
-      //   header: "",
-      //   cell: ({ row }) => {
-      //     const client = row.original;
-
-      //     return (
-      //       <RowActionsMenu
-      //         onEdit={() => handleAction("edit", client)}
-      //         onDelete={() => handleAction("delete", client)}
-      //       />
-      //     );
-      //   }
-      // })
     ],
     []
   );
@@ -352,13 +353,18 @@ export const Appointments = () => {
   const appointments = appData.map((app) => {
     const client = clientsById.get(app.client_id);
     const config = configsById.get(app.service_configuration_id);
-    const service = config ? servicesById.get(config.service_id) : undefined;
+    const service = servicesById.get(app.service_id);
     const stylist = stylistsById.get(app.stylist_id);
     const pet = petsById.get(app.pet_id);
     const breed = config ? breedsById.get(config.breed_id) : undefined;
 
     return {
       id: app.id,
+      client_id: app.client_id,
+      pet_id: app.pet_id,
+      service_id: app.service_id,
+      service_configuration_id: app.service_configuration_id,
+      stylist_id: app.stylist_id,
       client: client,
       service,
       pet,
@@ -368,6 +374,8 @@ export const Appointments = () => {
       stylist,
       startTime: app.start_time,
       endTime: app.end_time,
+      effectiveEndTime: app.effective_end_time,
+      description: app.description,
       durationSnapshot: app.duration_snapshot,
       uuid: app.uuid,
       createdAt: app.created_at,
@@ -385,7 +393,10 @@ export const Appointments = () => {
       (app.service?.name ?? "")
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      app.stylistName.toLowerCase().includes(searchTerm.toLowerCase())
+      app.stylist?.first_name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      app.stylist?.last_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -428,49 +439,6 @@ export const Appointments = () => {
           </div>
         </div>
 
-        {/* <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-500">
-            <thead className="bg-gray-50 text-xs uppercase text-gray-700 font-semibold">
-              <tr>
-                <th className="px-6 py-4">Client / Pet</th>
-                <th className="px-6 py-4">Service</th>
-                <th className="px-6 py-4">Date & Time</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-right">Amount</th>
-                <th className="px-6 py-4 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredAppointments.map((app) => (
-                <tr key={app.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-gray-900">
-                      {app.client}
-                    </div>
-                    <div className="text-xs text-gray-500">Pet: {app.pet}</div>
-                  </td>
-                  <td className="px-6 py-4">{app.service}</td>
-                  <td className="px-6 py-4">
-                    <div className="text-gray-900">{app.date}</div>
-                    <div className="text-xs text-gray-500">{app.time}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <StatusBadge status={app.status} />
-                  </td>
-                  <td className="px-6 py-4 text-right font-medium text-gray-900">
-                    {app.amount}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <button className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100">
-                      <MoreHorizontal className="h-5 w-5" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div> */}
-
         <div className="overflow-x-auto">
           <AppointmentTable data={filteredAppointments} columns={columns} />
         </div>
@@ -480,7 +448,7 @@ export const Appointments = () => {
             mode={mode || "create"}
             inputs={appointmentInputs}
             onSubmit={handleSubmit}
-            appointment={appointment}
+            row={appointment}
             onClose={() => setIsOpen(false)}
             isLoading={isSubmitting}
             configs={configsData}
@@ -488,6 +456,7 @@ export const Appointments = () => {
             services={servicesData}
             breeds={breedsData}
             pets={petsData}
+            appointmentsData={appointments}
             stylists={stylistsData}
           />
         )}

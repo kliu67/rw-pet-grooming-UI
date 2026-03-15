@@ -1,6 +1,7 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { CONFIRM_DELETE } from "@/constants";
 import DeleteModal from "./DeleteModal";
 
 vi.mock("i18next", () => ({
@@ -8,7 +9,7 @@ vi.mock("i18next", () => ({
 }));
 
 describe("DeleteModal", () => {
-  it("requires matching entity name before submit", () => {
+  it("requires the delete confirmation phrase before submit", () => {
     const onSubmit = vi.fn();
     render(
       <DeleteModal
@@ -25,7 +26,7 @@ describe("DeleteModal", () => {
     expect(submit).toBeDisabled();
 
     fireEvent.change(screen.getByPlaceholderText("Entity Name"), {
-      target: { value: "Bath" }
+      target: { value: CONFIRM_DELETE }
     });
 
     expect(submit).not.toBeDisabled();

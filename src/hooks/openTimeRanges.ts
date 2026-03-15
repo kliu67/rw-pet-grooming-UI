@@ -15,6 +15,7 @@ type OpenRange = {
 type UseOpenTimeRangesParams = {
   availabilityData?: unknown;
   timeOffsData?: unknown;
+  appointments?: unknown;
   date?: Date;
 };
 
@@ -159,12 +160,14 @@ function getDateTimeRangesForSelectedDay(record: UnknownRecord, selectedDate: Da
     "startDateTime",
     "start_at",
     "from_datetime",
+    "startTime"
   ]);
   const endAt = getDateTimeFromRecord(record, [
     "end_datetime",
     "endDateTime",
     "end_at",
     "to_datetime",
+    "endTime"
   ]);
 
   if (!startAt || !endAt) return null;
@@ -258,18 +261,48 @@ function minutesToTimeString(minutes: number) {
 export function useOpenTimeRanges({
   availabilityData,
   timeOffsData,
+  appointments,
   date,
 }: UseOpenTimeRangesParams) {
   return useMemo(() => {
     return getOpenTimeRanges({
       availabilityData,
       timeOffsData,
+      appointments,
       date,
     });
-  }, [availabilityData, date, timeOffsData]);
+  }, [availabilityData, date, appointments, timeOffsData]);
 }
 
 export function getOpenTimeRanges({
+  availabilityData,
+  timeOffsData,
+  appointments = [],
+  date,
+}: UseOpenTimeRangesParams): OpenRange[] {
+  if (!date) return [];
+
+  const availabilityRanges = toArray(availabilityData).flatMap((item) =>
+    toRangesForSelectedDay(item, date),
+  );
+
+  const blockedRanges = toArray(timeOffsData).flatMap((item) =>
+    toRangesForSelectedDay(item, date),
+  );
+
+  const bookedRanges = toArray(appointments).flatMap((app)=>
+    toRangesForSelectedDay(app,date),
+  );
+
+  return subtractRanges(subtractRanges(availabilityRanges, blockedRanges),bookedRanges)
+    .sort((a, b) => a.startMinutes - b.startMinutes)
+    .map((range) => ({
+      start: minutesToTimeString(range.startMinutes),
+      end: minutesToTimeString(range.endMinutes),
+    }));
+}
+
+export function getBlockedTimeRanges({
   availabilityData,
   timeOffsData,
   date,

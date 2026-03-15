@@ -27,6 +27,7 @@ export const DropdownSearch = ({ searchTerm, onChange }) => {
     </div>
   );
 };
+
 export default function PetModal({
   onClose,
   inputs,
@@ -110,6 +111,7 @@ export default function PetModal({
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
+  
   const hasChanges = (current) => {
     return (
       (petData?.name || "").trim() !== current.name.trim() ||

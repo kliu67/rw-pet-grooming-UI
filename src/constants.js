@@ -1,6 +1,7 @@
 //
 export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-export const INTERVAL_MINUTES = 10;
+export const INTERVAL_MINUTES = 30;
+export const CONFIRM_DELETE = 'DELETE';
 //service constants
 export const MAX_SERVICE_NAME_LENGTH = 60;
 export const MAX_SERVICE_DESC_LENGTH = 200;
@@ -32,6 +33,7 @@ export const SERVICE_CONFIGURATIONS_QUERY_KEY = "serviceConfigurations";
 
 //appointments
 export const APPOINTMENTS_QUERY_KEY = "appointments";
+export const MAX_APPOINTMENTS_DESC_LENGTH = 200;
 
 //stylists
 export const STYLISTS_QUERY_KEY = "stylists";

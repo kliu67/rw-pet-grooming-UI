@@ -29,11 +29,11 @@ describe("Table", () => {
     expect(screen.getByText("Service 1")).toBeInTheDocument();
     expect(screen.queryByText("Service 26")).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByText("Next"));
+    fireEvent.click(screen.getByRole("button", { name: "general.next" }));
     expect(screen.getByText("Service 26")).toBeInTheDocument();
     expect(screen.queryByText("Service 1")).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByText("Prev"));
+    fireEvent.click(screen.getByRole("button", { name: "general.prev" }));
     expect(screen.getByText("Service 1")).toBeInTheDocument();
   });
 

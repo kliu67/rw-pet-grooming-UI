@@ -9,7 +9,8 @@
         "update": "Update",
         "delete": "Delete",
         "create": "Create",
-        "select": "Select"
+        "select": "Select",
+        "remarks": "Remarks"
     },
     "columns":{
         "id": "ID",
@@ -27,7 +28,7 @@
     },
     "DeleteModal":{
         "title" : "Delete {{entity}}",
-        "confirmDelete": "Are you sure you want to delete the {{entity}} \"{{entity_name}}\"? To confirm, type the name of the service in the field below.",
+        "confirmDelete": "Are you sure you want to delete the {{entity}} \"{{entity_name}}\"? To confirm, type \"DELETE\" in the field below",
         "warning": "Note: This action cannot be undone."
     },
     "services":{
@@ -132,20 +133,30 @@
         "delete": "Delete appointment",
         "errors":{
             "notEmpty": "\"{{input}}\" field cannot be empty",
-            "loading": "Error loading appointments"
+            "loading": "Error loading appointments",
+            "description": "Description cannot be longer than \"{{max}}\" characters."
         },
         "displayName": {
             "client": "Client",
             "pet": "Pet",
             "service": "Service",
             "breed": "Breed",
-            "stylist": "Stylist"
+            "stylist": "Stylist",
+            "date": "Date",
+            "time": "Time"
         },
         "placeholderText": {
             "client": "Select Client",
             "pet": "Select Pet",
             "service": "Select Service",
-            "breed": "Select Breed"
-        }
+            "breed": "Select Breed",
+            "remarks": "Enter Remarks"
+        },
+        "dateTimeSelector": {
+            "selectDateAndStylist": "Select service, pet, stylist, and date to see available times",
+            "openTimeRanges": "Open time ranges"
+        },
+        "selectClient": "Select a client to see pets",
+        "confirmDelete": "To confirm, type DELETE in the field below"
     }
 }
