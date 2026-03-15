@@ -199,7 +199,7 @@ export const Appointments = () => {
       });
     }
 
-    return createAppMutation.mutateAsync(formData);
+    return await createAppMutation.mutateAsync(formData);
   };
 
   const formatDateTimeCell = (value: string | Date | null | undefined) => {

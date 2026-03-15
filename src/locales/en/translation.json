@@ -158,5 +158,31 @@
         },
         "selectClient": "Select a client to see pets",
         "confirmDelete": "To confirm, type DELETE in the field below"
+    },
+    "login":{
+        "heading": "Welcome",
+        "subHeading": "Log in to your account or create a new one",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "phone": "Phone",
+        "login": "Login",
+        "register": "Register",
+        "placeholderText": "you@example.com",
+        "required": "{{field}} is required",
+        "confirmPasswordRequired": "Please confirm your password",
+        "passwordMatchError": "Passwords do not match",
+        "createAccount": "Create Account",
+        "fieldLengthError": "{{field}} cannot be longer than {{length}} characters",
+        "emailFormatError": "Invalid email address",
+        "emailMaxLengthError": "Email cannot be longer than {{length}} characters",
+        "passwordError": "Password must contain a letter, a number, and a special character (!@#$%^&*())",
+        "passwordMinLengthError": "Password must be at least {{length}} characters",
+        "passwordMaxLengthError": "Password must be no longer than {{length}} characters",
+        "phoneFormatError": "Invalid phone format",
+        "phoneMinLengthError": "Phone must be at least {{length}} numbers",
+        "phoneMaxLengthError": "Phone cannot be longer than {{length}} numbers"
     }
 }

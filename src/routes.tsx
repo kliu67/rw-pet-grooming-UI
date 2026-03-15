@@ -8,6 +8,7 @@ import { Services } from './pages/Services';
 import { Breeds } from './pages/Breeds';
 import { Pets } from './pages/Pets';
 import { ServiceConfigurations } from './pages/ServiceConfigurations'
+import { Login } from  './pages/Login';
 
 export const router = createBrowserRouter([
   {
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
         path: 'pets',
         Component: Pets,
       },
+      {
+        path: 'login',
+        Component: Login,
+      }
     ],
   },
 ]);
