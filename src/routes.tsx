@@ -8,7 +8,7 @@ import { Services } from './pages/Services';
 import { Breeds } from './pages/Breeds';
 import { Pets } from './pages/Pets';
 import { ServiceConfigurations } from './pages/ServiceConfigurations'
-import { Login } from  './pages/Login';
+import { Authenticate } from  './pages/Authenticate';
 
 export const router = createBrowserRouter([
   {
@@ -45,7 +45,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'login',
-        Component: Login,
+        Component: Authenticate,
       }
     ],
   },

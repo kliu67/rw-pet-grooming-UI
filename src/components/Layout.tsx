@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Outlet, NavLink, useLocation } from "react-router";
 import {
   LayoutDashboard,
@@ -8,19 +8,27 @@ import {
   LogOut,
   Menu,
   Dog,
-  File
+  File,
+  User,
 } from "lucide-react";
 import { useState } from "react";
+import { refresh } from "../api/auth";
+import { useAuth } from "@/context/AuthContext";
+import { API_URL } from "@/constants";
 import { cn } from "../lib/utils"; // Assuming utility exists or I'll create it
+import { MODAL_TYPES } from "@/components/modals/modalRegistry";
+import { useModal } from "@/components/modals/ModalProvider";
 
 const Sidebar = ({
   isOpen,
-  onClose
+  onClose,
 }: {
   isOpen: boolean;
   onClose: () => void;
 }) => {
   const location = useLocation();
+  const { isAuthenticated, user, accessToken, setAuth, clearAuth } = useAuth();
+  const { openModal, closeModal } = useModal();
 
   const navItems = [
     { name: "Dashboard", path: "/", icon: LayoutDashboard },
@@ -30,11 +38,31 @@ const Sidebar = ({
     {
       name: "Service Configurations",
       path: "/serviceConfigurations",
-      icon: File
+      icon: File,
     },
     { name: "Breeds", path: "/breeds", icon: Scissors },
-    { name: "Pets", path: "/pets", icon: Dog }
+    { name: "Pets", path: "/pets", icon: Dog },
   ];
+ const openUserModal = () => {
+  openModal(MODAL_TYPES.USER, {user});
+ }
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        const res = await fetch(`${API_URL}/auth/refresh`, {
+          method: "POST",
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("No session");
+        const data = await res.json();
+        setAuth(data.accessToken);
+      } catch {
+        clearAuth();
+      }
+    };
+
+    initAuth();
+  }, [setAuth, clearAuth]);
 
   return (
     <>
@@ -49,7 +77,7 @@ const Sidebar = ({
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:h-screen md:sticky top-0",
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          isOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div className="flex flex-col h-full">
@@ -71,7 +99,7 @@ const Sidebar = ({
                     "flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium",
                     isActive
                       ? "bg-indigo-50 text-indigo-700"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
                   )
                 }
               >
@@ -82,6 +110,11 @@ const Sidebar = ({
           </nav>
 
           <div className="p-4 border-t border-gray-100">
+            <button className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-red-600 w-full transition-colors rounded-xl hover:bg-red-50 font-medium"
+            onClick={()=>openUserModal()}>
+              <User className="h-5 w-5" />
+              User
+            </button>
             <button className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-red-600 w-full transition-colors rounded-xl hover:bg-red-50 font-medium">
               <LogOut className="h-5 w-5" />
               Logout
