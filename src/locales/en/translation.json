@@ -197,5 +197,10 @@
             "phone": "Phone",
             "role": "Role"
         }
+    },
+    "logoutModal":{
+        "heading": "Logout",
+        "message": "Are you sure you want to log out?",
+        "confirm": "Log out"
     }
 }

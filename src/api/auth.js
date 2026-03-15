@@ -27,7 +27,7 @@ export async function loginUser(data) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
-    credentials:"include"
+    credentials: "include",
   });
 
   if (!res.ok) {
@@ -47,6 +47,23 @@ export async function loginUser(data) {
 
 export async function refresh() {
   const res = await fetch(`${API_URL}/auth/refresh`, {
+    method: "POST",
+    credentials: "include",
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const rawMessage = err?.message || err?.error || "Request failed";
+    const message =
+      typeof rawMessage === "string" ? rawMessage : "Request failed";
+    const error = new Error(message);
+    error.status = res.status;
+    error.error = err.error;
+    throw error;
+  }
+}
+
+export async function logout() {
+  const res = await fetch(`${API_URL}/auth/logout`, {
     method: "POST",
     credentials: "include",
   });
