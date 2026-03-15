@@ -11,7 +11,9 @@
         "delete": "Delete",
         "create": "Create",
         "select": "Select",
-        "remarks": "Remarks"
+        "remarks": "Remarks",
+        "login": "Login",
+        "logout": "Logout"
     },
     "columns":{
         "id": "ID",

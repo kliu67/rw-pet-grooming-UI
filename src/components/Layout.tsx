@@ -10,8 +10,10 @@ import {
   Dog,
   File,
   User,
+  LogIn,
 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { refresh } from "../api/auth";
 import { useAuth } from "@/context/AuthContext";
 import { API_URL } from "@/constants";
@@ -29,6 +31,7 @@ const Sidebar = ({
   const location = useLocation();
   const { isAuthenticated, user, accessToken, setAuth, clearAuth } = useAuth();
   const { openModal, closeModal } = useModal();
+  const navigate = useNavigate();
 
   const navItems = [
     { name: "Dashboard", path: "/", icon: LayoutDashboard },
@@ -43,9 +46,9 @@ const Sidebar = ({
     { name: "Breeds", path: "/breeds", icon: Scissors },
     { name: "Pets", path: "/pets", icon: Dog },
   ];
- const openUserModal = () => {
-  openModal(MODAL_TYPES.USER, {user});
- }
+  const openUserModal = () => {
+    openModal(MODAL_TYPES.USER, { user });
+  };
   useEffect(() => {
     const initAuth = async () => {
       try {
@@ -110,15 +113,29 @@ const Sidebar = ({
           </nav>
 
           <div className="p-4 border-t border-gray-100">
-            <button className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-red-600 w-full transition-colors rounded-xl hover:bg-red-50 font-medium"
-            onClick={()=>openUserModal()}>
-              <User className="h-5 w-5" />
-              User
-            </button>
-            <button className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-red-600 w-full transition-colors rounded-xl hover:bg-red-50 font-medium">
-              <LogOut className="h-5 w-5" />
-              Logout
-            </button>
+            {isAuthenticated && user && (
+              <button
+                className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-red-600 w-full transition-colors rounded-xl hover:bg-red-50 font-medium"
+                onClick={() => openUserModal()}
+              >
+                <User className="h-5 w-5" />
+                User
+              </button>
+            )}
+            {!isAuthenticated ? (
+              <button
+                className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-red-600 w-full transition-colors rounded-xl hover:bg-red-50 font-medium"
+                onClick={() => navigate("/login")}
+              >
+                <LogIn className="h-5 w-5" />
+                Login
+              </button>
+            ) : (
+              <button className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-red-600 w-full transition-colors rounded-xl hover:bg-red-50 font-medium">
+                <LogOut className="h-5 w-5" />
+                Logout
+              </button>
+            )}
           </div>
         </div>
       </aside>
