@@ -19,7 +19,7 @@ import { useAuth } from "@/context/AuthContext";
 import { API_URL } from "@/constants";
 import { cn } from "../lib/utils"; // Assuming utility exists or I'll create it
 import { MODAL_TYPES } from "@/components/modals/modalRegistry";
-import { useModal } from "@/components/modals/ModalProvider";
+import { ModalProvider, useModal } from "@/components/modals/ModalProvider";
 
 const Sidebar = ({
   isOpen,
@@ -49,6 +49,9 @@ const Sidebar = ({
   const openUserModal = () => {
     openModal(MODAL_TYPES.USER, { user });
   };
+  const openAuthModal = () => {
+    openModal(MODAL_TYPES.AUTH);
+  }
   useEffect(() => {
     const initAuth = async () => {
       try {
@@ -125,7 +128,7 @@ const Sidebar = ({
             {!isAuthenticated ? (
               <button
                 className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-red-600 w-full transition-colors rounded-xl hover:bg-red-50 font-medium"
-                onClick={() => navigate("/login")}
+                onClick={() => openAuthModal()}
               >
                 <LogIn className="h-5 w-5" />
                 Login
@@ -147,31 +150,36 @@ export const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+    <ModalProvider>
+      <div className="min-h-screen bg-gray-50 flex">
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+        />
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-white border-b border-gray-200 md:hidden sticky top-0 z-10">
-          <div className="flex items-center justify-between px-4 py-3">
-            <h1 className="text-xl font-bold text-indigo-600 flex items-center gap-2">
-              <Scissors className="h-5 w-5" />
-              <span>Groomify</span>
-            </h1>
-            <button
-              onClick={() => setIsSidebarOpen(true)}
-              className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
-          </div>
-        </header>
+        <div className="flex-1 flex flex-col min-w-0">
+          <header className="bg-white border-b border-gray-200 md:hidden sticky top-0 z-10">
+            <div className="flex items-center justify-between px-4 py-3">
+              <h1 className="text-xl font-bold text-indigo-600 flex items-center gap-2">
+                <Scissors className="h-5 w-5" />
+                <span>Groomify</span>
+              </h1>
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+              >
+                <Menu className="h-6 w-6" />
+              </button>
+            </div>
+          </header>
 
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-          <div className="max-w-8xl mx-auto">
-            <Outlet />
-          </div>
-        </main>
+          <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+            <div className="max-w-8xl mx-auto">
+              <Outlet />
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </ModalProvider>
   );
 };
