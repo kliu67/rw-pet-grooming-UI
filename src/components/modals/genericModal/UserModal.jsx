@@ -6,31 +6,31 @@ export default function UserModal({ closeModal, user }) {
   return (
     <div>
       <h2 className="text-lg font-semibold mb-4">{t("userModal.heading")}</h2>
-      <p className="text-md text-black-600 mt-1">
+      <p className="text-md font-semibold text-black-600 mt-1">
         {t("userModal.fields.firstName")}
       </p>
         <p className="text-md text-black-600 mt-1">
         {user?.first_name}
       </p>
-      <p className="text-md text-black-600 mt-1">
+      <p className="text-md font-semibold text-black-600 mt-1">
         {t("userModal.fields.lastName")}
       </p>
          <p className="text-md text-black-600 mt-1">
         {user?.last_name}
       </p>
-      <p className="text-md text-black-600 mt-1">
+      <p className="text-md font-semibold text-black-600 mt-1">
         {t("userModal.fields.email")}
       </p>
          <p className="text-md text-black-600 mt-1">
         {user?.email}
       </p>
-      <p className="text-md text-black-600 mt-1">
+      <p className="text-md font-semibold text-black-600 mt-1">
         {t("userModal.fields.phone")}
       </p>
          <p className="text-md text-black-600 mt-1">
         {user?.phone}
       </p>
-      <p className="text-md text-black-600 mt-1">
+      <p className="text-md font-semibold text-black-600 mt-1">
         {t("userModal.fields.role")}
       </p>
          <p className="text-md text-black-600 mt-1">
@@ -47,7 +47,7 @@ export default function UserModal({ closeModal, user }) {
           onClick={closeModal}
           className="px-4 py-2 border rounded-lg"
         >
-          {t("general.cancel")}
+          {t("general.close")}
         </button>
       </div>
     </div>
