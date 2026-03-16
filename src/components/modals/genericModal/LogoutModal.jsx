@@ -1,21 +1,18 @@
 import { t } from "i18next";
-import { logout } from "../../../api/auth";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 
 
-export default function ConfirmModal({
+export default function LogoutModal({
   closeModal,
   title = "",
   message = "",
   primaryLabel = "",
-  onSubmit = () => {}
 }) {
-  const { clearAuth } = useAuth();
+  const { logout } = useAuth();
   const handleLogout = async () => {
     try {
       await logout();
-      clearAuth();
       toast.success(t("toast.logoutSuccess"));
       closeModal();
     } catch (err) {
@@ -41,7 +38,6 @@ export default function ConfirmModal({
           type="primary"
           onClick={handleLogout}
           className="px-4 py-2 bg-red-600 text-white rounded-lg transition-colors hover:bg-red-700"
-          // disabled={!canDelete || isLoading || serverError}
         >
           {primaryLabel}
         </button>

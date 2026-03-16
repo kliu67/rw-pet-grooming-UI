@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Outlet, NavLink, useLocation } from "react-router";
+import { useEffect } from "react";
+import { Outlet, NavLink } from "react-router";
 import {
   LayoutDashboard,
   Calendar,
@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
 import { useAuth } from "@/context/AuthContext";
 import { API_URL } from "@/constants";
 import { Toaster } from "./ui/sonner";
@@ -29,10 +28,8 @@ const Sidebar = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
-  const location = useLocation();
-  const { isAuthenticated, user, accessToken, setAuth, clearAuth } = useAuth();
-  const { openModal, closeModal } = useModal();
-  const navigate = useNavigate();
+  const { isAuthenticated, user, setAuth, clearAuth } = useAuth();
+  const { openModal } = useModal();
   const { t } = useTranslation();
 
   const navItems = [
@@ -56,15 +53,11 @@ const Sidebar = ({
     openModal(MODAL_TYPES.AUTH);
   };
   const openLogoutModal = () => {
-    openModal(MODAL_TYPES.CONFIRM, {
+    openModal(MODAL_TYPES.LOGOUT, {
       title: t("logoutModal.heading"),
       message: t("logoutModal.message"),
       primaryLabel: t("logoutModal.confirm"),
     });
-  };
-
-  const closeLogoutModal = () => {
-    closeModal(MODAL_TYPES.CONFIRM);
   };
 
   useEffect(() => {
@@ -83,7 +76,7 @@ const Sidebar = ({
     };
 
     initAuth();
-  }, []);
+  }, [clearAuth, setAuth]);
 
   return (
     <>

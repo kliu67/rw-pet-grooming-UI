@@ -206,6 +206,12 @@
     },
     "toast": {
         "logoutSuccess": "You are now logged out",
-        "loginSuccess": "Logged in successfully!"
+        "loginSuccess": "Logged in successfully!",
+        "registerSuccess": "Registration successful!",
+        "registerFailed": "Registration failed",
+        "registerFailEmailAlreadyExists": "Account with this email already exists",
+        "loginInvalidEmailPassword": "Invalid email or password",
+        "loginInvalidRequest": "Invalid login request",
+        "loginFailed": "Login failed"
     }
 }

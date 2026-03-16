@@ -34,24 +34,31 @@ const AuthContext = createContext<AuthState | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const [accessToken, setAccessToken] = useState<string | null>(null);
-const [user, setUser] = useState<User | null>(() => {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  return raw ? JSON.parse(raw) : null;
-});
-  const setAuth = (token: string | null, nextUser?: AuthState["user"]) => {
-    setAccessToken(token);
-    if (nextUser !== undefined) {
-        setUser(nextUser);
-        if(nextUser) localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser));
-        else localStorage.removeItem(STORAGE_KEY);
-    }
-  };
+  const [user, setUser] = useState<User | null>(() => {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  });
 
-  const clearAuth = () => {
+  const setAuth = useCallback(
+    (token: string | null, nextUser?: AuthState["user"]) => {
+      setAccessToken(token);
+      if (nextUser !== undefined) {
+        setUser(nextUser);
+        if (nextUser) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser));
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      }
+    },
+    [],
+  );
+
+  const clearAuth = useCallback(() => {
     setAccessToken(null);
     setUser(null);
     localStorage.removeItem(STORAGE_KEY);
-  };
+  }, []);
 
   const login = useCallback(
     async (data: { email: string; password: string }) => {
