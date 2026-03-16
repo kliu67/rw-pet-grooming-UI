@@ -8,6 +8,7 @@ const closeModalMock = vi.fn();
 const createMutateAsyncMock = vi.fn();
 const updateMutateAsyncMock = vi.fn();
 const deleteMutateAsyncMock = vi.fn();
+const authState = { isAuthenticated: true };
 
 let appointmentsHookState: any;
 let clientsHookState: any;
@@ -65,12 +66,15 @@ vi.mock("@/components/modals/ModalProvider", () => ({
 }));
 
 vi.mock("@/components/modals/AppointmentModal", () => ({
-  default: ({ mode, row, onClose }: any) => (
+  default: ({ mode, row, onClose, onSubmit }: any) => (
     <div data-testid="appointment-modal">
       <span>{mode}</span>
       <span>{row?.id ?? "new"}</span>
       <button type="button" onClick={onClose}>
         close modal
+      </button>
+      <button type="button" onClick={() => onSubmit({ note: "submitted" })}>
+        submit modal
       </button>
     </div>
   )
@@ -104,6 +108,10 @@ vi.mock("@/components/Table", () => ({
       ))}
     </div>
   )
+}));
+
+vi.mock("@/context/AuthContext", () => ({
+  useAuth: () => authState
 }));
 
 const appointmentRecords = [
@@ -193,6 +201,7 @@ beforeEach(() => {
     isPending: false,
     error: null
   };
+  authState.isAuthenticated = true;
 });
 
 describe("Appointments", () => {
@@ -252,5 +261,68 @@ describe("Appointments", () => {
         })
       );
     });
+  });
+
+  it("renders the error state when any query fails", () => {
+    servicesHookState = {
+      data: [],
+      isLoading: false,
+      error: new Error("Boom")
+    };
+
+    render(<Appointments />);
+
+    expect(screen.getByText("serviceConfigurations.errors.loading")).toBeInTheDocument();
+  });
+
+  it("renders the empty state when unauthenticated", () => {
+    authState.isAuthenticated = false;
+
+    render(<Appointments />);
+
+    expect(screen.getByText("Groomify")).toBeInTheDocument();
+    expect(screen.getByText("general.loginRequireMessage")).toBeInTheDocument();
+  });
+
+  it("submits a new appointment from the modal", async () => {
+    render(<Appointments />);
+
+    fireEvent.click(screen.getByText("appointments.add"));
+    fireEvent.click(screen.getByText("submit modal"));
+
+    await waitFor(() => {
+      expect(createMutateAsyncMock).toHaveBeenCalledWith({ note: "submitted" });
+    });
+  });
+
+  it("submits an edited appointment from the modal", async () => {
+    render(<Appointments />);
+
+    fireEvent.click(screen.getAllByText("Edit")[0]);
+    fireEvent.click(screen.getByText("submit modal"));
+
+    await waitFor(() => {
+      expect(updateMutateAsyncMock).toHaveBeenCalledWith({
+        id: 1,
+        data: { note: "submitted" }
+      });
+    });
+  });
+
+  it("invokes the delete mutation on confirm", async () => {
+    render(<Appointments />);
+
+    fireEvent.click(screen.getAllByText("Delete")[0]);
+
+    await waitFor(() => {
+      expect(openModalMock).toHaveBeenCalled();
+    });
+
+    const [, modalProps] = openModalMock.mock.calls[0];
+
+    await modalProps.onSubmit();
+
+    expect(deleteMutateAsyncMock).toHaveBeenCalledWith(1);
+    expect(closeModalMock).toHaveBeenCalled();
   });
 });
