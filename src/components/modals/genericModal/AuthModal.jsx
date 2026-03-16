@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
@@ -18,9 +18,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "../../ui/tabs";
-import { Toaster } from "../../ui/sonner";
 import { toast } from "sonner";
-import { useCreateUser, useLogin } from "@/hooks/auth";
 import {
   MAX_EMAIL_LENGTH,
   MAX_FIRST_NAME_LENGTH,
@@ -49,21 +47,18 @@ export default function AuthModal({ closeModal }) {
     reValidateMode: "onChange",
   });
   const { t } = useTranslation();
-  const { setAuth } = useAuth();
+  const { login, register } = useAuth();
   const password = registerForm.watch("password");
-
-  const createUserMutation = useCreateUser();
-  const loginMutation = useLogin();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
   const navigate = useNavigate();
 
   const onLogin = async (data) => {
+    setIsLoggingIn(true);
     try {
-      const result = await loginMutation.mutateAsync(data);
+      const result = await login(data);
       console.log("Login:", { email: data.email });
       console.log("Login status:", result?.status);
-      const token = result?.data?.accessToken;
-      const user = result?.data?.user;
-      setAuth(token ?? null, user ?? null);
       toast.success(t('toast.loginSuccess'));
       navigate("/");
       if (closeModal) closeModal();
@@ -78,6 +73,8 @@ export default function AuthModal({ closeModal }) {
         );
       }
       console.log(err);
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -93,8 +90,9 @@ export default function AuthModal({ closeModal }) {
     const payload = {
       ...rest,
     };
+    setIsRegistering(true);
     try {
-      const result = await createUserMutation.mutateAsync(payload);
+      const result = await register(payload);
 
       console.log("Register:", payload);
       console.log("Register status:", result?.status);
@@ -109,12 +107,13 @@ export default function AuthModal({ closeModal }) {
         );
         console.log(err);
       }
+    } finally {
+      setIsRegistering(false);
     }
   };
 
   return (
     <>
-      <Toaster />
       <Card className="w-full max-w-md mx-4">
         <CardHeader>
           <CardTitle>{t("login.heading")}</CardTitle>
@@ -138,7 +137,7 @@ export default function AuthModal({ closeModal }) {
             </TabsList>
 
             <TabsContent value="login">
-              <form
+              <form className="space-y-4"
                 onSubmit={(e) => {
                   e.preventDefault();
                   loginForm.handleSubmit(onLogin)(e);
@@ -193,10 +192,10 @@ export default function AuthModal({ closeModal }) {
                 <Button
                   type="submit"
                   className="w-full transition-all hover:bg-primary/75 hover:shadow-sm"
-                  disabled={loginMutation.isPending}
-                  aria-busy={loginMutation.isPending}
+                  disabled={isLoggingIn}
+                  aria-busy={isLoggingIn}
                 >
-                  {loginMutation.isPending
+                  {isLoggingIn
                     ? `${t("login.login")}...`
                     : t("login.login")}
                 </Button>
@@ -387,7 +386,12 @@ export default function AuthModal({ closeModal }) {
                   )}
                 </div>
 
-                <Button type="submit" className="w-full transition-all hover:bg-primary/75 hover:shadow-sm">
+                <Button
+                  type="submit"
+                  className="w-full transition-all hover:bg-primary/75 hover:shadow-sm"
+                  disabled={isRegistering}
+                  aria-busy={isRegistering}
+                >
                   {t("login.createAccount")}
                 </Button>
               </form>
@@ -398,3 +402,5 @@ export default function AuthModal({ closeModal }) {
     </>
   );
 }
+
+

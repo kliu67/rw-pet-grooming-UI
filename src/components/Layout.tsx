@@ -15,11 +15,9 @@ import {
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
-import { refresh, logout } from "../api/auth";
 import { useAuth } from "@/context/AuthContext";
 import { API_URL } from "@/constants";
 import { Toaster } from "./ui/sonner";
-import { toast } from "sonner";
 import { cn } from "../lib/utils"; // Assuming utility exists or I'll create it
 import { MODAL_TYPES } from "@/components/modals/modalRegistry";
 import { ModalProvider, useModal } from "@/components/modals/ModalProvider";
@@ -51,18 +49,6 @@ const Sidebar = ({
     { name: "Pets", path: "/pets", icon: Dog },
   ];
 
-  const handleLogout = () => {
-    try {
-      logout();
-      clearAuth();
-      toast.success(t('toast.logoutSuccess'));
-      closeLogoutModal();
-    } catch (err) {
-      toast.error(
-        `Logout failed: ${err?.status} - ${err?.message || err?.error}`,
-      );
-    }
-  };
   const openUserModal = () => {
     openModal(MODAL_TYPES.USER, { user });
   };
@@ -74,7 +60,6 @@ const Sidebar = ({
       title: t("logoutModal.heading"),
       message: t("logoutModal.message"),
       primaryLabel: t("logoutModal.confirm"),
-      onSubmit: handleLogout,
     });
   };
 
@@ -98,7 +83,7 @@ const Sidebar = ({
     };
 
     initAuth();
-  }, [setAuth, clearAuth]);
+  }, []);
 
   return (
     <>
