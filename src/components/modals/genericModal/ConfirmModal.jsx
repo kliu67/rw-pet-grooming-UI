@@ -17,7 +17,7 @@ export default function ConfirmModal({
       <div className="flex justify-end gap-2">
         <button
           type="button"
-          onClick={()=>onSubmit()}
+          onClick={()=>closeModal()}
           className="px-4 py-2 border rounded-lg"
         >
           {t('general.cancel')}

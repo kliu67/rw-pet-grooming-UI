@@ -13,7 +13,8 @@
         "select": "Select",
         "remarks": "Remarks",
         "login": "Login",
-        "logout": "Logout"
+        "logout": "Logout",
+        "loginRequireMessage": "Please log in to view content"
     },
     "columns":{
         "id": "ID",

@@ -7,12 +7,15 @@ import { useServiceConfigurations } from "@/hooks/serviceConfigurations";
 import { useServices } from "@/hooks/services";
 import { useTranslation } from "react-i18next";
 import { Table as ServiceTable } from "@/components/Table";
+import { useAuth } from "@/context/AuthContext";
+import { EmptyState } from "@/components/emptyState";
 
 const columnHelper = createColumnHelper();
 
 export const ServiceConfigurations = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
 
   //query hooks
   const {
@@ -132,6 +135,7 @@ export const ServiceConfigurations = () => {
   );
 
   return (
+    isAuthenticated ? (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -166,5 +170,8 @@ export const ServiceConfigurations = () => {
         </div>
       </div>
     </div>
+    ) : (
+      <EmptyState />
+    )
   );
 };

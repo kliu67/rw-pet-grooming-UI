@@ -11,6 +11,8 @@ import { RowActionsMenu } from "@/components/RowActionDropdown";
 import { Table as BreedTable } from "@/components/Table";
 import { useBreeds,useCreateBreed, useUpdateBreed, useDeleteBreed } from "@/hooks/breeds";
 import BreedModal from "@/components/modals/BreedModal";
+import { useAuth } from "@/context/AuthContext";
+import { EmptyState } from "@/components/emptyState";
 
 const columnHelper = createColumnHelper();
 
@@ -22,6 +24,7 @@ export const Breeds = () => {
   const updateBreedMutation = useUpdateBreed();
   const deleteBreedMutation = useDeleteBreed();
   const [modal, setModal] = useState({});
+  const { isAuthenticated } = useAuth();
 
   const { t } = useTranslation();
 
@@ -140,6 +143,7 @@ export const Breeds = () => {
   if (error) return <p>{t("breeds.errors.loading")}</p>;
 
   return (
+    isAuthenticated ? (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -187,5 +191,8 @@ export const Breeds = () => {
         />
       )}
     </div>
+    ) : (
+      <EmptyState />
+    )
   );
 };

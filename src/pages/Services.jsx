@@ -15,6 +15,8 @@ import {
   useDeleteService
 } from "@/hooks/services";
 import { RowActionsMenu } from "@/components/RowActionDropdown";
+import { useAuth } from "@/context/AuthContext";
+import { EmptyState } from "@/components/emptyState";
 
 const columnHelper = createColumnHelper();
 
@@ -28,6 +30,7 @@ export const Services = () => {
   const createServiceMutation = useCreateService();
   const updateServiceMutation = useUpdateService();
   const deleteServiceMutation = useDeleteService();
+  const { isAuthenticated } = useAuth();
 
   //query hooks
   const {
@@ -166,6 +169,7 @@ export const Services = () => {
   if (error) return <p>{t("services.errors.loading")}</p>;
 
   return (
+    isAuthenticated ? (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -212,5 +216,8 @@ export const Services = () => {
         )}
       </div>
     </div>
+    ) : (
+      <EmptyState />
+    )
   );
 };

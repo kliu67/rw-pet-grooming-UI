@@ -13,6 +13,8 @@ import {
   useDeleteClient
 } from "@/hooks/clients";
 import { RowActionsMenu } from "@/components/RowActionDropdown";
+import { useAuth } from "@/context/AuthContext";
+import { EmptyState } from "@/components/emptyState";
 
 const columnHelper = createColumnHelper();
 
@@ -26,6 +28,7 @@ export const Clients = () => {
   const createClientMutation = useCreateClient();
   const updateClientMutation = useUpdateClient();
   const deleteClientMutation = useDeleteClient();
+  const {isAuthenticated} = useAuth();
 
   //query hooks
   const {
@@ -200,6 +203,7 @@ export const Clients = () => {
   if (error) return <p>{t("clients.errors.loading")}</p>;
 
   return (
+    isAuthenticated ?(
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -245,6 +249,10 @@ export const Clients = () => {
           />
         )}
       </div>
-    </div>
+    </div>)
+    :
+    (
+      <EmptyState />
+    )
   );
 };

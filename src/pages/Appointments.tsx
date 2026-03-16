@@ -19,6 +19,8 @@ import ServiceModal from "@/components/modals/ServiceModal";
 import { Table as AppointmentTable } from "@/components/Table";
 import { MODAL_TYPES } from "@/components/modals/modalRegistry";
 import { RowActionsMenu } from "@/components/RowActionDropdown";
+import { useAuth } from "@/context/AuthContext";
+import { EmptyState } from "@/components/emptyState";
 import {
   Calendar as CalendarIcon,
   CheckCircle,
@@ -62,6 +64,7 @@ export const Appointments = () => {
   const deleteAppMutation = useDeleteAppointment();
   // const [appointments, setAppointments] = useState(initialAppointments);
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
 
   //queries
 
@@ -400,6 +403,7 @@ export const Appointments = () => {
   );
 
   return (
+    isAuthenticated ? (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -462,5 +466,8 @@ export const Appointments = () => {
         )}
       </div>
     </div>
+    ) : (
+      <EmptyState />
+    )
   );
 };

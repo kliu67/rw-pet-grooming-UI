@@ -15,6 +15,8 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useAuth } from "@/context/AuthContext";
+import { EmptyState } from "@/components/emptyState";
 
 const data = [
   { name: 'Mon', appointments: 4 },
@@ -55,6 +57,12 @@ const StatCard = ({
 );
 
 export const Dashboard = () => {
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return <EmptyState />;
+  }
+
   return (
     <div className="space-y-6">
       <div>

@@ -11,6 +11,8 @@ import { useClients } from "@/hooks/clients";
 import { useBreeds } from "@/hooks/breeds";
 import { useWeightClasses } from "@/hooks/weightClasses"
 import { RowActionsMenu } from "@/components/RowActionDropdown";
+import { useAuth } from "@/context/AuthContext";
+import { EmptyState } from "@/components/emptyState";
 
 const columnHelper = createColumnHelper();
 
@@ -24,6 +26,7 @@ export const Pets = () => {
   const createPetMutation = useCreatePet();
   const updatePetMutation = useUpdatePet();
   const deletePetMutation = useDeletePet();
+  const { isAuthenticated } = useAuth();
 
   //query hooks
   const {
@@ -226,6 +229,7 @@ export const Pets = () => {
   if (isError) return <p>{t("pets.errors.loading")}</p>;
 
   return (
+    isAuthenticated ? (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -275,5 +279,8 @@ export const Pets = () => {
         )}
       </div>
     </div>
+    ) : (
+      <EmptyState />
+    )
   );
 };

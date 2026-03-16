@@ -41,7 +41,7 @@ export default function AuthModal({ closeModal }) {
   const [activeTab, setActiveTab] = useState("login");
 
   const loginForm = useForm({
-    mode: "onBlur",
+    mode: "onSubmit",
     reValidateMode: "onChange",
   });
   const registerForm = useForm({
@@ -123,8 +123,18 @@ export default function AuthModal({ closeModal }) {
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">{t("login.login")}</TabsTrigger>
-              <TabsTrigger value="register">{t("login.register")}</TabsTrigger>
+              <TabsTrigger
+                value="login"
+                className="transition-all hover:bg-background hover:text-foreground hover:shadow-sm"
+              >
+                {t("login.login")}
+              </TabsTrigger>
+              <TabsTrigger
+                value="register"
+                className="transition-all hover:bg-background hover:text-foreground hover:shadow-sm"
+              >
+                {t("login.register")}
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
@@ -182,7 +192,7 @@ export default function AuthModal({ closeModal }) {
 
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full transition-all hover:bg-primary/75 hover:shadow-sm"
                   disabled={loginMutation.isPending}
                   aria-busy={loginMutation.isPending}
                 >
@@ -377,7 +387,7 @@ export default function AuthModal({ closeModal }) {
                   )}
                 </div>
 
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full transition-all hover:bg-primary/75 hover:shadow-sm">
                   {t("login.createAccount")}
                 </Button>
               </form>
