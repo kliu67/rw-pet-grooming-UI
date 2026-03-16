@@ -203,5 +203,9 @@
         "heading": "Logout",
         "message": "Are you sure you want to log out?",
         "confirm": "Log out"
+    },
+    "toast": {
+        "logoutSuccess": "You are now logged out",
+        "loginSuccess": "Logged in successfully!"
     }
 }

@@ -64,7 +64,7 @@ export default function AuthModal({ closeModal }) {
       const token = result?.data?.accessToken;
       const user = result?.data?.user;
       setAuth(token ?? null, user ?? null);
-      toast.success("Login successful!");
+      toast.success(t('toast.loginSuccess'));
       navigate("/");
       if (closeModal) closeModal();
     } catch (err) {

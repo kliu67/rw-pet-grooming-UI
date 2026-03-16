@@ -55,7 +55,7 @@ const Sidebar = ({
     try {
       logout();
       clearAuth();
-      toast.success("logged out");
+      toast.success(t('toast.logoutSuccess'));
       closeLogoutModal();
     } catch (err) {
       toast.error(
