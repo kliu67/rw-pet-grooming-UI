@@ -78,3 +78,21 @@ export async function logout() {
     throw error;
   }
 }
+
+export async function me() {
+  const res = await fetch(`${API_URL}/auth/me`, {
+    credentials: "include",
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const rawMessage = err?.message || err?.error || "Request failed";
+    const message =
+      typeof rawMessage === "string" ? rawMessage : "Request failed";
+    const error = new Error(message);
+    error.status = res.status;
+    error.error = err.error;
+    throw error;
+  }
+  const payload = await res.json().catch(() => null);
+  return { status: res.status, data: payload };
+}

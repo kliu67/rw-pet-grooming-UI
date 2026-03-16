@@ -2,13 +2,20 @@ import { createContext, useCallback, useContext, useMemo, useState } from "react
 import { useQueryClient } from "@tanstack/react-query";
 import { loginUser, logout as logoutUser, registerUser } from "@/api/auth";
 import { USERS_QUERY_KEY } from "@/constants";
-const STORAGE_KEY = "pg_user";
+
+type AuthUser = {
+  id?: string | number;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  last_login_at?: string;
+};
 
 type AuthState = {
-  accessToken: string | null;
-  user: { id: string; email?: string } | null;
+  user: AuthUser | null;
   isAuthenticated: boolean;
-  setAuth: (token: string | null, user?: AuthState["user"]) => void;
+  setAuth: (user: AuthUser | null) => void;
   clearAuth: () => void;
   login: (data: { email: string; password: string }) => Promise<{
     status: number;
@@ -21,51 +28,25 @@ type AuthState = {
   logout: () => Promise<void>;
 };
 
-type User = {
-    email: string;
-    phone: string;
-    first_name: string;
-    last_name: string;
-    last_logged_at: string;
-}
-
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  });
+  const [user, setUser] = useState<AuthUser | null>(null);
 
-  const setAuth = useCallback(
-    (token: string | null, nextUser?: AuthState["user"]) => {
-      setAccessToken(token);
-      if (nextUser !== undefined) {
-        setUser(nextUser);
-        if (nextUser) {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser));
-        } else {
-          localStorage.removeItem(STORAGE_KEY);
-        }
-      }
-    },
-    [],
-  );
+  const setAuth = useCallback((nextUser: AuthUser | null) => {
+    setUser(nextUser);
+  }, []);
 
   const clearAuth = useCallback(() => {
-    setAccessToken(null);
     setUser(null);
-    localStorage.removeItem(STORAGE_KEY);
   }, []);
 
   const login = useCallback(
     async (data: { email: string; password: string }) => {
       const result = await loginUser(data);
-      const token = result?.data?.accessToken ?? null;
       const nextUser = result?.data?.user ?? null;
-      setAuth(token, nextUser);
+      setAuth(nextUser);
       return result;
     },
     [setAuth],
@@ -87,16 +68,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(
     () => ({
-      accessToken,
       user,
-      isAuthenticated: Boolean(accessToken),
+      isAuthenticated: Boolean(user),
       setAuth,
       clearAuth,
       login,
       register,
       logout,
     }),
-    [accessToken, user, login, register, logout],
+    [user, login, register, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

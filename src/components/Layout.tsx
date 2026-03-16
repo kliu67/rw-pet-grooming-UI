@@ -15,7 +15,7 @@ import {
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/context/AuthContext";
-import { API_URL } from "@/constants";
+import { me } from "@/api/auth";
 import { Toaster } from "./ui/sonner";
 import { cn } from "../lib/utils"; // Assuming utility exists or I'll create it
 import { MODAL_TYPES } from "@/components/modals/modalRegistry";
@@ -63,13 +63,9 @@ const Sidebar = ({
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const res = await fetch(`${API_URL}/auth/refresh`, {
-          method: "POST",
-          credentials: "include",
-        });
-        if (!res.ok) throw new Error("No session");
-        const data = await res.json();
-        setAuth(data.accessToken);
+        const result = await me();
+        const nextUser = result?.data?.user ?? null;
+        setAuth(nextUser);
       } catch {
         clearAuth();
       }
