@@ -19,7 +19,7 @@ describe("api/clients", () => {
     fetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue(payload) });
 
     await expect(getClients()).resolves.toEqual(payload);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/users");
+    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/clients");
   });
 
   it("getClients throws backend error message", async () => {
@@ -37,7 +37,7 @@ describe("api/clients", () => {
     fetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue(created) });
 
     await expect(createClient(input)).resolves.toEqual(created);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/users", {
+    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/clients", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input)
@@ -58,7 +58,7 @@ describe("api/clients", () => {
     });
 
     await expect(updateClient(1, { first_name: "Janet" })).rejects.toThrow("Failed to update client");
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/users/1", {
+    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/clients/1", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ first_name: "Janet" })
@@ -72,7 +72,7 @@ describe("api/clients", () => {
     });
 
     await expect(deleteClient(1)).resolves.toBeNull();
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/users/1", {
+    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/clients/1", {
       method: "DELETE"
     });
   });

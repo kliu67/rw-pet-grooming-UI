@@ -4,13 +4,17 @@
         "prev": "Prev",
         "save": "Save",
         "cancel": "Cancel",
+        "close" : "Close",
         "loading": "Loading...",
         "edit": "Edit",
         "update": "Update",
         "delete": "Delete",
         "create": "Create",
         "select": "Select",
-        "remarks": "Remarks"
+        "remarks": "Remarks",
+        "login": "Login",
+        "logout": "Logout",
+        "loginRequireMessage": "Please log in to view content"
     },
     "columns":{
         "id": "ID",
@@ -158,5 +162,56 @@
         },
         "selectClient": "Select a client to see pets",
         "confirmDelete": "To confirm, type DELETE in the field below"
+    },
+    "login":{
+        "heading": "Welcome",
+        "subHeading": "Log in to your account or create a new one",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "phone": "Phone",
+        "login": "Login",
+        "register": "Register",
+        "placeholderText": "you@example.com",
+        "required": "{{field}} is required",
+        "confirmPasswordRequired": "Please confirm your password",
+        "passwordMatchError": "Passwords do not match",
+        "createAccount": "Create Account",
+        "fieldLengthError": "{{field}} cannot be longer than {{length}} characters",
+        "emailFormatError": "Invalid email address",
+        "emailMaxLengthError": "Email cannot be longer than {{length}} characters",
+        "passwordError": "Password must contain a letter, a number, and a special character (!@#$%^&*())",
+        "passwordMinLengthError": "Password must be at least {{length}} characters",
+        "passwordMaxLengthError": "Password must be no longer than {{length}} characters",
+        "phoneFormatError": "Invalid phone format",
+        "phoneMinLengthError": "Phone must be at least {{length}} numbers",
+        "phoneMaxLengthError": "Phone cannot be longer than {{length}} numbers"
+    },
+    "userModal": {
+        "heading": "User",
+        "fields": {
+            "firstName": "First Name",
+            "lastName": "Last Name",
+            "email": "Email",
+            "phone": "Phone",
+            "role": "Role"
+        }
+    },
+    "logoutModal":{
+        "heading": "Logout",
+        "message": "Are you sure you want to log out?",
+        "confirm": "Log out"
+    },
+    "toast": {
+        "logoutSuccess": "You are now logged out",
+        "loginSuccess": "Logged in successfully!",
+        "registerSuccess": "Registration successful!",
+        "registerFailed": "Registration failed",
+        "registerFailEmailAlreadyExists": "Account with this email already exists",
+        "loginInvalidEmailPassword": "Invalid email or password",
+        "loginInvalidRequest": "Invalid login request",
+        "loginFailed": "Login failed"
     }
 }

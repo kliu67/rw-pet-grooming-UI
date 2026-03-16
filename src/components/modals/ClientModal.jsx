@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { isValidPhone, isValidEmail } from "@/utils";
 import {
-  MAX_CLIENT_FIRST_NAME_LENGTH,
-  MAX_CLIENT_LAST_NAME_LENGTH,
-  MAX_CLIENT_PHONE_LENGTH,
-  MAX_CLIENT_EMAIL_LENGTH,
+  MAX_FIRST_NAME_LENGTH,
+  MAX_LAST_NAME_LENGTH,
+  MAX_PHONE_LENGTH,
+  MAX_EMAIL_LENGTH,
   MAX_CLIENT_DESC_LENGTH
 } from "@/constants";
 
@@ -47,7 +47,7 @@ export default function ClientModal({
     if (field === "first_name") {
       if (!value) {
         return t("clients.errors.notEmpty", { input: "First Name" });
-      } else if (value.length > MAX_CLIENT_FIRST_NAME_LENGTH) {
+      } else if (value.length > MAX_FIRST_NAME_LENGTH) {
         return t("clients.errors.first_name");
       }
       return "";
@@ -56,7 +56,7 @@ export default function ClientModal({
     if (field === "last_name") {
       if (!value) {
         return t("clients.errors.notEmpty", { input: "Last Name" });
-      } else if (value.length > MAX_CLIENT_FIRST_NAME_LENGTH) {
+      } else if (value.length > MAX_FIRST_NAME_LENGTH) {
         return t("clients.errors.last_name");
       }
       return "";
@@ -67,7 +67,7 @@ export default function ClientModal({
         return t("clients.errors.notEmpty", { input: "Phone" });
       } else if (
         !isValidPhone(value) ||
-        value.length > MAX_CLIENT_PHONE_LENGTH
+        value.length > MAX_PHONE_LENGTH
       ) {
         return t("clients.errors.phone");
       }
@@ -77,7 +77,7 @@ export default function ClientModal({
     if (field === "email") {
       if (
         value &&
-        (!isValidEmail(value) || value.length > MAX_CLIENT_EMAIL_LENGTH)
+        (!isValidEmail(value) || value.length > MAX_EMAIL_LENGTH)
       ) {
         return t("clients.errors.email");
       }

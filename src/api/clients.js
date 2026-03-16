@@ -1,7 +1,7 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export async function getClients() {
-  const res = await fetch(`${API_URL}/api/users`);
+  const res = await fetch(`${API_URL}/api/clients`);
 
   if (!res.ok) {
     const err = await res.json();
@@ -12,7 +12,7 @@ export async function getClients() {
 }
 
 export async function createClient(data) {
-  const res = await fetch(`${API_URL}/api/users`, {
+  const res = await fetch(`${API_URL}/api/clients`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -27,7 +27,7 @@ export async function createClient(data) {
 }
 
 export async function updateClient(id, data) {
-  const res = await fetch(`${API_URL}/api/users/${id}`, {
+  const res = await fetch(`${API_URL}/api/clients/${id}`, {
     method: "PUT", // or PATCH depending on backend
     headers: {
       "Content-Type": "application/json",
@@ -44,7 +44,7 @@ export async function updateClient(id, data) {
 }
 
 export async function deleteClient(id) {
-  const res = await fetch(`${API_URL}/api/users/${id}`, {
+  const res = await fetch(`${API_URL}/api/clients/${id}`, {
     method: "DELETE",
   });
 
