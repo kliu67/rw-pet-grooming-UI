@@ -5,15 +5,14 @@ import {
 } from "lucide-react";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
-
-import { useQuery } from "@tanstack/react-query";
-import { getBreeds } from "../api/breeds";
 import { useModal } from "@/components/modals/ModalProvider.jsx";
 import { MODAL_TYPES } from "@/components/modals/modalRegistry.js";
 import { RowActionsMenu } from "@/components/RowActionDropdown";
-import { Table as SpeciesTable } from "@/components/Table";
-import { useCreateBreed, useUpdateBreed, useDeleteBreed } from "@/hooks/breeds";
+import { Table as BreedTable } from "@/components/Table";
+import { useBreeds,useCreateBreed, useUpdateBreed, useDeleteBreed } from "@/hooks/breeds";
 import BreedModal from "@/components/modals/BreedModal";
+import { useAuth } from "@/context/AuthContext";
+import { EmptyState } from "@/components/emptyState";
 
 const columnHelper = createColumnHelper();
 
@@ -25,6 +24,7 @@ export const Breeds = () => {
   const updateBreedMutation = useUpdateBreed();
   const deleteBreedMutation = useDeleteBreed();
   const [modal, setModal] = useState({});
+  const { isAuthenticated } = useAuth();
 
   const { t } = useTranslation();
 
@@ -32,10 +32,7 @@ export const Breeds = () => {
     data = [],
     isLoading,
     error
-  } = useQuery({
-    queryKey: ["species"],
-    queryFn: getBreeds
-  });
+  } = useBreeds();
 
   //inputs
   const breedInputs = React.useMemo(
@@ -138,14 +135,15 @@ export const Breeds = () => {
     [handleAction]
   );
 
-  const filteredBreeds = data.filter((species) =>
-    species.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredBreeds = data.filter((breed) =>
+    breed.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (isLoading) return <p>{t("general.loading")}</p>;
   if (error) return <p>{t("breeds.errors.loading")}</p>;
 
   return (
+    isAuthenticated ? (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -179,7 +177,7 @@ export const Breeds = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <SpeciesTable data={filteredBreeds} columns={columns} />
+          <BreedTable data={filteredBreeds} columns={columns} />
         </div>
       </div>
       {isOpen && (
@@ -193,5 +191,8 @@ export const Breeds = () => {
         />
       )}
     </div>
+    ) : (
+      <EmptyState />
+    )
   );
 };

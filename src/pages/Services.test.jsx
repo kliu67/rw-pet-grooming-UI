@@ -3,21 +3,12 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Services } from "./Services";
 
-/* ---------------- MOCKS ---------------- */
-
-// i18n
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (k) => k
   })
 }));
 
-// react-query
-vi.mock("@tanstack/react-query", () => ({
-  useQuery: vi.fn()
-}));
-
-// modal provider
 const openModal = vi.fn();
 const closeModal = vi.fn();
 
@@ -28,12 +19,13 @@ vi.mock("@/components/modals/ModalProvider", () => ({
   })
 }));
 
-// mutations
 const createMutateAsync = vi.fn();
 const updateMutateAsync = vi.fn();
 const deleteMutateAsync = vi.fn();
+const useServicesMock = vi.fn();
 
-vi.mock("@/hooks/service", () => ({
+vi.mock("@/hooks/services", () => ({
+  useServices: () => useServicesMock(),
   useCreateService: () => ({
     mutateAsync: createMutateAsync,
     isPending: false
@@ -48,9 +40,8 @@ vi.mock("@/hooks/service", () => ({
   })
 }));
 
-// table
 vi.mock("@/components/Table", () => ({
-  Table: ({ data, columns = [] }) => {
+  Table: ({ data = [], columns = [] }) => {
     const actionsCol = columns.find((c) => c.id === "actions");
 
     return (
@@ -68,7 +59,6 @@ vi.mock("@/components/Table", () => ({
   }
 }));
 
-// RowActionsMenu
 vi.mock("@/components/RowActionDropdown", () => ({
   RowActionsMenu: ({ onEdit, onDelete }) => (
     <div>
@@ -78,7 +68,6 @@ vi.mock("@/components/RowActionDropdown", () => ({
   )
 }));
 
-// ServiceModal
 vi.mock("@/components/modals/ServiceModal", () => ({
   default: ({ mode, onSubmit, onClose }) => (
     <div data-testid="service-modal">
@@ -88,16 +77,22 @@ vi.mock("@/components/modals/ServiceModal", () => ({
   )
 }));
 
-/* ---------------- TEST DATA ---------------- */
-
 const mockServices = [
   { id: 1, name: "Bath", base_price: 10, description: "Wash" },
   { id: 2, name: "Haircut", base_price: 20, description: "Trim" }
 ];
 
-/* ---------------- TESTS ---------------- */
-
-import { useQuery } from "@tanstack/react-query";
+function mockServicesQuery({
+  data = mockServices,
+  isLoading = false,
+  error = null
+} = {}) {
+  useServicesMock.mockReturnValue({
+    data,
+    isLoading,
+    error
+  });
+}
 
 describe("Services", () => {
   beforeEach(() => {
@@ -105,25 +100,21 @@ describe("Services", () => {
   });
 
   it("shows loading state", () => {
-    useQuery.mockReturnValue({ data: [], isLoading: true });
+    mockServicesQuery({ data: [], isLoading: true });
 
     render(<Services />);
     expect(screen.getByText("general.loading")).toBeInTheDocument();
   });
 
   it("shows error state", () => {
-    useQuery.mockReturnValue({ data: [], isLoading: false, error: true });
+    mockServicesQuery({ data: [], error: true });
 
     render(<Services />);
     expect(screen.getByText("services.errors.loading")).toBeInTheDocument();
   });
 
   it("renders services in table", () => {
-    useQuery.mockReturnValue({
-      data: mockServices,
-      isLoading: false,
-      error: null
-    });
+    mockServicesQuery();
 
     render(<Services />);
     expect(screen.getByText("Bath")).toBeInTheDocument();
@@ -131,11 +122,7 @@ describe("Services", () => {
   });
 
   it("filters services by search", () => {
-    useQuery.mockReturnValue({
-      data: mockServices,
-      isLoading: false,
-      error: null
-    });
+    mockServicesQuery();
 
     render(<Services />);
 
@@ -147,30 +134,19 @@ describe("Services", () => {
   });
 
   it("opens/closes service modal", () => {
-    useQuery.mockReturnValue({
-      data: mockServices,
-      isLoading: false,
-      error: null
-    });
+    mockServicesQuery();
 
     render(<Services />);
 
     fireEvent.click(screen.getByText("services.add"));
-
     expect(screen.getByTestId("service-modal")).toBeInTheDocument();
 
-    //close modal
     fireEvent.click(screen.getByText("cancel-create"));
     expect(screen.queryByTestId("service-modal")).not.toBeInTheDocument();
   });
 
-
   it("submits create service", async () => {
-    useQuery.mockReturnValue({
-      data: mockServices,
-      isLoading: false,
-      error: null
-    });
+    mockServicesQuery();
 
     render(<Services />);
 
@@ -183,11 +159,7 @@ describe("Services", () => {
   });
 
   it("submits edit service", async () => {
-    useQuery.mockReturnValue({
-      data: mockServices,
-      isLoading: false,
-      error: null
-    });
+    mockServicesQuery();
 
     render(<Services />);
     fireEvent.click(screen.getAllByText("edit")[0]);
@@ -202,14 +174,9 @@ describe("Services", () => {
   });
 
   it("calls delete modal", async () => {
-    useQuery.mockReturnValue({
-      data: mockServices,
-      isLoading: false,
-      error: null
-    });
+    mockServicesQuery();
 
     render(<Services />);
-
     fireEvent.click(screen.getAllByText("delete")[0]);
 
     await waitFor(() => {
@@ -218,11 +185,7 @@ describe("Services", () => {
   });
 
   it("submits delete service", async () => {
-    useQuery.mockReturnValue({
-      data: mockServices,
-      isLoading: false,
-      error: null
-    });
+    mockServicesQuery();
 
     render(<Services />);
     fireEvent.click(screen.getAllByText("delete")[0]);
@@ -235,7 +198,4 @@ describe("Services", () => {
     });
     expect(closeModal).toHaveBeenCalled();
   });
-
-  
-
 });

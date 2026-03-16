@@ -3,16 +3,10 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Breeds } from "./Breeds";
 
-/* ---------------- MOCKS ---------------- */
-
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (k) => k
   })
-}));
-
-vi.mock("@tanstack/react-query", () => ({
-  useQuery: vi.fn()
 }));
 
 const openModal = vi.fn();
@@ -28,8 +22,10 @@ vi.mock("@/components/modals/ModalProvider.jsx", () => ({
 const createMutateAsync = vi.fn();
 const updateMutateAsync = vi.fn();
 const deleteMutateAsync = vi.fn();
+const useBreedsMock = vi.fn();
 
 vi.mock("@/hooks/breeds", () => ({
+  useBreeds: () => useBreedsMock(),
   useCreateBreed: () => ({
     mutateAsync: createMutateAsync,
     isPending: false
@@ -45,7 +41,7 @@ vi.mock("@/hooks/breeds", () => ({
 }));
 
 vi.mock("@/components/Table", () => ({
-  Table: ({ data, columns = [] }) => {
+  Table: ({ data = [], columns = [] }) => {
     const actionsCol = columns.find((c) => c.id === "actions");
 
     return (
@@ -81,16 +77,22 @@ vi.mock("@/components/modals/BreedModal", () => ({
   )
 }));
 
-/* ---------------- TEST DATA ---------------- */
-
 const mockBreeds = [
   { id: 1, name: "Poodle" },
   { id: 2, name: "Labrador" }
 ];
 
-/* ---------------- TESTS ---------------- */
-
-import { useQuery } from "@tanstack/react-query";
+function mockBreedsQuery({
+  data = mockBreeds,
+  isLoading = false,
+  error = null
+} = {}) {
+  useBreedsMock.mockReturnValue({
+    data,
+    isLoading,
+    error
+  });
+}
 
 describe("Breeds", () => {
   beforeEach(() => {
@@ -98,25 +100,21 @@ describe("Breeds", () => {
   });
 
   it("shows loading state", () => {
-    useQuery.mockReturnValue({ data: [], isLoading: true, error: null });
+    mockBreedsQuery({ data: [], isLoading: true });
 
     render(<Breeds />);
     expect(screen.getByText("general.loading")).toBeInTheDocument();
   });
 
   it("shows error state", () => {
-    useQuery.mockReturnValue({ data: [], isLoading: false, error: true });
+    mockBreedsQuery({ data: [], error: true });
 
     render(<Breeds />);
     expect(screen.getByText("breeds.errors.loading")).toBeInTheDocument();
   });
 
   it("renders breeds in table", () => {
-    useQuery.mockReturnValue({
-      data: mockBreeds,
-      isLoading: false,
-      error: null
-    });
+    mockBreedsQuery();
 
     render(<Breeds />);
     expect(screen.getByText("Poodle")).toBeInTheDocument();
@@ -124,11 +122,7 @@ describe("Breeds", () => {
   });
 
   it("filters breeds by search", () => {
-    useQuery.mockReturnValue({
-      data: mockBreeds,
-      isLoading: false,
-      error: null
-    });
+    mockBreedsQuery();
 
     render(<Breeds />);
     fireEvent.change(screen.getByPlaceholderText("breeds.search"), {
@@ -140,11 +134,7 @@ describe("Breeds", () => {
   });
 
   it("opens and closes breed modal", () => {
-    useQuery.mockReturnValue({
-      data: mockBreeds,
-      isLoading: false,
-      error: null
-    });
+    mockBreedsQuery();
 
     render(<Breeds />);
     fireEvent.click(screen.getByText("breeds.add"));
@@ -155,11 +145,7 @@ describe("Breeds", () => {
   });
 
   it("submits create breed", async () => {
-    useQuery.mockReturnValue({
-      data: mockBreeds,
-      isLoading: false,
-      error: null
-    });
+    mockBreedsQuery();
 
     render(<Breeds />);
     fireEvent.click(screen.getByText("breeds.add"));
@@ -171,11 +157,7 @@ describe("Breeds", () => {
   });
 
   it("submits edit breed", async () => {
-    useQuery.mockReturnValue({
-      data: mockBreeds,
-      isLoading: false,
-      error: null
-    });
+    mockBreedsQuery();
 
     render(<Breeds />);
     fireEvent.click(screen.getAllByText("edit")[0]);
@@ -190,11 +172,7 @@ describe("Breeds", () => {
   });
 
   it("opens delete confirmation modal", async () => {
-    useQuery.mockReturnValue({
-      data: mockBreeds,
-      isLoading: false,
-      error: null
-    });
+    mockBreedsQuery();
 
     render(<Breeds />);
     fireEvent.click(screen.getAllByText("delete")[0]);
@@ -205,11 +183,7 @@ describe("Breeds", () => {
   });
 
   it("confirms delete and calls delete mutation", async () => {
-    useQuery.mockReturnValue({
-      data: mockBreeds,
-      isLoading: false,
-      error: null
-    });
+    mockBreedsQuery();
 
     render(<Breeds />);
     fireEvent.click(screen.getAllByText("delete")[0]);

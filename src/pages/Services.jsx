@@ -3,19 +3,20 @@ import { Plus, Search } from "lucide-react";
 import {
   createColumnHelper,
 } from "@tanstack/react-table";
-import { useQuery } from "@tanstack/react-query";
-import { getServices } from "../api/services";
 import { useTranslation } from "react-i18next";
 import { useModal } from "@/components/modals/ModalProvider";
 import ServiceModal from "@/components/modals/ServiceModal";
 import { Table as ServiceTable } from "@/components/Table";
 import { MODAL_TYPES } from "@/components/modals/modalRegistry";
 import {
+  useServices,
   useCreateService,
   useUpdateService,
   useDeleteService
-} from "@/hooks/service";
+} from "@/hooks/services";
 import { RowActionsMenu } from "@/components/RowActionDropdown";
+import { useAuth } from "@/context/AuthContext";
+import { EmptyState } from "@/components/emptyState";
 
 const columnHelper = createColumnHelper();
 
@@ -29,16 +30,14 @@ export const Services = () => {
   const createServiceMutation = useCreateService();
   const updateServiceMutation = useUpdateService();
   const deleteServiceMutation = useDeleteService();
+  const { isAuthenticated } = useAuth();
 
   //query hooks
   const {
     data = [],
     isLoading,
     error
-  } = useQuery({
-    queryKey: ["services"],
-    queryFn: getServices
-  });
+  } = useServices();
 
   const serviceInputs = React.useMemo(
     () => ({
@@ -170,6 +169,7 @@ export const Services = () => {
   if (error) return <p>{t("services.errors.loading")}</p>;
 
   return (
+    isAuthenticated ? (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -216,5 +216,8 @@ export const Services = () => {
         )}
       </div>
     </div>
+    ) : (
+      <EmptyState />
+    )
   );
 };

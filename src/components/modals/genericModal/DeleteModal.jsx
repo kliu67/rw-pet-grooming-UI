@@ -1,5 +1,6 @@
 import { t } from "i18next";
 import { useState } from "react";
+import { CONFIRM_DELETE } from "@/constants";
 
 export default function DeleteModal({
   closeModal,
@@ -7,7 +8,7 @@ export default function DeleteModal({
   isLoading,
   serverError,
   entityName,
-  entityType
+  entityType,
 }) {
   const [name, setName] = useState("");
   const [canDelete, setCanDelete] = useState(false);
@@ -15,7 +16,7 @@ export default function DeleteModal({
   function handleChange(e) {
     const value = e.target.value;
     setName(value);
-    setCanDelete(value === entityName);
+    setCanDelete(value === CONFIRM_DELETE);
   }
 
   function handleSubmit(e) {
