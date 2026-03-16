@@ -45,7 +45,7 @@ export default function UserModal({ closeModal, user }) {
         <button
           type="button"
           onClick={closeModal}
-          className="px-4 py-2 border rounded-lg"
+          className="px-4 py-2 border rounded-lg transition-colors hover:bg-gray-100 hover:border-gray-300"
         >
           {t("general.close")}
         </button>

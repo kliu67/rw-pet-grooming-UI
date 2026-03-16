@@ -18,7 +18,7 @@ export default function ConfirmModal({
         <button
           type="button"
           onClick={()=>closeModal()}
-          className="px-4 py-2 border rounded-lg"
+          className="px-4 py-2 border rounded-lg transition-colors hover:bg-gray-100 hover:border-gray-300"
         >
           {t('general.cancel')}
         </button>
@@ -26,7 +26,7 @@ export default function ConfirmModal({
         <button
           type="primary"
            onClick={()=>onSubmit()}
-          className="px-4 py-2 bg-red-600 text-white rounded-lg"
+          className="px-4 py-2 bg-red-600 text-white rounded-lg transition-colors hover:bg-red-700"
           // disabled={!canDelete || isLoading || serverError}
         >
           {primaryLabel}
