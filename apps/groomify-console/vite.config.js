@@ -12,13 +12,15 @@ export default defineConfig({
   appType: "spa",
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src")
+      "@": path.resolve(__dirname, "./src"),
+      "@shared-api": path.resolve(__dirname, "../../packages/shared-api/src")
     }
   },
   test: {
     globals: true,
     environment: "jsdom",
     setupFiles: "./src/test/setup.js",
+    exclude: ["e2e/**", "node_modules/**", "dist/**"],
     css: true,
     threads: false,
      deps: {
@@ -36,7 +38,7 @@ export default defineConfig({
         "node_modules/",
         "src/test/",
         "**/*.test.{js,jsx}",
-        "**/*.spec.{js,jsx}"
+        "**/*.spec.{js,jsx}",
       ],
 
       // ✅ Coverage thresholds
