@@ -1,6 +1,4 @@
 import { API_URL } from "@/constants";
-import { apiFetch } from "./api";
-// const API_URL = "http://localhost:3000"
 
 export async function getClients() {
   const res = await fetch(`${API_URL}/api/clients`, {
