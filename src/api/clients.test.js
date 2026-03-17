@@ -5,9 +5,15 @@ import {
   updateClient
 } from "./clients";
 
+vi.mock("./api", () => ({
+  apiFetch: vi.fn()
+}));
+
+import { apiFetch } from "./api";
+
 describe("api/clients", () => {
   beforeEach(() => {
-    global.fetch = vi.fn();
+    apiFetch.mockReset();
   });
 
   afterEach(() => {
@@ -16,17 +22,14 @@ describe("api/clients", () => {
 
   it("getClients returns clients list on success", async () => {
     const payload = [{ id: 1, first_name: "Jane" }];
-    fetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue(payload) });
+    apiFetch.mockResolvedValue(payload);
 
     await expect(getClients()).resolves.toEqual(payload);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/clients");
+    expect(apiFetch).toHaveBeenCalledWith("/api/clients");
   });
 
   it("getClients throws backend error message", async () => {
-    fetch.mockResolvedValue({
-      ok: false,
-      json: vi.fn().mockResolvedValue({ error: "Clients unavailable" })
-    });
+    apiFetch.mockRejectedValue(new Error("Clients unavailable"));
 
     await expect(getClients()).rejects.toThrow("Clients unavailable");
   });
@@ -34,45 +37,39 @@ describe("api/clients", () => {
   it("createClient posts payload and returns created client", async () => {
     const input = { first_name: "Jane", last_name: "Doe" };
     const created = { id: 10, ...input };
-    fetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue(created) });
+    apiFetch.mockResolvedValue(created);
 
     await expect(createClient(input)).resolves.toEqual(created);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/clients", {
+    expect(apiFetch).toHaveBeenCalledWith("/api/clients", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input)
     });
   });
 
-  it("createClient throws raw backend error object", async () => {
-    const backendError = { message: "Validation failed" };
-    fetch.mockResolvedValue({ ok: false, json: vi.fn().mockResolvedValue(backendError) });
+  it("createClient throws backend error message", async () => {
+    apiFetch.mockRejectedValue(new Error("Validation failed"));
 
-    await expect(createClient({ first_name: "" })).rejects.toEqual(backendError);
+    await expect(createClient({ first_name: "" })).rejects.toThrow("Validation failed");
   });
 
-  it("updateClient throws fallback message when response is not json", async () => {
-    fetch.mockResolvedValue({
-      ok: false,
-      json: vi.fn().mockRejectedValue(new Error("invalid json"))
-    });
+  it("updateClient forwards payload to apiFetch", async () => {
+    apiFetch.mockResolvedValue({ id: 1, first_name: "Janet" });
 
-    await expect(updateClient(1, { first_name: "Janet" })).rejects.toThrow("Failed to update client");
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/clients/1", {
+    await expect(updateClient(1, { first_name: "Janet" })).resolves.toEqual({
+      id: 1,
+      first_name: "Janet"
+    });
+    expect(apiFetch).toHaveBeenCalledWith("/api/clients/1", {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ first_name: "Janet" })
     });
   });
 
   it("deleteClient returns null when response has no json body", async () => {
-    fetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockRejectedValue(new Error("empty body"))
-    });
+    apiFetch.mockResolvedValue(null);
 
     await expect(deleteClient(1)).resolves.toBeNull();
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/clients/1", {
+    expect(apiFetch).toHaveBeenCalledWith("/api/clients/1", {
       method: "DELETE"
     });
   });
