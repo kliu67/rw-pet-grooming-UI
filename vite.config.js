@@ -5,8 +5,11 @@ import tailwindcss from "@tailwindcss/vite";
 
 import { cloudflare } from "@cloudflare/vite-plugin";
 
+const isCloudflare = Boolean(process.env.CF_PAGES);
+
 export default defineConfig({
-  plugins: [react(), tailwindcss(), cloudflare()],
+  plugins: [react(), tailwindcss(), isCloudflare && cloudflare()].filter(Boolean),
+  appType: "spa",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src")
