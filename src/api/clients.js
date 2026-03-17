@@ -1,7 +1,11 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import { API_URL } from "@/constants";
+import { apiFetch } from "./api";
+// const API_URL = "http://localhost:3000"
 
 export async function getClients() {
-  const res = await fetch(`${API_URL}/api/clients`);
+  const res = await fetch(`${API_URL}/api/clients`, {
+    credentials: "include"
+  });
 
   if (!res.ok) {
     const err = await res.json();
@@ -15,12 +19,13 @@ export async function createClient(data) {
   const res = await fetch(`${API_URL}/api/clients`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    credentials: "include",
+    body: JSON.stringify(data)
   });
 
   if (!res.ok) {
     const error = await res.json();
-    throw error;   // important
+    throw error; // important
   }
 
   return res.json();
@@ -30,9 +35,10 @@ export async function updateClient(id, data) {
   const res = await fetch(`${API_URL}/api/clients/${id}`, {
     method: "PUT", // or PATCH depending on backend
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify(data),
+    credentials: "include",
+    body: JSON.stringify(data)
   });
 
   if (!res.ok) {
@@ -46,6 +52,7 @@ export async function updateClient(id, data) {
 export async function deleteClient(id) {
   const res = await fetch(`${API_URL}/api/clients/${id}`, {
     method: "DELETE",
+    credentials: "include"
   });
 
   if (!res.ok) {
