@@ -5,9 +5,15 @@ import {
   updateBreed
 } from "./breeds";
 
+vi.mock("./api", () => ({
+  apiFetch: vi.fn()
+}));
+
+import { apiFetch } from "./api";
+
 describe("api/breeds", () => {
   beforeEach(() => {
-    global.fetch = vi.fn();
+    apiFetch.mockReset();
   });
 
   afterEach(() => {
@@ -16,17 +22,14 @@ describe("api/breeds", () => {
 
   it("getBreeds returns breeds list on success", async () => {
     const payload = [{ id: 1, name: "Poodle" }];
-    fetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue(payload) });
+    apiFetch.mockResolvedValue(payload);
 
     await expect(getBreeds()).resolves.toEqual(payload);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/breeds");
+    expect(apiFetch).toHaveBeenCalledWith("/api/breeds");
   });
 
   it("getBreeds throws backend error message", async () => {
-    fetch.mockResolvedValue({
-      ok: false,
-      json: vi.fn().mockResolvedValue({ error: "Bad request" })
-    });
+    apiFetch.mockRejectedValue(new Error("Bad request"));
 
     await expect(getBreeds()).rejects.toThrow("Bad request");
   });
@@ -34,45 +37,36 @@ describe("api/breeds", () => {
   it("createBreed posts payload and returns created breed", async () => {
     const input = { name: "Bulldog" };
     const created = { id: 10, name: "Bulldog" };
-    fetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue(created) });
+    apiFetch.mockResolvedValue(created);
 
     await expect(createBreed(input)).resolves.toEqual(created);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/breeds", {
+    expect(apiFetch).toHaveBeenCalledWith("/api/breeds", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input)
     });
   });
 
-  it("createBreed throws raw backend error object", async () => {
-    const backendError = { message: "Duplicate breed" };
-    fetch.mockResolvedValue({ ok: false, json: vi.fn().mockResolvedValue(backendError) });
+  it("createBreed throws backend error message", async () => {
+    apiFetch.mockRejectedValue(new Error("Duplicate breed"));
 
-    await expect(createBreed({ name: "Poodle" })).rejects.toEqual(backendError);
+    await expect(createBreed({ name: "Poodle" })).rejects.toThrow("Duplicate breed");
   });
 
   it("updateBreed sends PUT and throws fallback message when response has no json", async () => {
-    fetch.mockResolvedValue({
-      ok: false,
-      json: vi.fn().mockRejectedValue(new Error("no json body"))
-    });
+    apiFetch.mockRejectedValue(new Error("Request failed"));
 
-    await expect(updateBreed(1, { name: "Mix" })).rejects.toThrow("Failed to update breed");
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/breeds/1", {
+    await expect(updateBreed(1, { name: "Mix" })).rejects.toThrow("Request failed");
+    expect(apiFetch).toHaveBeenCalledWith("/api/breeds/1", {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: "Mix" })
     });
   });
 
   it("deleteBreed returns null when delete response has no body", async () => {
-    fetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockRejectedValue(new Error("empty body"))
-    });
+    apiFetch.mockResolvedValue(null);
 
     await expect(deleteBreed(1)).resolves.toBeNull();
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/breeds/1", {
+    expect(apiFetch).toHaveBeenCalledWith("/api/breeds/1", {
       method: "DELETE"
     });
   });

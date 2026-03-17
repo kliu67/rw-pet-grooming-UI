@@ -6,28 +6,28 @@ import {
   updateAppointment
 } from "./appointments";
 
+vi.mock("./api", () => ({
+  apiFetch: vi.fn()
+}));
+
+import { apiFetch } from "./api";
+
 describe("appointments api", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    global.fetch = vi.fn();
+    apiFetch.mockReset();
   });
 
   it("gets appointments", async () => {
     const payload = [{ id: 1 }];
-    fetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue(payload)
-    });
+    apiFetch.mockResolvedValue(payload);
 
     await expect(getAppointments()).resolves.toEqual(payload);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/appointments");
+    expect(apiFetch).toHaveBeenCalledWith("/api/appointments");
   });
 
   it("throws fetch error for getAppointments", async () => {
-    fetch.mockResolvedValue({
-      ok: false,
-      json: vi.fn().mockResolvedValue({ error: "No appointments" })
-    });
+    apiFetch.mockRejectedValue(new Error("No appointments"));
 
     await expect(getAppointments()).rejects.toThrow("No appointments");
   });
@@ -35,72 +35,51 @@ describe("appointments api", () => {
   it("creates an appointment", async () => {
     const data = { client_id: 1 };
     const payload = { id: 3 };
-    fetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue(payload)
-    });
+    apiFetch.mockResolvedValue(payload);
 
     await expect(createAppointment(data)).resolves.toEqual(payload);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/appointments", {
+    expect(apiFetch).toHaveBeenCalledWith("/api/appointments", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     });
   });
 
-  it("throws raw error object for createAppointment", async () => {
-    const error = { error: "Bad request" };
-    fetch.mockResolvedValue({
-      ok: false,
-      json: vi.fn().mockResolvedValue(error)
-    });
+  it("throws backend error message for createAppointment", async () => {
+    apiFetch.mockRejectedValue(new Error("Bad request"));
 
-    await expect(createAppointment({})).rejects.toEqual(error);
+    await expect(createAppointment({})).rejects.toThrow("Bad request");
   });
 
   it("updates an appointment", async () => {
     const data = { status: "completed" };
     const payload = { ok: true };
-    fetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue(payload)
-    });
+    apiFetch.mockResolvedValue(payload);
 
     await expect(updateAppointment(4, data)).resolves.toEqual(payload);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/appointments/4/update", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+    expect(apiFetch).toHaveBeenCalledWith("/api/appointments/4", {
+      method: "PUT",
       body: JSON.stringify(data)
     });
   });
 
-  it("throws fallback error for updateAppointment", async () => {
-    fetch.mockResolvedValue({
-      ok: false,
-      json: vi.fn().mockRejectedValue(new Error("bad json"))
-    });
+  it("throws backend error message for updateAppointment", async () => {
+    apiFetch.mockRejectedValue(new Error("Request failed"));
 
-    await expect(updateAppointment(4, {})).rejects.toThrow("Failed to update appointment");
+    await expect(updateAppointment(4, {})).rejects.toThrow("Request failed");
   });
 
   it("deletes an appointment", async () => {
     const payload = { ok: true };
-    fetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue(payload)
-    });
+    apiFetch.mockResolvedValue(payload);
 
     await expect(deleteAppointment(6)).resolves.toEqual(payload);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/appointments/6", {
+    expect(apiFetch).toHaveBeenCalledWith("/api/appointments/6", {
       method: "DELETE"
     });
   });
 
   it("returns null when delete response has no json body", async () => {
-    fetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockRejectedValue(new Error("empty"))
-    });
+    apiFetch.mockResolvedValue(null);
 
     await expect(deleteAppointment(6)).resolves.toBeNull();
   });

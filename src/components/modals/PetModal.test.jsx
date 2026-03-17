@@ -70,7 +70,7 @@ describe("PetModal", () => {
         name: "Buddy",
         owner: 1,
         breed: 10,
-        weightClassId: 100
+        weight_class_id: 100
       });
     });
     expect(onClose).toHaveBeenCalledTimes(1);

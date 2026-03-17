@@ -1,5 +1,5 @@
+import React, { useState } from "react";
 import { t } from "i18next";
-import { useState } from "react";
 import { CONFIRM_DELETE } from "@/constants";
 
 export default function DeleteModal({

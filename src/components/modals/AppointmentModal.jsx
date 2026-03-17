@@ -1,3 +1,4 @@
+import React from "react";
 import { Fragment, useState, useEffect, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { MAX_APPOINTMENTS_DESC_LENGTH, INTERVAL_MINUTES } from "@/constants";

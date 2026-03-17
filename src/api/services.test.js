@@ -5,9 +5,15 @@ import {
   updateService
 } from "./services";
 
+vi.mock("./api", () => ({
+  apiFetch: vi.fn()
+}));
+
+import { apiFetch } from "./api";
+
 describe("api/services", () => {
   beforeEach(() => {
-    global.fetch = vi.fn();
+    apiFetch.mockReset();
   });
 
   afterEach(() => {
@@ -16,17 +22,14 @@ describe("api/services", () => {
 
   it("getServices returns services list on success", async () => {
     const payload = [{ id: 1, name: "Bath" }];
-    fetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue(payload) });
+    apiFetch.mockResolvedValue(payload);
 
     await expect(getServices()).resolves.toEqual(payload);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/services");
+    expect(apiFetch).toHaveBeenCalledWith("/api/services");
   });
 
   it("getServices throws backend error message", async () => {
-    fetch.mockResolvedValue({
-      ok: false,
-      json: vi.fn().mockResolvedValue({ error: "Services unavailable" })
-    });
+    apiFetch.mockRejectedValue(new Error("Services unavailable"));
 
     await expect(getServices()).rejects.toThrow("Services unavailable");
   });
@@ -34,45 +37,36 @@ describe("api/services", () => {
   it("createService posts payload and returns created service", async () => {
     const input = { name: "Haircut", base_price: 25 };
     const created = { id: 7, ...input };
-    fetch.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue(created) });
+    apiFetch.mockResolvedValue(created);
 
     await expect(createService(input)).resolves.toEqual(created);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/services", {
+    expect(apiFetch).toHaveBeenCalledWith("/api/services", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input)
     });
   });
 
-  it("createService throws raw backend error object", async () => {
-    const backendError = { message: "Validation failed" };
-    fetch.mockResolvedValue({ ok: false, json: vi.fn().mockResolvedValue(backendError) });
+  it("createService throws backend error message", async () => {
+    apiFetch.mockRejectedValue(new Error("Validation failed"));
 
-    await expect(createService({ name: "" })).rejects.toEqual(backendError);
+    await expect(createService({ name: "" })).rejects.toThrow("Validation failed");
   });
 
   it("updateService sends PUT and throws specific backend message", async () => {
-    fetch.mockResolvedValue({
-      ok: false,
-      json: vi.fn().mockResolvedValue({ message: "Not found" })
-    });
+    apiFetch.mockRejectedValue(new Error("Not found"));
 
     await expect(updateService(5, { name: "Spa" })).rejects.toThrow("Not found");
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/services/5", {
+    expect(apiFetch).toHaveBeenCalledWith("/api/services/5", {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: "Spa" })
     });
   });
 
   it("deleteService throws fallback message when response is not json", async () => {
-    fetch.mockResolvedValue({
-      ok: false,
-      json: vi.fn().mockRejectedValue(new Error("invalid json"))
-    });
+    apiFetch.mockRejectedValue(new Error("Request failed"));
 
-    await expect(deleteService(2)).rejects.toThrow("Failed to delete service");
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/services/2", {
+    await expect(deleteService(2)).rejects.toThrow("Request failed");
+    expect(apiFetch).toHaveBeenCalledWith("/api/services/2", {
       method: "DELETE"
     });
   });

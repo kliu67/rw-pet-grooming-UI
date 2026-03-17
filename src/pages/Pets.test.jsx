@@ -92,7 +92,7 @@ vi.mock("@/components/modals/PetModal", () => ({
             name: "Buddy",
             owner: 1,
             breed: 10,
-            weightClassId: 100
+            weight_class_id: 100
           })
         }
       >
@@ -239,7 +239,7 @@ describe("Pets", () => {
         name: "Buddy",
         owner: 1,
         breed: 10,
-        weightClassId: 100
+        weight_class_id: 100
       });
     });
   });
@@ -258,7 +258,7 @@ describe("Pets", () => {
           name: "Buddy",
           owner: 1,
           breed: 10,
-          weightClassId: 100
+          weight_class_id: 100
         }
       });
     });

@@ -1,28 +1,28 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getWeightClasses } from "./weightClasses";
 
+vi.mock("./api", () => ({
+  apiFetch: vi.fn()
+}));
+
+import { apiFetch } from "./api";
+
 describe("weightClasses api", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    global.fetch = vi.fn();
+    apiFetch.mockReset();
   });
 
   it("gets weight classes", async () => {
     const payload = [{ id: 1 }];
-    fetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue(payload)
-    });
+    apiFetch.mockResolvedValue(payload);
 
     await expect(getWeightClasses()).resolves.toEqual(payload);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/weightClasses");
+    expect(apiFetch).toHaveBeenCalledWith("/api/weightClasses");
   });
 
   it("throws fetch error for getWeightClasses", async () => {
-    fetch.mockResolvedValue({
-      ok: false,
-      json: vi.fn().mockResolvedValue({ error: "No weight classes" })
-    });
+    apiFetch.mockRejectedValue(new Error("No weight classes"));
 
     await expect(getWeightClasses()).rejects.toThrow("No weight classes");
   });

@@ -1,3 +1,4 @@
+import React from "react";
 import { Fragment, useState, useEffect } from "react";
 import { Search } from "lucide-react";
 
@@ -170,7 +171,7 @@ export default function PetModal({
               delta.breed = form.breed.id;
             }
             if (petData?.weightClass?.id !== form.weightClass?.id) {
-              delta.weightClassId = form.weightClass.id;
+              delta.weight_class_id = form.weightClass.id;
             }
 
             try {

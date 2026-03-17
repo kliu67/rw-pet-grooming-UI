@@ -1,3 +1,4 @@
+import React from "react";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { MAX_BREED_NAME_LENGTH } from "@/constants";

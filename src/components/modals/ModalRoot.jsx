@@ -1,3 +1,4 @@
+import React from "react";
 import { XIcon } from "lucide-react";
 import { MODAL_COMPONENTS } from "./modalRegistry";
 

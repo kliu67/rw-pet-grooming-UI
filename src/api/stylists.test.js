@@ -1,28 +1,28 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getStylists } from "./stylists";
 
+vi.mock("./api", () => ({
+  apiFetch: vi.fn()
+}));
+
+import { apiFetch } from "./api";
+
 describe("stylists api", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    global.fetch = vi.fn();
+    apiFetch.mockReset();
   });
 
   it("gets stylists", async () => {
     const payload = [{ id: 1 }];
-    fetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue(payload)
-    });
+    apiFetch.mockResolvedValue(payload);
 
     await expect(getStylists()).resolves.toEqual(payload);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/stylists");
+    expect(apiFetch).toHaveBeenCalledWith("/api/stylists");
   });
 
   it("throws fetch error for getStylists", async () => {
-    fetch.mockResolvedValue({
-      ok: false,
-      json: vi.fn().mockResolvedValue({ error: "No stylists" })
-    });
+    apiFetch.mockRejectedValue(new Error("No stylists"));
 
     await expect(getStylists()).rejects.toThrow("No stylists");
   });

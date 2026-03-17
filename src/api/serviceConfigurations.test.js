@@ -1,28 +1,28 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getServiceConfigurations } from "./serviceConfigurations";
 
+vi.mock("./api", () => ({
+  apiFetch: vi.fn()
+}));
+
+import { apiFetch } from "./api";
+
 describe("serviceConfigurations api", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    global.fetch = vi.fn();
+    apiFetch.mockReset();
   });
 
   it("gets service configurations", async () => {
     const payload = [{ id: 1 }];
-    fetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue(payload)
-    });
+    apiFetch.mockResolvedValue(payload);
 
     await expect(getServiceConfigurations()).resolves.toEqual(payload);
-    expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/serviceConfigurations/all");
+    expect(apiFetch).toHaveBeenCalledWith("/api/serviceConfigurations");
   });
 
   it("throws fetch error for getServiceConfigurations", async () => {
-    fetch.mockResolvedValue({
-      ok: false,
-      json: vi.fn().mockResolvedValue({ error: "No configs" })
-    });
+    apiFetch.mockRejectedValue(new Error("No configs"));
 
     await expect(getServiceConfigurations()).rejects.toThrow("No configs");
   });

@@ -1,3 +1,4 @@
+import React from "react";
 import { useState, useRef, useEffect } from "react";
 import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 export const RowActionsMenu = ({ onEdit, onDelete }) => {
