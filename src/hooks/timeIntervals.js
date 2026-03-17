@@ -32,17 +32,18 @@ export const computeAMPMTimeString = (date) => {
 
 export const computeDateTimeIntervals = (timeRange, date, durationMinutes, intervalMinutes) => {
   const { start, end } = timeRange;
-  date.setHours(0);
-  date.setMinutes(0);
-  date.setMilliseconds(0);
+  const baseDate = new Date(date);
+  baseDate.setHours(0);
+  baseDate.setMinutes(0);
+  baseDate.setMilliseconds(0);
   let rangeStart =
-    date.getHours() * 60 +
-    date.getMinutes() +
+    baseDate.getHours() * 60 +
+    baseDate.getMinutes() +
     Number(start.substring(0, 2)) * 60 +
     Number(start.substring(3, 5));
   let rangeEnd =
-    date.getHours() * 60 +
-    date.getMinutes() +
+    baseDate.getHours() * 60 +
+    baseDate.getMinutes() +
     Number(end.substring(0, 2)) * 60 +
     Number(end.substring(3, 5));
   
@@ -51,11 +52,11 @@ export const computeDateTimeIntervals = (timeRange, date, durationMinutes, inter
 
     while ((rangeEnd - rangeStart) >= durationMinutes) {
 
-      let start = new Date(date);
+      let start = new Date(baseDate);
       start.setHours(Math.trunc(rangeStart / 60));
       start.setMinutes(rangeStart % 60);
 
-      let end = new Date(date);
+      let end = new Date(baseDate);
       end.setHours(Math.trunc((rangeStart + durationMinutes) / 60));
       end.setMinutes((rangeStart + durationMinutes) % 60);
 

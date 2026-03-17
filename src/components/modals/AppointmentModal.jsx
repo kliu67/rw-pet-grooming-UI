@@ -134,15 +134,20 @@ export default function AppointmentModal({
     error: timeOffsError
   } = useTimeOffById(stylist?.id);
 
-  const openTimeRanges = useOpenTimeRanges({
-    availabilityData,
-    timeOffsData,
-    appointments: appointmentsData
+  const appointmentsForRanges = useMemo(() => {
+    return appointmentsData
       .filter((app) => app.stylist_id === stylist?.id)
+      .filter((app) => (mode === "edit" ? app.id !== row?.id : true))
       .map((app) => ({
         startTime: app.startTime,
         endTime: app.effectiveEndTime
-      })),
+      }));
+  }, [appointmentsData, mode, row?.id, stylist?.id]);
+
+  const openTimeRanges = useOpenTimeRanges({
+    availabilityData,
+    timeOffsData,
+    appointments: appointmentsForRanges,
     date
   });
 
@@ -223,12 +228,7 @@ export default function AppointmentModal({
 
     const thisMonth = calendarMonth.getMonth();
     const thisYear = calendarMonth.getFullYear();
-    const appointmentsByStylist = appointmentsData
-      .filter((app) => app.stylist_id === stylist?.id)
-      .map((app) => ({
-        startTime: app.startTime,
-        endTime: app.effectiveEndTime
-      }));
+    const appointmentsByStylist = appointmentsForRanges;
 
     return getDaysInMonth(thisYear, thisMonth).map((day) =>
       getOpenTimeRanges({
@@ -238,7 +238,7 @@ export default function AppointmentModal({
         date: day
       })
     );
-  }, [availabilityData, appointments, timeOffsData, calendarMonth]);
+  }, [availabilityData, appointmentsForRanges, timeOffsData, calendarMonth]);
 
   const monthBookableDates = useMemo(() => {
     if (!availabilityData?.length) return new Set();
