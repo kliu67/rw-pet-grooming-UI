@@ -13,7 +13,14 @@ import { EmptyState } from "./components/emptyState";
 import { useAuth } from "./context/AuthContext";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAuthReady } = useAuth();
+  if (!isAuthReady) {
+    return (
+      <div className="w-full flex items-center justify-center py-12 text-sm text-gray-500">
+        Loading...
+      </div>
+    );
+  }
   return isAuthenticated ? children : <Navigate to="/empty" replace />;
 }
 

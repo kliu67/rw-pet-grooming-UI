@@ -1,6 +1,6 @@
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { loginUser, logout as logoutUser, registerUser } from "@/api/auth";
+import { loginUser, logout as logoutUser, registerUser, me } from "@/api/auth";
 import { USERS_QUERY_KEY } from "@/constants";
 
 type AuthUser = {
@@ -15,6 +15,7 @@ type AuthUser = {
 type AuthState = {
   user: AuthUser | null;
   isAuthenticated: boolean;
+  isAuthReady: boolean;
   setAuth: (user: AuthUser | null) => void;
   clearAuth: () => void;
   login: (data: { email: string; password: string }) => Promise<{
@@ -33,6 +34,7 @@ const AuthContext = createContext<AuthState | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [isAuthReady, setIsAuthReady] = useState(false);
 
   const setAuth = useCallback((nextUser: AuthUser | null) => {
     setUser(nextUser);
@@ -66,17 +68,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearAuth();
   }, [clearAuth]);
 
+  useEffect(() => {
+    let isMounted = true;
+    me()
+      .then((result) => {
+        const nextUser = result?.data?.user ?? null;
+        if (isMounted) setAuth(nextUser);
+      })
+      .catch(() => {
+        if (isMounted) clearAuth();
+      })
+      .finally(() => {
+        if (isMounted) setIsAuthReady(true);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [setAuth, clearAuth]);
+
   const value = useMemo(
     () => ({
       user,
       isAuthenticated: Boolean(user),
+      isAuthReady,
       setAuth,
       clearAuth,
       login,
       register,
       logout,
     }),
-    [user, login, register, logout],
+    [user, isAuthReady, login, register, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
