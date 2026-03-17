@@ -1,52 +1,87 @@
-import React from 'react';
-import { createBrowserRouter } from 'react-router';
-import { Layout } from './components/Layout';
-import { Dashboard } from './pages/Dashboard';
-import { Appointments } from './pages/Appointments';
-import { Clients } from './pages/Clients';
-import { Services } from './pages/Services';
-import { Breeds } from './pages/Breeds';
-import { Pets } from './pages/Pets';
-import { ServiceConfigurations } from './pages/ServiceConfigurations'
-import { Authenticate } from  './pages/Authenticate';
+import React from "react";
+import { createBrowserRouter, Navigate } from "react-router";
+import { Layout } from "./components/Layout";
+import { Dashboard } from "./pages/Dashboard";
+import { Appointments } from "./pages/Appointments";
+import { Clients } from "./pages/Clients";
+import { Services } from "./pages/Services";
+import { Breeds } from "./pages/Breeds";
+import { Pets } from "./pages/Pets";
+import { ServiceConfigurations } from "./pages/ServiceConfigurations";
+import { Authenticate } from "./pages/Authenticate";
+import { EmptyState } from "./components/emptyState";
+import { useAuth } from "./context/AuthContext";
+
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/empty" replace />;
+}
 
 export const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     Component: Layout,
     children: [
       {
         index: true,
-        Component: Dashboard,
+        Component: Dashboard
       },
       {
-        path: 'appointments',
-        Component: Appointments,
+        path: "/empty",
+        Component: EmptyState
       },
       {
-        path: 'clients',
-        Component: Clients,
+        path: "appointments",
+        element: (
+          <RequireAuth>
+            <Appointments />
+          </RequireAuth>
+        )
       },
       {
-        path: 'services',
-        Component: Services,
+        path: "clients",
+        element: (
+          <RequireAuth>
+            <Clients />
+          </RequireAuth>
+        )
       },
       {
-        path: 'serviceConfigurations',
-        Component: ServiceConfigurations,
+        path: "services",
+        element: (
+          <RequireAuth>
+            <Services />
+          </RequireAuth>
+        )
       },
       {
-        path: 'breeds',
-        Component: Breeds,
+        path: "serviceConfigurations",
+        element: (
+          <RequireAuth>
+            <ServiceConfigurations />
+          </RequireAuth>
+        )
       },
       {
-        path: 'pets',
-        Component: Pets,
+        path: "breeds",
+        element: (
+          <RequireAuth>
+            <Breeds />
+          </RequireAuth>
+        )
       },
       {
-        path: 'login',
-        Component: Authenticate,
+        path: "pets",
+        element: (
+          <RequireAuth>
+            <Pets />
+          </RequireAuth>
+        )
+      },
+      {
+        path: "login",
+        Component: Authenticate
       }
-    ],
-  },
+    ]
+  }
 ]);
