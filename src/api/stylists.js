@@ -1,12 +1,25 @@
-import { API_URL } from "@/constants";
+import { apiFetch } from "./api";
 
 export async function getStylists() {
-  const res = await fetch(`${API_URL}/api/stylists`);
+  return await apiFetch("/api/stylists");
+}
 
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error || "Failed to fetch stylists");
-  }
+export async function createStylist(data) {
+  return await apiFetch("/api/stylists", {
+    method: "POST",
+    body: JSON.stringify(data)
+  })
+}
 
-  return res.json();
+export async function updateStylist(id, data) {
+   return await apiFetch(`/api/stylists/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data)
+  })
+}
+
+export async function deleteStylist(id) {
+  return await apiFetch(`/api/stylists/${id}`, {
+    method: "DELETE"
+  })
 }
