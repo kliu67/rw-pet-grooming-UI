@@ -29,8 +29,21 @@ import { useBreeds } from "../hooks/breeds";
 import { useWeightClasses } from "../hooks/weightClasses";
 import { useAvailabiltyById } from "../hooks/availability";
 import { useTimeOffById } from "../hooks/timeOffs";
-import { DEFAULT_STYLIST } from "../constants";
-
+import {
+  DEFAULT_STYLIST,
+  staticServiceData,
+  serviceImageMap,
+  defaultImage,
+} from "../constants";
+import { ServiceCard } from "./ServiceCard";
+// import {
+//   Card,
+//   CardHeader,
+//   CardTitle,
+//   CardDescription,
+//   CardContent,
+//   CardFooter,
+// } from "./ui/card";
 interface MultiStepFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -45,7 +58,7 @@ interface FormData {
 
   // Step 2
   petName: string;
-  service: number;
+  serviceId: number;
   breed: number;
   weight: number;
 
@@ -67,7 +80,7 @@ export function MultiStepFormModal({
     phone: "",
 
     petName: "",
-    service: "",
+    serviceId: "",
     breed: "",
     weight: "",
 
@@ -76,9 +89,32 @@ export function MultiStepFormModal({
     message: "",
   });
 
-  const totalSteps = 3;
-  const progress = (currentStep / totalSteps) * 100;
   const { t } = useTranslation();
+  const totalSteps = 5;
+  const progress = (currentStep / totalSteps) * 100;
+
+  const steps = [
+    {
+      id: 1,
+      label: t("bookingModal.serviceStep"),
+    },
+    {
+      id: 2,
+      label: t("bookingModal.personalStep"),
+    },
+    {
+      id: 3,
+      label: t("bookingModal.petStep"),
+    },
+    {
+      id: 4,
+      label: t("bookingModal.dateTimeStep"),
+    },
+    {
+      id: 5,
+      label: t("bookingModal.reviewStep"),
+    },
+  ];
 
   const {
     data: serviceData = [],
@@ -110,10 +146,20 @@ export function MultiStepFormModal({
     error: timeOffsError,
   } = useTimeOffById(DEFAULT_STYLIST);
 
-  const updateFormData = (field: keyof FormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
+  const services = serviceData.map((service) => {
+    const match = staticServiceData.find((s) => s.code === service.code);
+    return {
+      name: service.name,
+      price: `From $${service.base_price}`,
+      description: service.description,
+      code: service.code,
+    };
+  });
 
+  const updateFormData = (field: keyof FormData, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    console.log(formData);
+  };
   const validateStep = () => {
     switch (currentStep) {
       case 1:
@@ -150,7 +196,7 @@ export function MultiStepFormModal({
         phone: "",
 
         petName: "",
-        service: "",
+        serviceId: "",
         breed: "",
         weight: "",
 
@@ -166,6 +212,29 @@ export function MultiStepFormModal({
   const renderStep = () => {
     switch (currentStep) {
       case 1:
+        return (
+          <div className="space-y-4">
+            <div
+              id="services-container"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            >
+              {serviceData.length > 1 &&
+                serviceData.map((service, index) => {
+                  const image = serviceImageMap[service?.code] ?? defaultImage;
+                  return (
+                    <ServiceCard
+                      key={service?.id}
+                      service={service}
+                      image={image}
+                      isSelected={String(formData.serviceId) === String(service?.id)}
+                      onClick={updateFormData}
+                    />
+                  );
+                })}
+            </div>
+          </div>
+        );
+      case 2:
         return (
           <div className="space-y-4">
             <div className={BOOKING_MODAL_FIELD}>
@@ -209,7 +278,7 @@ export function MultiStepFormModal({
           </div>
         );
 
-      case 2:
+      case 3:
         return (
           <div className="space-y-4">
             <div className={BOOKING_MODAL_FIELD}>
@@ -221,7 +290,7 @@ export function MultiStepFormModal({
                 onChange={(e) => updateFormData("petName", e.target.value)}
               />
             </div>
-            {serviceData.length > 1 && (
+            {/* {serviceData.length > 1 && (
               <div className={BOOKING_MODAL_FIELD}>
                 <Label htmlFor="breed">{t("bookingModal.service")}</Label>
                 <Select
@@ -240,7 +309,7 @@ export function MultiStepFormModal({
                   </SelectContent>
                 </Select>
               </div>
-            )}
+            )} */}
             {breedsData.length > 1 && (
               <div className={BOOKING_MODAL_FIELD}>
                 <Label htmlFor="breed">{t("bookingModal.breed")}</Label>
@@ -280,7 +349,7 @@ export function MultiStepFormModal({
           </div>
         );
 
-      case 3:
+      case 4:
         return (
           <div className="space-y-4">
             <div className={BOOKING_MODAL_FIELD}>
@@ -307,7 +376,10 @@ export function MultiStepFormModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent
+        className="sm:max-w-[1000px] max-h-[90vh] overflow-y-auto"
+        onInteractOutside={(event) => event.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>{t("bookingModal.title")}</DialogTitle>
           <DialogDescription>
@@ -319,29 +391,25 @@ export function MultiStepFormModal({
         <div className={BOOKING_MODAL_FIELD}>
           <Progress value={progress} className="h-2" />
           <div className="flex justify-between">
-            {[1, 2, 3].map((step) => (
-              <div key={step} className="flex items-center gap-2">
+            {steps.map((step) => (
+              <div key={step.id} className="flex items-center gap-2">
                 <div
                   className={`flex items-center justify-center size-8 rounded-full border-2 transition-colors ${
-                    currentStep > step
+                    currentStep > step.id
                       ? "bg-primary border-primary text-primary-foreground"
-                      : currentStep === step
+                      : currentStep === step.id
                         ? "border-primary text-primary"
                         : "border-muted-foreground/25 text-muted-foreground"
                   }`}
                 >
-                  {currentStep > step ? (
+                  {currentStep > step.id ? (
                     <Check className="size-4" />
                   ) : (
-                    <span className="text-sm">{step}</span>
+                    <span className="text-sm">{step.id}</span>
                   )}
                 </div>
                 <span className="text-sm text-muted-foreground hidden sm:inline">
-                  {step === 1
-                    ? t("bookingModal.personalStep")
-                    : step === 2
-                      ? t("bookingModal.petStep")
-                      : t("bookingModal.dateTimeStep")}
+                  {step.label}
                 </span>
               </div>
             ))}
