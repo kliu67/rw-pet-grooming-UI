@@ -1,13 +1,19 @@
 
   import { defineConfig } from 'vite';
   import react from '@vitejs/plugin-react-swc';
+  import tailwindcss from '@tailwindcss/vite';
   import path from 'path';
 
   export default defineConfig({
-    plugins: [react()],
+    plugins: [react(), tailwindcss()],
     resolve: {
+      dedupe: ['react', 'react-dom', 'react-i18next', 'i18next'],
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
+        'react': path.resolve(__dirname, './node_modules/react'),
+        'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
+        'react-i18next': path.resolve(__dirname, './node_modules/react-i18next'),
+        'i18next': path.resolve(__dirname, './node_modules/i18next'),
         'vaul@1.1.2': 'vaul',
         'sonner@2.0.3': 'sonner',
         'recharts@2.15.2': 'recharts',
