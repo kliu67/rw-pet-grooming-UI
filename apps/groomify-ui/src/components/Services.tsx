@@ -139,7 +139,7 @@ export const Services = ({}) => {
                       <Icon className="h-6 w-6" />
                     </div>
                     <span className="bg-gray-100 text-gray-800 text-sm font-semibold px-2.5 py-0.5 rounded">
-                      {service.base_price}
+                      {service.price}
                     </span>
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">
