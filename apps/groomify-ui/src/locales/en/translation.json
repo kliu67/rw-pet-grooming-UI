@@ -1,0 +1,49 @@
+{
+  "general": {
+    "next": "Next",
+    "prev": "Prev",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "loading": "Loading...",
+    "edit": "Edit",
+    "update": "Update",
+    "delete": "Delete",
+    "create": "Create",
+    "select": "Select",
+    "remarks": "Remarks",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "bookingModal":{
+    "title": "Complete Your Booking",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "petName": "Pet Name",
+    "service": "Service",
+    "breed": "Breed",
+    "weight": "Weight",
+    "date": "Date",
+    "time": "Time",
+    "message": "Message",
+    "serviceStep": "Service",
+    "personalStep": "Personal",
+    "petStep": "Pet",
+    "dateTimeStep": "Date/Time",
+    "reviewStep": "Review",
+    "startingPrice": "From ${{price}}"
+  },
+  "placeholder":{
+    "firstName": "Enter your first name",
+    "lastName": "Enter your last name",
+    "email" : "Enter your email",
+    "phone": "Enter your phone",
+    "petName": "Enter your pet's name",
+    "service": "Select a service",
+    "message": "Leave a message",
+    "breed": "Select your pet's breed",
+    "weight": "Select your pet's weight"
+  }
+}
