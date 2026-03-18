@@ -85,6 +85,7 @@ export const Appointments = () => {
     isLoading: breedsIsLoading,
     error: breedsError
   } = useBreeds();
+  
   const {
     data: servicesData = [],
     isLoading: servicesIsLoading,

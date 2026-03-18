@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getAvailability, getAvailabilityById } from "@/api/availability";
 import { AVAILABILITY_QUERY_KEY } from "@/constants";
 
-export function useAvaiability() {
+export function useAvailability() {
   return useQuery({
     queryKey: [AVAILABILITY_QUERY_KEY],
     queryFn: getAvailability,

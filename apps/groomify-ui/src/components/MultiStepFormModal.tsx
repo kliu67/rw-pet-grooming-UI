@@ -23,8 +23,14 @@ import { Progress } from "./ui/progress";
 import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { CLASSNAMES } from "../styles/classNames";
-import { DropdownMenu } from "./ui/dropdown-menu";
 import { Calendar } from "./ui/calendar";
+import { useServices } from "../hooks/services";
+import { useBreeds } from "../hooks/breeds";
+import { useWeightClasses } from "../hooks/weightClasses";
+import { useAvailabiltyById } from "../hooks/availability";
+import { useTimeOffById } from "../hooks/timeOffs";
+import { DEFAULT_STYLIST } from "../constants";
+
 interface MultiStepFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -39,6 +45,7 @@ interface FormData {
 
   // Step 2
   petName: string;
+  service: number;
   breed: number;
   weight: number;
 
@@ -60,6 +67,7 @@ export function MultiStepFormModal({
     phone: "",
 
     petName: "",
+    service: "",
     breed: "",
     weight: "",
 
@@ -71,6 +79,36 @@ export function MultiStepFormModal({
   const totalSteps = 3;
   const progress = (currentStep / totalSteps) * 100;
   const { t } = useTranslation();
+
+  const {
+    data: serviceData = [],
+    isLoading: servicesIsLoading,
+    error: servicesError,
+  } = useServices();
+
+  const {
+    data: breedsData = [],
+    isLoading: breedsIsLoading,
+    error: breedsError,
+  } = useBreeds();
+
+  const {
+    data: weightClassesData = [],
+    isLoading: weightClassesIsLoading,
+    error: weightClassesError,
+  } = useWeightClasses();
+
+  const {
+    data: availabilityData = [],
+    isLoading: availabilityIsLoading,
+    error: availabilityError,
+  } = useAvailabiltyById(DEFAULT_STYLIST);
+
+  const {
+    data: timeOffsData = [],
+    isLoading: timeOffsIsLoading,
+    error: timeOffsError,
+  } = useTimeOffById(DEFAULT_STYLIST);
 
   const updateFormData = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -112,6 +150,7 @@ export function MultiStepFormModal({
         phone: "",
 
         petName: "",
+        service: "",
         breed: "",
         weight: "",
 
@@ -182,40 +221,62 @@ export function MultiStepFormModal({
                 onChange={(e) => updateFormData("petName", e.target.value)}
               />
             </div>
-            <div className={BOOKING_MODAL_FIELD}>
-              <Label htmlFor="breed">{t("bookingModal.breed")}</Label>
-              <Select
-                value={formData.breed}
-                onValueChange={(value) => updateFormData("breed", value)}
-              >
-                <SelectTrigger id="breed">
-                  <SelectValue placeholder={t("placeholder.breed")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0-2">0-2 years</SelectItem>
-                  <SelectItem value="3-5">3-5 years</SelectItem>
-                  <SelectItem value="6-10">6-10 years</SelectItem>
-                  <SelectItem value="10+">10+ years</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className={BOOKING_MODAL_FIELD}>
-              <Label htmlFor="weight">{t("bookingModal.weight")}</Label>
-              <Select
-                value={formData.weight}
-                onValueChange={(value) => updateFormData("weight", value)}
-              >
-                <SelectTrigger id="weight">
-                  <SelectValue placeholder={t("placeholder.weight")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0-2">0-2 years</SelectItem>
-                  <SelectItem value="3-5">3-5 years</SelectItem>
-                  <SelectItem value="6-10">6-10 years</SelectItem>
-                  <SelectItem value="10+">10+ years</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {serviceData.length > 1 && (
+              <div className={BOOKING_MODAL_FIELD}>
+                <Label htmlFor="breed">{t("bookingModal.service")}</Label>
+                <Select
+                  value={formData.service}
+                  onValueChange={(value) => updateFormData("service", value)}
+                >
+                  <SelectTrigger id="breed">
+                    <SelectValue placeholder={t("placeholder.service")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {serviceData.map((service) => (
+                      <SelectItem value={service?.id}>
+                        {service.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            {breedsData.length > 1 && (
+              <div className={BOOKING_MODAL_FIELD}>
+                <Label htmlFor="breed">{t("bookingModal.breed")}</Label>
+                <Select
+                  value={formData.breed}
+                  onValueChange={(value) => updateFormData("breed", value)}
+                >
+                  <SelectTrigger id="breed">
+                    <SelectValue placeholder={t("placeholder.breed")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {breedsData.map((breed) => (
+                      <SelectItem value={breed?.id}>{breed?.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            {weightClassesData.length > 1 && (
+              <div className={BOOKING_MODAL_FIELD}>
+                <Label htmlFor="weight">{t("bookingModal.weight")}</Label>
+                <Select
+                  value={formData.weight}
+                  onValueChange={(value) => updateFormData("weight", value)}
+                >
+                  <SelectTrigger id="weight">
+                    <SelectValue placeholder={t("placeholder.weight")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {weightClassesData.map((weight) => (
+                      <SelectItem value={weight.id}>{weight.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
         );
 
@@ -224,12 +285,6 @@ export function MultiStepFormModal({
           <div className="space-y-4">
             <div className={BOOKING_MODAL_FIELD}>
               <Label htmlFor="date">{t("bookingModal.date")}</Label>
-              {/* <Input
-                id="interests"
-                placeholder="e.g., Design, Development, Marketing"
-                value={formData.interests}
-                onChange={(e) => updateFormData("interests", e.target.value)}
-              /> */}
               <Calendar></Calendar>
             </div>
             <div className={BOOKING_MODAL_FIELD}>
@@ -254,7 +309,7 @@ export function MultiStepFormModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{t('bookingModal.title')}</DialogTitle>
+          <DialogTitle>{t("bookingModal.title")}</DialogTitle>
           <DialogDescription>
             Step {currentStep} of {totalSteps}
           </DialogDescription>
@@ -283,10 +338,10 @@ export function MultiStepFormModal({
                 </div>
                 <span className="text-sm text-muted-foreground hidden sm:inline">
                   {step === 1
-                    ? t('bookingModal.personalStep')
+                    ? t("bookingModal.personalStep")
                     : step === 2
-                      ? t('bookingModal.petStep')
-                      : t('bookingModal.dateTimeStep')}
+                      ? t("bookingModal.petStep")
+                      : t("bookingModal.dateTimeStep")}
                 </span>
               </div>
             ))}

@@ -64,3 +64,6 @@ export const phoneRegex = /^(?!-)(?!.*--)[0-9]+(?:-[0-9]+)*$/;
 export const passwordRegex = new RegExp(
   `^(?=.*[A-Za-z])(?=.*\\d)(?=.*[^A-Za-z0-9]).+$`,
 );
+
+
+export const DEFAULT_STYLIST=1;
