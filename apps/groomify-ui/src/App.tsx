@@ -76,7 +76,7 @@ export default function App() {
       </main>
 
       <Footer />
-      <MultiStepFormModal isOpen={isModalOpen} onOpenChange={setIsModalOpen} />
+      <MultiStepFormModal open={isModalOpen} onOpenChange={setIsModalOpen} />
     </div>
   );
 }

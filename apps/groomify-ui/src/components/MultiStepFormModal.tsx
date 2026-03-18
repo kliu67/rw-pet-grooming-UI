@@ -1,3 +1,4 @@
+import React from "react";
 import { useState } from "react";
 import {
   Dialog,
@@ -11,10 +12,19 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import { Progress } from "./ui/progress";
 import { Check } from "lucide-react";
-
+import { useTranslation } from "react-i18next";
+import { CLASSNAMES } from "../styles/classNames";
+import { DropdownMenu } from "./ui/dropdown-menu";
+import { Calendar } from "./ui/calendar";
 interface MultiStepFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -25,32 +35,42 @@ interface FormData {
   firstName: string;
   lastName: string;
   email: string;
-  
-  // Step 2
-  company: string;
-  position: string;
-  experience: string;
-  
-  // Step 3
-  interests: string;
-  message: string;
-}
+  phone: string;
 
-export function MultiStepFormModal({ isOpen, onOpenChange }: MultiStepFormModalProps) {
+  // Step 2
+  petName: string;
+  breed: number;
+  weight: number;
+
+  // Step 3
+  appStartDate: Date;
+  appStylistId: number;
+  appRemarks: string;
+}
+const { BOOKING_MODAL_FIELD_TWO: BOOKING_MODAL_FIELD } = CLASSNAMES;
+export function MultiStepFormModal({
+  open,
+  onOpenChange,
+}: MultiStepFormModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
     email: "",
-    company: "",
-    position: "",
-    experience: "",
-    interests: "",
+    phone: "",
+
+    petName: "",
+    breed: "",
+    weight: "",
+
+    startDate: "",
+    stylistId: "",
     message: "",
   });
 
   const totalSteps = 3;
   const progress = (currentStep / totalSteps) * 100;
+  const { t } = useTranslation();
 
   const updateFormData = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -70,15 +90,15 @@ export function MultiStepFormModal({ isOpen, onOpenChange }: MultiStepFormModalP
   };
 
   const handleNext = () => {
-    if (validateStep() && currentStep < totalSteps) {
-      setCurrentStep((prev) => prev + 1);
-    }
+    // if (validateStep() && currentStep < totalSteps) {
+    setCurrentStep((prev) => prev + 1);
+    // }
   };
 
   const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep((prev) => prev - 1);
-    }
+    // if (currentStep > 1) {
+    setCurrentStep((prev) => prev - 1);
+    // }
   };
 
   const handleSubmit = () => {
@@ -89,10 +109,14 @@ export function MultiStepFormModal({ isOpen, onOpenChange }: MultiStepFormModalP
         firstName: "",
         lastName: "",
         email: "",
-        company: "",
-        position: "",
-        experience: "",
-        interests: "",
+        phone: "",
+
+        petName: "",
+        breed: "",
+        weight: "",
+
+        startDate: "",
+        stylistId: "",
         message: "",
       });
       setCurrentStep(1);
@@ -105,30 +129,40 @@ export function MultiStepFormModal({ isOpen, onOpenChange }: MultiStepFormModalP
       case 1:
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
+            <div className={BOOKING_MODAL_FIELD}>
+              <Label htmlFor="firstName">{t("bookingModal.firstName")}</Label>
               <Input
                 id="firstName"
-                placeholder="Enter your first name"
+                placeholder={t("placeholder.firstName")}
                 value={formData.firstName}
                 onChange={(e) => updateFormData("firstName", e.target.value)}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
+            <div className={BOOKING_MODAL_FIELD}>
+              <Label htmlFor="lastName">{t("bookingModal.lastName")}</Label>
               <Input
                 id="lastName"
-                placeholder="Enter your last name"
+                placeholder={t("placeholder.lastName")}
                 value={formData.lastName}
                 onChange={(e) => updateFormData("lastName", e.target.value)}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+            <div className={BOOKING_MODAL_FIELD}>
+              <Label htmlFor="phone">{t("bookingModal.phone")}</Label>
+              <Input
+                id="phone"
+                type="email"
+                placeholder={t("placeholder.phone")}
+                value={formData.phone}
+                onChange={(e) => updateFormData("phone", e.target.value)}
+              />
+            </div>
+            <div className={BOOKING_MODAL_FIELD}>
+              <Label htmlFor="email">{t("bookingModal.email")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t("placeholder.phone")}
                 value={formData.email}
                 onChange={(e) => updateFormData("email", e.target.value)}
               />
@@ -139,32 +173,40 @@ export function MultiStepFormModal({ isOpen, onOpenChange }: MultiStepFormModalP
       case 2:
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="company">Company</Label>
+            <div className={BOOKING_MODAL_FIELD}>
+              <Label htmlFor="pet-name">{t("bookingModal.petName")}</Label>
               <Input
-                id="company"
-                placeholder="Enter your company name"
-                value={formData.company}
-                onChange={(e) => updateFormData("company", e.target.value)}
+                id="pet-name"
+                placeholder={t("placeholder.petName")}
+                value={formData.petName}
+                onChange={(e) => updateFormData("petName", e.target.value)}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="position">Position</Label>
-              <Input
-                id="position"
-                placeholder="Enter your position"
-                value={formData.position}
-                onChange={(e) => updateFormData("position", e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="experience">Years of Experience</Label>
+            <div className={BOOKING_MODAL_FIELD}>
+              <Label htmlFor="breed">{t("bookingModal.breed")}</Label>
               <Select
-                value={formData.experience}
-                onValueChange={(value) => updateFormData("experience", value)}
+                value={formData.breed}
+                onValueChange={(value) => updateFormData("breed", value)}
               >
-                <SelectTrigger id="experience">
-                  <SelectValue placeholder="Select experience level" />
+                <SelectTrigger id="breed">
+                  <SelectValue placeholder={t("placeholder.breed")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0-2">0-2 years</SelectItem>
+                  <SelectItem value="3-5">3-5 years</SelectItem>
+                  <SelectItem value="6-10">6-10 years</SelectItem>
+                  <SelectItem value="10+">10+ years</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className={BOOKING_MODAL_FIELD}>
+              <Label htmlFor="weight">{t("bookingModal.weight")}</Label>
+              <Select
+                value={formData.weight}
+                onValueChange={(value) => updateFormData("weight", value)}
+              >
+                <SelectTrigger id="weight">
+                  <SelectValue placeholder={t("placeholder.weight")} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="0-2">0-2 years</SelectItem>
@@ -180,20 +222,21 @@ export function MultiStepFormModal({ isOpen, onOpenChange }: MultiStepFormModalP
       case 3:
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="interests">Areas of Interest</Label>
-              <Input
+            <div className={BOOKING_MODAL_FIELD}>
+              <Label htmlFor="date">{t("bookingModal.date")}</Label>
+              {/* <Input
                 id="interests"
                 placeholder="e.g., Design, Development, Marketing"
                 value={formData.interests}
                 onChange={(e) => updateFormData("interests", e.target.value)}
-              />
+              /> */}
+              <Calendar></Calendar>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="message">Tell us about yourself</Label>
+            <div className={BOOKING_MODAL_FIELD}>
+              <Label htmlFor="message">{t("bookingModal.message")}</Label>
               <Textarea
                 id="message"
-                placeholder="Share your goals and what you're looking for..."
+                placeholder={t("placeholder.message")}
                 className="min-h-32"
                 value={formData.message}
                 onChange={(e) => updateFormData("message", e.target.value)}
@@ -208,31 +251,28 @@ export function MultiStepFormModal({ isOpen, onOpenChange }: MultiStepFormModalP
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Complete Your Profile</DialogTitle>
+          <DialogTitle>{t('bookingModal.title')}</DialogTitle>
           <DialogDescription>
             Step {currentStep} of {totalSteps}
           </DialogDescription>
         </DialogHeader>
 
         {/* Progress Bar */}
-        <div className="space-y-2">
+        <div className={BOOKING_MODAL_FIELD}>
           <Progress value={progress} className="h-2" />
           <div className="flex justify-between">
             {[1, 2, 3].map((step) => (
-              <div
-                key={step}
-                className="flex items-center gap-2"
-              >
+              <div key={step} className="flex items-center gap-2">
                 <div
                   className={`flex items-center justify-center size-8 rounded-full border-2 transition-colors ${
                     currentStep > step
                       ? "bg-primary border-primary text-primary-foreground"
                       : currentStep === step
-                      ? "border-primary text-primary"
-                      : "border-muted-foreground/25 text-muted-foreground"
+                        ? "border-primary text-primary"
+                        : "border-muted-foreground/25 text-muted-foreground"
                   }`}
                 >
                   {currentStep > step ? (
@@ -242,7 +282,11 @@ export function MultiStepFormModal({ isOpen, onOpenChange }: MultiStepFormModalP
                   )}
                 </div>
                 <span className="text-sm text-muted-foreground hidden sm:inline">
-                  {step === 1 ? "Personal" : step === 2 ? "Professional" : "Additional"}
+                  {step === 1
+                    ? t('bookingModal.personalStep')
+                    : step === 2
+                      ? t('bookingModal.petStep')
+                      : t('bookingModal.dateTimeStep')}
                 </span>
               </div>
             ))}
@@ -257,7 +301,7 @@ export function MultiStepFormModal({ isOpen, onOpenChange }: MultiStepFormModalP
             type="button"
             variant="outline"
             onClick={handleBack}
-            disabled={currentStep === 1}
+            // disabled={currentStep === 1}
           >
             Back
           </Button>
@@ -265,7 +309,7 @@ export function MultiStepFormModal({ isOpen, onOpenChange }: MultiStepFormModalP
             <Button
               type="button"
               onClick={handleNext}
-              disabled={!validateStep()}
+              // disabled={!validateStep()}
             >
               Next
             </Button>
