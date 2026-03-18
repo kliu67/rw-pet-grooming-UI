@@ -5,6 +5,7 @@ import { Services } from './components/Services';
 import { Testimonials } from './components/Testimonials';
 import { Footer } from './components/Footer';
 import { BookingModal } from './components/BookingModal';
+import { MultiStepFormModal } from './components/MultiStepFormModal';
 
 export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,7 +66,7 @@ export default function App() {
               Book an appointment today and see the FreshPaws difference. Spots fill up fast!
             </p>
             <button 
-              onClick={openModal}
+              onClick={()=>setIsModalOpen(true)}
               className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-4 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all"
             >
               Schedule Appointment
@@ -75,7 +76,7 @@ export default function App() {
       </main>
 
       <Footer />
-      <BookingModal isOpen={isModalOpen} onClose={closeModal} />
+      <MultiStepFormModal isOpen={isModalOpen} onOpenChange={setIsModalOpen} />
     </div>
   );
 }
