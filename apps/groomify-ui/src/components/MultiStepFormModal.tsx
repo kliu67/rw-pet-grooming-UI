@@ -84,7 +84,7 @@ export function MultiStepFormModal({
 
     startDate: "",
     stylistId: "",
-    message: ""
+    description: ""
   });
 
   const { t } = useTranslation();
@@ -172,10 +172,10 @@ export function MultiStepFormModal({
         );
       case 3:
         return formData.petName &&
-        formData.breedid &&
-        formData.weightclassid;
+        formData.breedId &&
+        formData.weightclassId;
       case 4:
-        return formData.interests && formData.message;
+        return formData.startDate;
       default:
         return false;
     }
@@ -216,7 +216,7 @@ export function MultiStepFormModal({
 
         startDate: "",
         stylistId: "",
-        message: ""
+        description: ""
       });
       setCurrentStep(1);
       onOpenChange(false);
@@ -244,7 +244,7 @@ export function MultiStepFormModal({
 
           startDate: "",
           stylistId: "",
-          message: ""
+          description: ""
         });
       }, RESET_DELAY_MS);
     }
@@ -331,8 +331,8 @@ export function MultiStepFormModal({
                 id="message"
                 placeholder={t("placeholder.message")}
                 className="min-h-32"
-                value={formData.message}
-                onChange={(e) => updateFormData("message", e.target.value)}
+                value={formData.description}
+                onChange={(e) => updateFormData("description", e.target.value)}
               />
             </div>
           </div>
