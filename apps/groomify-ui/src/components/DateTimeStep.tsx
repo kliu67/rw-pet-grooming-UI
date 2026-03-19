@@ -23,6 +23,7 @@ export const DateTimeStep = ({
   availabilityData = [],
   timeOffsData = [],
   appointmentData = [],
+  configData={},
   onValidityChange,
   showErrors = false
 }) => {

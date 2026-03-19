@@ -6,7 +6,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -17,7 +17,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "./ui/select";
 import { Progress } from "./ui/progress";
 import { Check } from "lucide-react";
@@ -30,16 +30,18 @@ import { useWeightClasses } from "../hooks/weightClasses";
 import { useAvailabiltyById } from "../hooks/availability";
 import { useTimeOffById } from "../hooks/timeOffs";
 import { useAppointments } from "@/hooks/appointments";
+import { useConfigByFKs } from "@/hooks/serviceConfigurations";
 import {
   DEFAULT_STYLIST,
   staticServiceData,
   serviceImageMap,
-  defaultImage
+  defaultImage,
 } from "../constants";
 import { ServiceCard } from "./ServiceCard";
 import { PersonalStep } from "./PersonalStep";
 import { PetStep } from "./PetStep";
 import { DateTimeStep } from "./DateTimeStep";
+import { config } from "process";
 
 interface MultiStepFormModalProps {
   open: boolean;
@@ -67,7 +69,7 @@ interface FormData {
 const { BOOKING_MODAL_FIELD_TWO: BOOKING_MODAL_FIELD } = CLASSNAMES;
 export function MultiStepFormModal({
   open,
-  onOpenChange
+  onOpenChange,
 }: MultiStepFormModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [stepIsValid, setStepIsValid] = useState(false);
@@ -80,13 +82,13 @@ export function MultiStepFormModal({
     phone: "6476172401",
 
     petName: "test Pet",
-    serviceId: 1,
-    breedId: 1,
-    weightClassId: 1,
+    serviceId: 36,
+    breedId: 3,
+    weightClassId: 4,
 
     startDate: "",
     stylistId: "",
-    description: ""
+    description: "",
   });
 
   const { t } = useTranslation();
@@ -96,61 +98,71 @@ export function MultiStepFormModal({
   const steps = [
     {
       id: 1,
-      label: t("bookingModal.serviceStep")
+      label: t("bookingModal.serviceStep"),
     },
     {
       id: 2,
-      label: t("bookingModal.personalStep")
+      label: t("bookingModal.personalStep"),
     },
     {
       id: 3,
-      label: t("bookingModal.petStep")
+      label: t("bookingModal.petStep"),
     },
     {
       id: 4,
-      label: t("bookingModal.dateTimeStep")
+      label: t("bookingModal.dateTimeStep"),
     },
     {
       id: 5,
-      label: t("bookingModal.reviewStep")
-    }
+      label: t("bookingModal.reviewStep"),
+    },
   ];
 
   const {
     data: serviceData = [],
     isLoading: servicesIsLoading,
-    error: servicesError
+    error: servicesError,
   } = useServices();
 
   const {
     data: breedsData = [],
     isLoading: breedsIsLoading,
-    error: breedsError
+    error: breedsError,
   } = useBreeds();
 
   const {
     data: weightClassesData = [],
     isLoading: weightClassesIsLoading,
-    error: weightClassesError
+    error: weightClassesError,
   } = useWeightClasses();
 
   const {
     data: availabilityData = [],
     isLoading: availabilityIsLoading,
-    error: availabilityError
+    error: availabilityError,
   } = useAvailabiltyById(DEFAULT_STYLIST);
 
   const {
     data: timeOffsData = [],
     isLoading: timeOffsIsLoading,
-    error: timeOffsError
+    error: timeOffsError,
   } = useTimeOffById(DEFAULT_STYLIST);
 
-    const {
+  const {
     data: appointmentData = [],
     isLoading: appIsLoading,
-    error: appError
+    error: appError,
   } = useAppointments();
+
+  const {
+    data: configData = {},
+    isLoading: configIsLoading,
+    error: configError,
+  } = useConfigByFKs(
+    {serviceId: formData.serviceId,
+    breedId: formData.breedId,
+    weightClassId: formData.weightClassId}
+  );
 
   const services = serviceData.map((service) => {
     const match = staticServiceData.find((s) => s.code === service.code);
@@ -158,7 +170,7 @@ export function MultiStepFormModal({
       name: service.name,
       price: `From $${service.base_price}`,
       description: service.description,
-      code: service.code
+      code: service.code,
     };
   });
 
@@ -222,7 +234,7 @@ export function MultiStepFormModal({
 
         startDate: "",
         stylistId: "",
-        description: ""
+        description: "",
       });
       setCurrentStep(1);
       onOpenChange(false);
@@ -250,7 +262,7 @@ export function MultiStepFormModal({
 
           startDate: "",
           stylistId: "",
-          description: ""
+          description: "",
         });
       }, RESET_DELAY_MS);
     }
@@ -332,6 +344,7 @@ export function MultiStepFormModal({
             availabilityData={availabilityData}
             timeOffsData={timeOffsData}
             appointmentData={appointmentData}
+            configData={configData}
             onValidityChange={(isValid) => setStepIsValid(isValid)}
             showErrors={showPetErrors}
           />
