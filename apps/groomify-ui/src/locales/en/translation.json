@@ -6,6 +6,7 @@
     "save": "Save",
     "cancel": "Cancel",
     "close": "Close",
+    "search": "Search...",
     "loading": "Loading...",
     "edit": "Edit",
     "update": "Update",
@@ -16,7 +17,7 @@
     "login": "Login",
     "logout": "Logout"
   },
-  "bookingModal":{
+  "bookingModal": {
     "title": "Complete Your Booking",
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -37,10 +38,10 @@
     "startingPrice": "From ${{price}}",
     "requiredMessage": " indicates required field"
   },
-  "placeholder":{
+  "placeholder": {
     "firstName": "Enter your first name",
     "lastName": "Enter your last name",
-    "email" : "Enter your email",
+    "email": "Enter your email",
     "phone": "Enter your phone",
     "petName": "Enter your pet's name",
     "service": "Select a service",
@@ -48,8 +49,8 @@
     "breed": "Select your pet's breed",
     "weight": "Select your pet's weight"
   },
-  "clients":{
-    "errors":{
+  "clients": {
+    "errors": {
       "firstName": "First name length must be between 0 and \"{{max}}\" characters",
       "lastName": "Last name length must be between 0 and \"{{max}}\" characters",
       "phone": "phone length must be between 0 and \"{{max}}\" and consist of numbers and '-' only",
@@ -59,7 +60,12 @@
       "loading": "Error loading clients"
     }
   },
-  "pets":{
-    "pounds":"lbs"
+  "pets": {
+    "pounds": "lbs",
+    "errors": {
+      "nameLengthViolation": "Pet name length must be between 0 and \"{{max}}\" characters",
+      "notEmpty": "\"{{input}}\" field cannot be empty",
+      "loading": "Error loading pets"
+    }
   }
 }

@@ -1,11 +1,7 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  isValidPhone,
-  isValidEmail,
-  areAllObjectKeysEmpty
-} from "@shared-utils";
+import { areAllObjectKeysEmpty } from "@shared-utils";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import {
@@ -17,6 +13,7 @@ import {
 } from "./ui/select";
 import { CLASSNAMES } from "../styles/classNames";
 import { MAX_PET_NAME_LENGTH } from "../constants";
+import { DropdownSearch } from "./DropdownSearch";
 const { BOOKING_MODAL_FIELD_TWO } = CLASSNAMES;
 export const PetStep = ({
   formData = {},
@@ -30,52 +27,23 @@ export const PetStep = ({
   const [errors, setErrors] = useState({
     petName: ""
   });
+  const [searchTerm, setSearchTerm] = useState("");
+
   const { t } = useTranslation();
-  const { petName } = formData;
-  // const weightMapping={
-  //   SMALL: `$${t('pets.pounds')}`
-  //   MEDIUM:
-  //   LARGE:
-  //   XLARGE:
-  // }
+  const stepIsValid = areAllObjectKeysEmpty(errors) && formData.petName;
+
   const validateFields = (field, value) => {
-    if (field === "firstName") {
+    if (field === "petName") {
       if (!value) {
-        return t("clients.errors.notEmpty", { input: "First Name" });
-      } else if (value.length > MAX_FIRST_NAME_LENGTH) {
-        return t("clients.errors.firstName", { max: MAX_FIRST_NAME_LENGTH });
+        return t("pets.errors.notEmpty", { input: "Name" });
+      } else if (value.length > MAX_PET_NAME_LENGTH) {
+        return t("pets.errors.nameLengthViolation", {
+          max: MAX_PET_NAME_LENGTH
+        });
       }
-      return "";
-    }
-
-    if (field === "lastName") {
-      if (!value) {
-        return t("clients.errors.notEmpty", { input: "Last Name" });
-      } else if (value.length > MAX_FIRST_NAME_LENGTH) {
-        return t("clients.errors.lastName", { max: MAX_FIRST_NAME_LENGTH });
-      }
-      return "";
-    }
-
-    if (field === "phone") {
-      if (!value) {
-        return t("clients.errors.notEmpty", { input: "Phone" });
-      } else if (!isValidPhone(value) || value.length > MAX_PHONE_LENGTH) {
-        return t("clients.errors.phone", { max: MAX_PHONE_LENGTH });
-      }
-      return "";
-    }
-
-    if (field === "email") {
-      if (value && (!isValidEmail(value) || value.length > MAX_EMAIL_LENGTH)) {
-        return t("clients.errors.email", { max: MAX_EMAIL_LENGTH });
-      }
-
-      return "";
     }
     return "";
   };
-  const stepIsValid = areAllObjectKeysEmpty(errors) && formData.petName;
 
   const updateFieldError = (name, value) => {
     const errorMsg = validateFields(name, value);
@@ -101,6 +69,10 @@ export const PetStep = ({
     updateFieldError(name, value);
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
   useEffect(() => {
     onValidityChange(stepIsValid);
   }, [stepIsValid, onValidityChange]);
@@ -121,11 +93,16 @@ export const PetStep = ({
     <div className="space-y-4">
       <div className={BOOKING_MODAL_FIELD_TWO}>
         <Label htmlFor="pet-name">{t("bookingModal.petName")}</Label>
+        {errors.petName && touched.petName && (
+          <p className="text-sm text-red-600 mt-1">{errors.petName}</p>
+        )}
         <Input
           id="pet-name"
+          name="petName"
           placeholder={t("placeholder.petName")}
           value={formData.petName}
-          onChange={(e) => updateFormData("petName", e.target.value)}
+          onChange={handleChange}
+          onBlur={handleBlur}
         />
       </div>
       {breedsData.length > 1 && (
@@ -139,8 +116,14 @@ export const PetStep = ({
               <SelectValue placeholder={t("placeholder.breed")} />
             </SelectTrigger>
             <SelectContent>
+              <DropdownSearch
+                searchTerm={searchTerm}
+                onChange={handleSearchChange}
+              ></DropdownSearch>
               {breedsData.map((breed) => (
-                <SelectItem value={breed?.id}>{breed?.name}</SelectItem>
+                <SelectItem key={breed?.id} value={breed?.id}>
+                  {breed?.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -158,12 +141,14 @@ export const PetStep = ({
             </SelectTrigger>
             <SelectContent>
               {weightClassesData.map((weight) => (
-                <SelectItem value={weight.id}>
-                  <span className="font-semibold">{weight.label}</span>{" "}
+                <SelectItem key={weight?.id} value={weight?.id}>
+                  <span className="font-semibold">{weight?.label}</span>{" "}
                   <span>
-                    {weight.weight_bounds[0]}–{weight.weight_bounds[1]}
+                    {weight?.weight_bounds[0]}-{weight?.weight_bounds[1]}
                   </span>{" "}
-                  <span className="text-gray-600 text-sm">{t("pets.pounds")}</span>
+                  <span className="text-gray-600 text-sm">
+                    {t("pets.pounds")}
+                  </span>
                 </SelectItem>
               ))}
             </SelectContent>

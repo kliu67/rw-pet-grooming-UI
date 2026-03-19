@@ -72,10 +72,10 @@ export function MultiStepFormModal({
   const [showPersonalErrors, setShowPersonalErrors] = useState(false);
   const [showPetErrors, setShowPetErrors] = useState(false);
   const [formData, setFormData] = useState<FormData>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
+    firstName: "Kai",
+    lastName: "Liu",
+    email: "derekkailiu@gmail.com",
+    phone: "6476172401",
 
     petName: "",
     serviceId: "",
@@ -356,6 +356,8 @@ export function MultiStepFormModal({
           <PetStep
             formData={formData}
             updateFormData={updateFormData}
+            weightClassesData={weightClassesData}
+            breedsData={breedsData}
             onValidityChange={(isValid) => setStepIsValid(isValid)}
             showErrors={showPetErrors}
           />
