@@ -29,6 +29,7 @@ import { useBreeds } from "../hooks/breeds";
 import { useWeightClasses } from "../hooks/weightClasses";
 import { useAvailabiltyById } from "../hooks/availability";
 import { useTimeOffById } from "../hooks/timeOffs";
+import { useAppointments } from "@/hooks/appointments";
 import {
   DEFAULT_STYLIST,
   staticServiceData,
@@ -38,6 +39,7 @@ import {
 import { ServiceCard } from "./ServiceCard";
 import { PersonalStep } from "./PersonalStep";
 import { PetStep } from "./PetStep";
+import { DateTimeStep } from "./DateTimeStep";
 
 interface MultiStepFormModalProps {
   open: boolean;
@@ -78,7 +80,7 @@ export function MultiStepFormModal({
     phone: "6476172401",
 
     petName: "test Pet",
-    serviceId: "1",
+    serviceId: 1,
     breedId: 1,
     weightClassId: 1,
 
@@ -144,6 +146,12 @@ export function MultiStepFormModal({
     error: timeOffsError
   } = useTimeOffById(DEFAULT_STYLIST);
 
+    const {
+    data: appointmentData = [],
+    isLoading: appIsLoading,
+    error: appError
+  } = useAppointments();
+
   const services = serviceData.map((service) => {
     const match = staticServiceData.find((s) => s.code === service.code);
     return {
@@ -171,9 +179,7 @@ export function MultiStepFormModal({
           stepIsValid
         );
       case 3:
-        return formData.petName &&
-        formData.breedId &&
-        formData.weightclassId;
+        return formData.petName && formData.breedId && formData.weightclassId;
       case 4:
         return formData.startDate;
       default:
@@ -320,22 +326,15 @@ export function MultiStepFormModal({
 
       case 4:
         return (
-          <div className="space-y-4">
-            <div className={BOOKING_MODAL_FIELD}>
-              <Label htmlFor="date">{t("bookingModal.date")}</Label>
-              <Calendar></Calendar>
-            </div>
-            <div className={BOOKING_MODAL_FIELD}>
-              <Label htmlFor="message">{t("bookingModal.message")}</Label>
-              <Textarea
-                id="message"
-                placeholder={t("placeholder.message")}
-                className="min-h-32"
-                value={formData.description}
-                onChange={(e) => updateFormData("description", e.target.value)}
-              />
-            </div>
-          </div>
+          <DateTimeStep
+            formData={formData}
+            updateFormData={updateFormData}
+            availabilityData={availabilityData}
+            timeOffsData={timeOffsData}
+            appointmentData={appointmentData}
+            onValidityChange={(isValid) => setStepIsValid(isValid)}
+            showErrors={showPetErrors}
+          />
         );
         return null;
     }
