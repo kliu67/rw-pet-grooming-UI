@@ -2,6 +2,7 @@
   "general": {
     "next": "Next",
     "prev": "Prev",
+    "back": "Back",
     "save": "Save",
     "cancel": "Cancel",
     "close": "Close",
@@ -33,7 +34,8 @@
     "petStep": "Pet",
     "dateTimeStep": "Date/Time",
     "reviewStep": "Review",
-    "startingPrice": "From ${{price}}"
+    "startingPrice": "From ${{price}}",
+    "requiredMessage": " indicates required field"
   },
   "placeholder":{
     "firstName": "Enter your first name",
@@ -45,5 +47,17 @@
     "message": "Leave a message",
     "breed": "Select your pet's breed",
     "weight": "Select your pet's weight"
+  },
+  "clients":{
+
+    "errors":{
+      "firstName": "First name length must be between 0 and \"{{max}}\" characters",
+      "lastName": "Last name length must be between 0 and \"{{max}}\" characters",
+      "phone": "phone length must be between 0 and \"{{max}}\" and consist of numbers and '-' only",
+      "email": "Email length must be between 0 and \"{{max}}\" characters and be in valid format",
+      "description": "Description cannot be longer than 200 characters.",
+      "notEmpty": "\"{{input}}\" field cannot be empty",
+      "loading": "Error loading clients"
+    }
   }
 }
