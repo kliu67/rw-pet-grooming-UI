@@ -6,7 +6,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -17,7 +17,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "./ui/select";
 import { Progress } from "./ui/progress";
 import { Check } from "lucide-react";
@@ -33,11 +33,11 @@ import {
   DEFAULT_STYLIST,
   staticServiceData,
   serviceImageMap,
-  defaultImage,
+  defaultImage
 } from "../constants";
 import { ServiceCard } from "./ServiceCard";
 import { PersonalStep } from "./PersonalStep";
-
+import { PetStep } from "./PetStep";
 
 interface MultiStepFormModalProps {
   open: boolean;
@@ -65,11 +65,12 @@ interface FormData {
 const { BOOKING_MODAL_FIELD_TWO: BOOKING_MODAL_FIELD } = CLASSNAMES;
 export function MultiStepFormModal({
   open,
-  onOpenChange,
+  onOpenChange
 }: MultiStepFormModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [stepIsValid, setStepIsValid] = useState(false);
   const [showPersonalErrors, setShowPersonalErrors] = useState(false);
+  const [showPetErrors, setShowPetErrors] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
@@ -83,7 +84,7 @@ export function MultiStepFormModal({
 
     startDate: "",
     stylistId: "",
-    message: "",
+    message: ""
   });
 
   const { t } = useTranslation();
@@ -93,54 +94,54 @@ export function MultiStepFormModal({
   const steps = [
     {
       id: 1,
-      label: t("bookingModal.serviceStep"),
+      label: t("bookingModal.serviceStep")
     },
     {
       id: 2,
-      label: t("bookingModal.personalStep"),
+      label: t("bookingModal.personalStep")
     },
     {
       id: 3,
-      label: t("bookingModal.petStep"),
+      label: t("bookingModal.petStep")
     },
     {
       id: 4,
-      label: t("bookingModal.dateTimeStep"),
+      label: t("bookingModal.dateTimeStep")
     },
     {
       id: 5,
-      label: t("bookingModal.reviewStep"),
-    },
+      label: t("bookingModal.reviewStep")
+    }
   ];
 
   const {
     data: serviceData = [],
     isLoading: servicesIsLoading,
-    error: servicesError,
+    error: servicesError
   } = useServices();
 
   const {
     data: breedsData = [],
     isLoading: breedsIsLoading,
-    error: breedsError,
+    error: breedsError
   } = useBreeds();
 
   const {
     data: weightClassesData = [],
     isLoading: weightClassesIsLoading,
-    error: weightClassesError,
+    error: weightClassesError
   } = useWeightClasses();
 
   const {
     data: availabilityData = [],
     isLoading: availabilityIsLoading,
-    error: availabilityError,
+    error: availabilityError
   } = useAvailabiltyById(DEFAULT_STYLIST);
 
   const {
     data: timeOffsData = [],
     isLoading: timeOffsIsLoading,
-    error: timeOffsError,
+    error: timeOffsError
   } = useTimeOffById(DEFAULT_STYLIST);
 
   const services = serviceData.map((service) => {
@@ -149,23 +150,26 @@ export function MultiStepFormModal({
       name: service.name,
       price: `From $${service.base_price}`,
       description: service.description,
-      code: service.code,
+      code: service.code
     };
   });
 
-  
   const updateFormData = (field: keyof FormData, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     console.log(formData);
   };
-
 
   const validateStep = () => {
     switch (currentStep) {
       case 1:
         return formData.serviceId;
       case 2:
-        return formData.firstName && formData.lastName && formData.phone && stepIsValid;
+        return (
+          formData.firstName &&
+          formData.lastName &&
+          formData.phone &&
+          stepIsValid
+        );
       case 3:
         return formData.company && formData.position && formData.experience;
       case 4:
@@ -179,8 +183,11 @@ export function MultiStepFormModal({
     if (currentStep === 2) {
       setShowPersonalErrors(true);
     }
+    if (currentStep === 3) {
+      setShowPetErrors(true);
+    }
     if (validateStep() && currentStep < totalSteps) {
-    setCurrentStep((prev) => prev + 1);
+      setCurrentStep((prev) => prev + 1);
     }
   };
 
@@ -207,7 +214,7 @@ export function MultiStepFormModal({
 
         startDate: "",
         stylistId: "",
-        message: "",
+        message: ""
       });
       setCurrentStep(1);
       onOpenChange(false);
@@ -218,10 +225,11 @@ export function MultiStepFormModal({
     if (!nextOpen) {
       const RESET_DELAY_MS = 200;
       setTimeout(() => {
-      setCurrentStep(1);
-      setStepIsValid(false);
-      setShowPersonalErrors(false);
-      setFormData({
+        setCurrentStep(1);
+        setStepIsValid(false);
+        setShowPersonalErrors(false);
+        setShowPetErrors(false);
+        setFormData({
           firstName: "",
           lastName: "",
           email: "",
@@ -234,25 +242,28 @@ export function MultiStepFormModal({
 
           startDate: "",
           stylistId: "",
-          message: "",
+          message: ""
         });
       }, RESET_DELAY_MS);
     }
     onOpenChange(nextOpen);
   };
 
-  useEffect(()=>{
-    if(formData.serviceId){
+  useEffect(() => {
+    if (formData.serviceId) {
       setCurrentStep(2);
     }
-
-  }, [formData.serviceId])
+  }, [formData.serviceId]);
 
   useEffect(() => {
     if (currentStep !== 2 && showPersonalErrors) {
       setShowPersonalErrors(false);
     }
-  }, [currentStep, showPersonalErrors]);
+
+    if (currentStep !== 3 && showPetErrors) {
+      setShowPetErrors(false);
+    }
+  }, [currentStep, showPersonalErrors, showPetErrors]);
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -270,10 +281,13 @@ export function MultiStepFormModal({
                       key={service?.id}
                       service={service}
                       image={image}
-                      isSelected={String(formData.serviceId) === String(service?.id)}
-                      onClick={(field, value)=>{
+                      isSelected={
+                        String(formData.serviceId) === String(service?.id)
+                      }
+                      onClick={(field, value) => {
                         setCurrentStep(2);
-                        updateFormData(field, value)}}
+                        updateFormData(field, value);
+                      }}
                     />
                   );
                 })}
@@ -283,82 +297,68 @@ export function MultiStepFormModal({
       case 2:
         return (
           <PersonalStep
-          formData={formData}
-          updateFormData={updateFormData}
-          onValidityChange={(isValid) => setStepIsValid(isValid)}
-          showErrors={showPersonalErrors}
+            formData={formData}
+            updateFormData={updateFormData}
+            onValidityChange={(isValid) => setStepIsValid(isValid)}
+            showErrors={showPersonalErrors}
           />
         );
 
       case 3:
         return (
-          <div className="space-y-4">
-            <div className={BOOKING_MODAL_FIELD}>
-              <Label htmlFor="pet-name">{t("bookingModal.petName")}</Label>
-              <Input
-                id="pet-name"
-                placeholder={t("placeholder.petName")}
-                value={formData.petName}
-                onChange={(e) => updateFormData("petName", e.target.value)}
-              />
-            </div>
-            {/* {serviceData.length > 1 && (
-              <div className={BOOKING_MODAL_FIELD}>
-                <Label htmlFor="breed">{t("bookingModal.service")}</Label>
-                <Select
-                  value={formData.service}
-                  onValueChange={(value) => updateFormData("service", value)}
-                >
-                  <SelectTrigger id="breed">
-                    <SelectValue placeholder={t("placeholder.service")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {serviceData.map((service) => (
-                      <SelectItem value={service?.id}>
-                        {service.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )} */}
-            {breedsData.length > 1 && (
-              <div className={BOOKING_MODAL_FIELD}>
-                <Label htmlFor="breed">{t("bookingModal.breed")}</Label>
-                <Select
-                  value={formData.breed}
-                  onValueChange={(value) => updateFormData("breed", value)}
-                >
-                  <SelectTrigger id="breed">
-                    <SelectValue placeholder={t("placeholder.breed")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {breedsData.map((breed) => (
-                      <SelectItem value={breed?.id}>{breed?.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-            {weightClassesData.length > 1 && (
-              <div className={BOOKING_MODAL_FIELD}>
-                <Label htmlFor="weight">{t("bookingModal.weight")}</Label>
-                <Select
-                  value={formData.weight}
-                  onValueChange={(value) => updateFormData("weight", value)}
-                >
-                  <SelectTrigger id="weight">
-                    <SelectValue placeholder={t("placeholder.weight")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {weightClassesData.map((weight) => (
-                      <SelectItem value={weight.id}>{weight.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          </div>
+          // <div className="space-y-4">
+          //   <div className={BOOKING_MODAL_FIELD}>
+          //     <Label htmlFor="pet-name">{t("bookingModal.petName")}</Label>
+          //     <Input
+          //       id="pet-name"
+          //       placeholder={t("placeholder.petName")}
+          //       value={formData.petName}
+          //       onChange={(e) => updateFormData("petName", e.target.value)}
+          //     />
+          //   </div>
+          //   {breedsData.length > 1 && (
+          //     <div className={BOOKING_MODAL_FIELD}>
+          //       <Label htmlFor="breed">{t("bookingModal.breed")}</Label>
+          //       <Select
+          //         value={formData.breed}
+          //         onValueChange={(value) => updateFormData("breed", value)}
+          //       >
+          //         <SelectTrigger id="breed">
+          //           <SelectValue placeholder={t("placeholder.breed")} />
+          //         </SelectTrigger>
+          //         <SelectContent>
+          //           {breedsData.map((breed) => (
+          //             <SelectItem value={breed?.id}>{breed?.name}</SelectItem>
+          //           ))}
+          //         </SelectContent>
+          //       </Select>
+          //     </div>
+          //   )}
+          //   {weightClassesData.length > 1 && (
+          //     <div className={BOOKING_MODAL_FIELD}>
+          //       <Label htmlFor="weight">{t("bookingModal.weight")}</Label>
+          //       <Select
+          //         value={formData.weight}
+          //         onValueChange={(value) => updateFormData("weight", value)}
+          //       >
+          //         <SelectTrigger id="weight">
+          //           <SelectValue placeholder={t("placeholder.weight")} />
+          //         </SelectTrigger>
+          //         <SelectContent>
+          //           {weightClassesData.map((weight) => (
+          //             <SelectItem value={weight.id}>{weight.label}</SelectItem>
+          //           ))}
+          //         </SelectContent>
+          //       </Select>
+          //     </div>
+          //   )}
+          // </div>
+          <PetStep
+            formData={formData}
+            updateFormData={updateFormData}
+            onValidityChange={(isValid) => setStepIsValid(isValid)}
+            showErrors={showPetErrors}
+          />
         );
 
       case 4:
@@ -379,7 +379,7 @@ export function MultiStepFormModal({
               />
             </div>
           </div>
-        );  
+        );
         return null;
     }
   };
@@ -428,47 +428,48 @@ export function MultiStepFormModal({
 
         {/* Form Content */}
         <div className="py-4">{renderStep()}</div>
-{
-        currentStep > 1 && 
-        <DialogFooter className="flex-row justify-between sm:justify-between">
-          
-          {currentStep === 1 ? <Button
-            type="button"
-            variant="outline"
-            onClick={handleBack}
-            // disabled={currentStep === 1}
-          >
-            {t('general.cancel')}
-          </Button>
-          :<Button
-            type="button"
-            variant="outline"
-            onClick={handleBack}
-            // disabled={currentStep === 1}
-          >
-            {t('general.back')}
-          </Button>}
-          {currentStep < totalSteps ? (
-            <Button
-              type="button"
-              onClick={handleNext}
-              className="disabled:opacity-60 disabled:cursor-not-allowed"
-              disabled={currentStep === 2 && !validateStep()}
-            >
-              Next
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              onClick={handleSubmit}
-              className="disabled:opacity-60 disabled:cursor-not-allowed"
-              disabled={!validateStep()}
-            >
-              Submit
-            </Button>
-          )}
-        </DialogFooter>
-}
+        {currentStep > 1 && (
+          <DialogFooter className="flex-row justify-between sm:justify-between">
+            {currentStep === 1 ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleBack}
+                // disabled={currentStep === 1}
+              >
+                {t("general.cancel")}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleBack}
+                // disabled={currentStep === 1}
+              >
+                {t("general.back")}
+              </Button>
+            )}
+            {currentStep < totalSteps ? (
+              <Button
+                type="button"
+                onClick={handleNext}
+                className="disabled:opacity-60 disabled:cursor-not-allowed"
+                disabled={currentStep === 2 && !validateStep()}
+              >
+                Next
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={handleSubmit}
+                className="disabled:opacity-60 disabled:cursor-not-allowed"
+                disabled={!validateStep()}
+              >
+                Submit
+              </Button>
+            )}
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
