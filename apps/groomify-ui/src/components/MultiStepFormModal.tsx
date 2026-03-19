@@ -58,9 +58,9 @@ interface FormData {
   weightClassId: number;
 
   // Step 3
-  appStartDate: Date;
-  appStylistId: number;
-  appRemarks: string;
+  startDate: Date;
+  stylistId: number;
+  description: string;
 }
 const { BOOKING_MODAL_FIELD_TWO: BOOKING_MODAL_FIELD } = CLASSNAMES;
 export function MultiStepFormModal({
