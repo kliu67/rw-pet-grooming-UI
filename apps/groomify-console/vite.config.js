@@ -13,7 +13,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@shared-api": path.resolve(__dirname, "../../packages/shared-api/src")
+      "@shared-api": path.resolve(__dirname, "../../packages/shared-api/src"),
+      "@shared-utils": path.resolve(__dirname, "../../packages/shared-utils/src")
     }
   },
   test: {

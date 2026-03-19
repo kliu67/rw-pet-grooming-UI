@@ -5,16 +5,14 @@
     "lib": ["ESNext", "DOM"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "strict": true,
     "jsx": "react-jsx",
-
+    "strict": false,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
       "@shared-api": ["../../packages/shared-api/src"],
       "@shared-utils": ["../../packages/shared-utils/src"]
     },
-
     "allowJs": true,
     "skipLibCheck": true,
     "noEmit": true

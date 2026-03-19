@@ -54,6 +54,7 @@
         '@radix-ui/react-accordion@1.2.3': '@radix-ui/react-accordion',
         '@': path.resolve(__dirname, './src'),
         '@shared-api': path.resolve(__dirname, '../../packages/shared-api/src'),
+        '@shared-utils': path.resolve(__dirname, '../../packages/shared-utils/src'),
       },
     },
     build: {
