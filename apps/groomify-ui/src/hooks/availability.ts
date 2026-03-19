@@ -9,7 +9,7 @@ export function useAvailability() {
   });
 }
 
-export function useAvailabiltyById(stylistId: number | string | undefined) {
+export function useAvailabiltyByStylistId(stylistId: number | string | undefined) {
   return useQuery({
     queryKey: [AVAILABILITY_QUERY_KEY, stylistId],
     queryFn: () => getAvailabilityById(stylistId),

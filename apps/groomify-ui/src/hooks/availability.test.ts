@@ -13,7 +13,7 @@ vi.mock("@/api/availability", () => ({
   getAvailabilityById: (...args: any[]) => getAvailabilityByIdMock(...args)
 }));
 
-import { useAvailability, useAvailabiltyById } from "./availability";
+import { useAvailability, useAvailabiltyByStylistId } from "./availability";
 import { AVAILABILITY_QUERY_KEY } from "@/constants";
 
 describe("availability hooks", () => {
@@ -31,7 +31,7 @@ describe("availability hooks", () => {
   });
 
   it("useAvailabiltyById enables query when stylist id is present", () => {
-    useAvailabiltyById(7);
+    useAvailabiltyByStylistId(7);
 
     const config = useQueryMock.mock.calls[0][0];
     expect(config.queryKey).toEqual([AVAILABILITY_QUERY_KEY, 7]);
@@ -41,7 +41,7 @@ describe("availability hooks", () => {
   });
 
   it("useAvailabiltyById disables query for missing stylist id", () => {
-    useAvailabiltyById("");
+    useAvailabiltyByStylistId("");
 
     expect(useQueryMock).toHaveBeenCalledWith(
       expect.objectContaining({
