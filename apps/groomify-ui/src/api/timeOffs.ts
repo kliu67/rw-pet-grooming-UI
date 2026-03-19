@@ -7,3 +7,7 @@ export function getTimeOffs() {
 export function getTimeOffByStylistId(id: number | string) {
   return apiFetch(`/api/timeOffs/stylist/${id}`);
 }
+
+export function getUpcomingStylistTimeOffByStylistId(id: number | string) {
+  return apiFetch(`/api/timeOffs/stylist/${id}/upcoming`);
+}
