@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -36,14 +36,9 @@ import {
   defaultImage,
 } from "../constants";
 import { ServiceCard } from "./ServiceCard";
-// import {
-//   Card,
-//   CardHeader,
-//   CardTitle,
-//   CardDescription,
-//   CardContent,
-//   CardFooter,
-// } from "./ui/card";
+import { PersonalStep } from "./PersonalStep";
+
+
 interface MultiStepFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -73,6 +68,8 @@ export function MultiStepFormModal({
   onOpenChange,
 }: MultiStepFormModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
+  const [stepIsValid, setStepIsValid] = useState(false);
+  const [showPersonalErrors, setShowPersonalErrors] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
@@ -156,17 +153,22 @@ export function MultiStepFormModal({
     };
   });
 
+  
   const updateFormData = (field: keyof FormData, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     console.log(formData);
   };
+
+
   const validateStep = () => {
     switch (currentStep) {
       case 1:
-        return formData.firstName && formData.lastName && formData.email;
+        return formData.serviceId;
       case 2:
-        return formData.company && formData.position && formData.experience;
+        return formData.firstName && formData.lastName && formData.phone && stepIsValid;
       case 3:
+        return formData.company && formData.position && formData.experience;
+      case 4:
         return formData.interests && formData.message;
       default:
         return false;
@@ -174,9 +176,12 @@ export function MultiStepFormModal({
   };
 
   const handleNext = () => {
-    // if (validateStep() && currentStep < totalSteps) {
+    if (currentStep === 2) {
+      setShowPersonalErrors(true);
+    }
+    if (validateStep() && currentStep < totalSteps) {
     setCurrentStep((prev) => prev + 1);
-    // }
+    }
   };
 
   const handleBack = () => {
@@ -209,6 +214,45 @@ export function MultiStepFormModal({
     }
   };
 
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      const RESET_DELAY_MS = 200;
+      setTimeout(() => {
+      setCurrentStep(1);
+      setStepIsValid(false);
+      setShowPersonalErrors(false);
+      setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+
+          petName: "",
+          serviceId: "",
+          breed: "",
+          weight: "",
+
+          startDate: "",
+          stylistId: "",
+          message: "",
+        });
+      }, RESET_DELAY_MS);
+    }
+    onOpenChange(nextOpen);
+  };
+
+  useEffect(()=>{
+    if(formData.serviceId){
+      setCurrentStep(2);
+    }
+
+  }, [formData.serviceId])
+
+  useEffect(() => {
+    if (currentStep !== 2 && showPersonalErrors) {
+      setShowPersonalErrors(false);
+    }
+  }, [currentStep, showPersonalErrors]);
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -227,7 +271,9 @@ export function MultiStepFormModal({
                       service={service}
                       image={image}
                       isSelected={String(formData.serviceId) === String(service?.id)}
-                      onClick={updateFormData}
+                      onClick={(field, value)=>{
+                        setCurrentStep(2);
+                        updateFormData(field, value)}}
                     />
                   );
                 })}
@@ -236,46 +282,12 @@ export function MultiStepFormModal({
         );
       case 2:
         return (
-          <div className="space-y-4">
-            <div className={BOOKING_MODAL_FIELD}>
-              <Label htmlFor="firstName">{t("bookingModal.firstName")}</Label>
-              <Input
-                id="firstName"
-                placeholder={t("placeholder.firstName")}
-                value={formData.firstName}
-                onChange={(e) => updateFormData("firstName", e.target.value)}
-              />
-            </div>
-            <div className={BOOKING_MODAL_FIELD}>
-              <Label htmlFor="lastName">{t("bookingModal.lastName")}</Label>
-              <Input
-                id="lastName"
-                placeholder={t("placeholder.lastName")}
-                value={formData.lastName}
-                onChange={(e) => updateFormData("lastName", e.target.value)}
-              />
-            </div>
-            <div className={BOOKING_MODAL_FIELD}>
-              <Label htmlFor="phone">{t("bookingModal.phone")}</Label>
-              <Input
-                id="phone"
-                type="email"
-                placeholder={t("placeholder.phone")}
-                value={formData.phone}
-                onChange={(e) => updateFormData("phone", e.target.value)}
-              />
-            </div>
-            <div className={BOOKING_MODAL_FIELD}>
-              <Label htmlFor="email">{t("bookingModal.email")}</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder={t("placeholder.phone")}
-                value={formData.email}
-                onChange={(e) => updateFormData("email", e.target.value)}
-              />
-            </div>
-          </div>
+          <PersonalStep
+          formData={formData}
+          updateFormData={updateFormData}
+          onValidityChange={(isValid) => setStepIsValid(isValid)}
+          showErrors={showPersonalErrors}
+          />
         );
 
       case 3:
@@ -367,15 +379,13 @@ export function MultiStepFormModal({
               />
             </div>
           </div>
-        );
-
-      default:
+        );  
         return null;
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         className="sm:max-w-[1000px] max-h-[90vh] overflow-y-auto"
         onInteractOutside={(event) => event.preventDefault()}
@@ -418,21 +428,32 @@ export function MultiStepFormModal({
 
         {/* Form Content */}
         <div className="py-4">{renderStep()}</div>
-
+{
+        currentStep > 1 && 
         <DialogFooter className="flex-row justify-between sm:justify-between">
-          <Button
+          
+          {currentStep === 1 ? <Button
             type="button"
             variant="outline"
             onClick={handleBack}
             // disabled={currentStep === 1}
           >
-            Back
+            {t('general.cancel')}
           </Button>
+          :<Button
+            type="button"
+            variant="outline"
+            onClick={handleBack}
+            // disabled={currentStep === 1}
+          >
+            {t('general.back')}
+          </Button>}
           {currentStep < totalSteps ? (
             <Button
               type="button"
               onClick={handleNext}
-              // disabled={!validateStep()}
+              className="disabled:opacity-60 disabled:cursor-not-allowed"
+              disabled={currentStep === 2 && !validateStep()}
             >
               Next
             </Button>
@@ -440,12 +461,14 @@ export function MultiStepFormModal({
             <Button
               type="button"
               onClick={handleSubmit}
+              className="disabled:opacity-60 disabled:cursor-not-allowed"
               disabled={!validateStep()}
             >
               Submit
             </Button>
           )}
         </DialogFooter>
+}
       </DialogContent>
     </Dialog>
   );
