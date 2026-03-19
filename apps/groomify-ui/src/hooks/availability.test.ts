@@ -13,7 +13,7 @@ vi.mock("@/api/availability", () => ({
   getAvailabilityById: (...args: any[]) => getAvailabilityByIdMock(...args)
 }));
 
-import { useAvaiability, useAvailabiltyById } from "./availability";
+import { useAvailability, useAvailabiltyById } from "./availability";
 import { AVAILABILITY_QUERY_KEY } from "@/constants";
 
 describe("availability hooks", () => {
@@ -21,8 +21,8 @@ describe("availability hooks", () => {
     vi.clearAllMocks();
   });
 
-  it("useAvaiability configures the base query", () => {
-    useAvaiability();
+  it("useAvailability configures the base query", () => {
+    useAvailability();
 
     const config = useQueryMock.mock.calls[0][0];
     expect(config.queryKey).toEqual([AVAILABILITY_QUERY_KEY]);
