@@ -35,3 +35,11 @@ export const areAllObjectKeysEmpty = (obj) => {
     return value === "" || value === null || value === undefined;
   });
 };
+
+  export const getTimestamp = (value) => {
+    if (!value) return null;
+    if (value instanceof Date) return value.getTime();
+
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed.getTime();
+  };
