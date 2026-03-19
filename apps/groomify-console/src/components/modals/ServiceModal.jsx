@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { isValidPrice } from "@/utils";
+import { isValidPrice } from "@shared-utils";
 import {
   MAX_SERVICE_NAME_LENGTH,
   MAX_SERVICE_DESC_LENGTH,

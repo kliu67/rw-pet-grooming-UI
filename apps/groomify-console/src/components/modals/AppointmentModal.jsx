@@ -23,7 +23,7 @@ import {
   getNameLexicalOrder,
   getNameStandard,
   isObjectNotEmpty
-} from "@/utils";
+} from "@shared-utils";
 import { useAvailabiltyById } from "@/hooks/availability";
 import { useTimeOffById } from "@/hooks/timeOffs";
 import { getOpenTimeRanges, useOpenTimeRanges } from "@/hooks/openTimeRanges";

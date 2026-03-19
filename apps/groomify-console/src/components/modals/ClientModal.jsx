@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { isValidPhone, isValidEmail } from "@/utils";
+import { isValidPhone, isValidEmail } from "@shared-utils";
 import {
   MAX_FIRST_NAME_LENGTH,
   MAX_LAST_NAME_LENGTH,
@@ -29,8 +29,10 @@ export default function ClientModal({
   const [touched, setTouched] = useState({});
 
   const [errors, setErrors] = useState({
-    name: "",
-    base_price: "",
+    first_name: "",
+    last_name:"",
+    phone:"",
+    email: "",
     description: ""
   });
 
