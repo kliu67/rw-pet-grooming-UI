@@ -13,7 +13,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "./ui/select";
 import { CLASSNAMES } from "../styles/classNames";
 import { MAX_PET_NAME_LENGTH } from "../constants";
@@ -32,6 +32,12 @@ export const PetStep = ({
   });
   const { t } = useTranslation();
   const { petName } = formData;
+  // const weightMapping={
+  //   SMALL: `$${t('pets.pounds')}`
+  //   MEDIUM:
+  //   LARGE:
+  //   XLARGE:
+  // }
   const validateFields = (field, value) => {
     if (field === "firstName") {
       if (!value) {
@@ -152,7 +158,13 @@ export const PetStep = ({
             </SelectTrigger>
             <SelectContent>
               {weightClassesData.map((weight) => (
-                <SelectItem value={weight.id}>{weight.label}</SelectItem>
+                <SelectItem value={weight.id}>
+                  <span className="font-semibold">{weight.label}</span>{" "}
+                  <span>
+                    {weight.weight_bounds[0]}–{weight.weight_bounds[1]}
+                  </span>{" "}
+                  <span className="text-gray-600 text-sm">{t("pets.pounds")}</span>
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>

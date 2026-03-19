@@ -49,7 +49,6 @@
     "weight": "Select your pet's weight"
   },
   "clients":{
-
     "errors":{
       "firstName": "First name length must be between 0 and \"{{max}}\" characters",
       "lastName": "Last name length must be between 0 and \"{{max}}\" characters",
@@ -59,5 +58,8 @@
       "notEmpty": "\"{{input}}\" field cannot be empty",
       "loading": "Error loading clients"
     }
+  },
+  "pets":{
+    "pounds":"lbs"
   }
 }
