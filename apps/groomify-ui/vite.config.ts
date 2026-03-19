@@ -4,9 +4,13 @@
   import tailwindcss from '@tailwindcss/vite';
   import path from 'path';
 
-  export default defineConfig({
-    plugins: [react(), tailwindcss()],
-    resolve: {
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  test: {
+    environment: "jsdom",
+    setupFiles: "./src/test/setup.ts",
+  },
+  resolve: {
       dedupe: ['react', 'react-dom', 'react-i18next', 'i18next'],
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {

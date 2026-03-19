@@ -39,7 +39,7 @@ describe("PersonalStep", () => {
   it("shows field error on blur", () => {
     renderWithState();
 
-    const firstNameInput = screen.getByLabelText("bookingModal.firstName");
+    const firstNameInput = screen.getByLabelText(/bookingModal\.firstName/i);
     fireEvent.blur(firstNameInput);
 
     expect(screen.getByText("clients.errors.notEmpty")).toBeInTheDocument();
@@ -48,7 +48,7 @@ describe("PersonalStep", () => {
   it("does not show error before blur when showErrors is false", () => {
     renderWithState();
 
-    const phoneInput = screen.getByLabelText("bookingModal.phone");
+    const phoneInput = screen.getByLabelText(/bookingModal\.phone/i);
     fireEvent.change(phoneInput, { target: { value: "12" } });
 
     expect(screen.queryByText("clients.errors.phone")).not.toBeInTheDocument();
@@ -65,13 +65,13 @@ describe("PersonalStep", () => {
   it("calls onValidityChange with true when required fields are valid", async () => {
     const { onValidityChange } = renderWithState();
 
-    fireEvent.change(screen.getByLabelText("bookingModal.firstName"), {
+    fireEvent.change(screen.getByLabelText(/bookingModal\.firstName/i), {
       target: { value: "Sam" }
     });
-    fireEvent.change(screen.getByLabelText("bookingModal.lastName"), {
+    fireEvent.change(screen.getByLabelText(/bookingModal\.lastName/i), {
       target: { value: "Paws" }
     });
-    fireEvent.change(screen.getByLabelText("bookingModal.phone"), {
+    fireEvent.change(screen.getByLabelText(/bookingModal\.phone/i), {
       target: { value: "123456" }
     });
 
@@ -83,7 +83,7 @@ describe("PersonalStep", () => {
   it("shows email validation error for invalid email on blur", () => {
     renderWithState();
 
-    const emailInput = screen.getByLabelText("bookingModal.email");
+    const emailInput = screen.getByLabelText(/bookingModal\.email/i);
     fireEvent.change(emailInput, { target: { value: "not-an-email" } });
     fireEvent.blur(emailInput);
 

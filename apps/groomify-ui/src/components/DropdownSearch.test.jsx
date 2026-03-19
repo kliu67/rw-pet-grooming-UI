@@ -7,7 +7,7 @@ describe("DropdownSearch", () => {
   it("renders the controlled input value", () => {
     render(<DropdownSearch searchTerm="buddy" onChange={vi.fn()} />);
 
-    expect(screen.getByPlaceholderText("search...")).toHaveValue("buddy");
+    expect(screen.getByPlaceholderText("general.search")).toHaveValue("buddy");
   });
 
   it("forwards the change event when typing", () => {
@@ -15,7 +15,7 @@ describe("DropdownSearch", () => {
 
     render(<DropdownSearch searchTerm="" onChange={onChange} />);
 
-    fireEvent.change(screen.getByPlaceholderText("search..."), {
+    fireEvent.change(screen.getByPlaceholderText("general.search"), {
       target: { value: "sam" }
     });
 

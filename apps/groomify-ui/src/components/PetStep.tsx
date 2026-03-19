@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { areAllObjectKeysEmpty } from "@shared-utils";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import {
@@ -30,7 +29,6 @@ export const PetStep = ({
   const [searchTerm, setSearchTerm] = useState("");
 
   const { t } = useTranslation();
-  const stepIsValid = areAllObjectKeysEmpty(errors) && formData.petName;
 
   const validateFields = (field, value) => {
     if (field === "petName") {
@@ -44,6 +42,8 @@ export const PetStep = ({
     }
     return "";
   };
+
+  const stepIsValid = validateFields("petName", formData.petName) === "";
 
   const updateFieldError = (name, value) => {
     const errorMsg = validateFields(name, value);

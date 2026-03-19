@@ -1,11 +1,7 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  isValidPhone,
-  isValidEmail,
-  areAllObjectKeysEmpty
-} from "@shared-utils";
+import { isValidPhone, isValidEmail } from "@shared-utils";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { CLASSNAMES } from "../styles/classNames";
@@ -68,10 +64,9 @@ export const PersonalStep = ({
     return "";
   };
   const stepIsValid =
-    areAllObjectKeysEmpty(errors) &&
-    formData.firstName &&
-    formData.lastName &&
-    formData.phone;
+    validateFields("firstName", formData.firstName) === "" &&
+    validateFields("lastName", formData.lastName) === "" &&
+    validateFields("phone", formData.phone) === "";
 
   const updateFieldError = (name, value) => {
     const errorMsg = validateFields(name, value);
