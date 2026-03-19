@@ -9,27 +9,16 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { Textarea } from "./ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
 import { Progress } from "./ui/progress";
 import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { CLASSNAMES } from "../styles/classNames";
-import { Calendar } from "./ui/calendar";
 import { useServices } from "../hooks/services";
 import { useBreeds } from "../hooks/breeds";
 import { useWeightClasses } from "../hooks/weightClasses";
-import { useAvailabiltyById } from "../hooks/availability";
-import { useTimeOffById } from "../hooks/timeOffs";
-import { useAppointments } from "@/hooks/appointments";
+import { useAvailabiltyByStylistId } from "../hooks/availability";
+import { useUpcomingAppointmentsByStylistId } from "@/hooks/appointments";
+import { useUpcomingTimeOffsByStylistId } from "../hooks/timeOffs";
 import { useConfigByFKs } from "@/hooks/serviceConfigurations";
 import {
   DEFAULT_STYLIST,
@@ -41,7 +30,6 @@ import { ServiceCard } from "./ServiceCard";
 import { PersonalStep } from "./PersonalStep";
 import { PetStep } from "./PetStep";
 import { DateTimeStep } from "./DateTimeStep";
-import { config } from "process";
 
 interface MultiStepFormModalProps {
   open: boolean;
@@ -137,22 +125,22 @@ export function MultiStepFormModal({
   } = useWeightClasses();
 
   const {
-    data: availabilityData = [],
+    data: stylistAvailability = [],
     isLoading: availabilityIsLoading,
     error: availabilityError,
-  } = useAvailabiltyById(DEFAULT_STYLIST);
+  } = useAvailabiltyByStylistId(DEFAULT_STYLIST);
 
   const {
     data: timeOffsData = [],
     isLoading: timeOffsIsLoading,
     error: timeOffsError,
-  } = useTimeOffById(DEFAULT_STYLIST);
+  } = useUpcomingTimeOffsByStylistId(DEFAULT_STYLIST);
 
   const {
-    data: appointmentData = [],
+    data: stylistAppointmentsData = [],
     isLoading: appIsLoading,
     error: appError,
-  } = useAppointments();
+  } = useUpcomingAppointmentsByStylistId(DEFAULT_STYLIST);
 
   const {
     data: configData = {},
@@ -341,9 +329,9 @@ export function MultiStepFormModal({
           <DateTimeStep
             formData={formData}
             updateFormData={updateFormData}
-            availabilityData={availabilityData}
+            availabilityData={stylistAvailability}
             timeOffsData={timeOffsData}
-            appointmentData={appointmentData}
+            appointmentsData={stylistAppointmentsData}
             configData={configData}
             onValidityChange={(isValid) => setStepIsValid(isValid)}
             showErrors={showPetErrors}
