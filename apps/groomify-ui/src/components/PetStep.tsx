@@ -109,10 +109,11 @@ export const PetStep = ({
         <div className={BOOKING_MODAL_FIELD_TWO}>
           <Label htmlFor="breed">{t("bookingModal.breed")}</Label>
           <Select
-            value={formData.breed}
-            onValueChange={(value) => updateFormData("breed", value)}
+            name="breed"
+            value={formData.breedId}
+            onValueChange={(value) => updateFormData("breedId", value)}
           >
-            <SelectTrigger id="breed">
+            <SelectTrigger id="breedId">
               <SelectValue placeholder={t("placeholder.breed")} />
             </SelectTrigger>
             <SelectContent>
@@ -131,12 +132,13 @@ export const PetStep = ({
       )}
       {weightClassesData.length > 1 && (
         <div className={BOOKING_MODAL_FIELD_TWO}>
-          <Label htmlFor="weight">{t("bookingModal.weight")}</Label>
+          <Label htmlFor="weight-class">{t("bookingModal.weight")}</Label>
           <Select
-            value={formData.weight}
-            onValueChange={(value) => updateFormData("weight", value)}
+          name="weight-class"
+            value={formData.weightClassId}
+            onValueChange={(value) => updateFormData("weightClassId", value)}
           >
-            <SelectTrigger id="weight">
+            <SelectTrigger id="weightClassId">
               <SelectValue placeholder={t("placeholder.weight")} />
             </SelectTrigger>
             <SelectContent>

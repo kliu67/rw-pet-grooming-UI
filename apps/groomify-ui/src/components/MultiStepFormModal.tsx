@@ -54,8 +54,8 @@ interface FormData {
   // Step 2
   petName: string;
   serviceId: number;
-  breed: number;
-  weight: number;
+  breedId: number;
+  weightClassId: number;
 
   // Step 3
   appStartDate: Date;
@@ -77,10 +77,10 @@ export function MultiStepFormModal({
     email: "derekkailiu@gmail.com",
     phone: "6476172401",
 
-    petName: "",
-    serviceId: "",
-    breed: "",
-    weight: "",
+    petName: "test Pet",
+    serviceId: "1",
+    breedId: 1,
+    weightClassId: 1,
 
     startDate: "",
     stylistId: "",
@@ -171,7 +171,9 @@ export function MultiStepFormModal({
           stepIsValid
         );
       case 3:
-        return formData.company && formData.position && formData.experience;
+        return formData.petName &&
+        formData.breedid &&
+        formData.weightclassid;
       case 4:
         return formData.interests && formData.message;
       default:
@@ -186,7 +188,7 @@ export function MultiStepFormModal({
     if (currentStep === 3) {
       setShowPetErrors(true);
     }
-    if (validateStep() && currentStep < totalSteps) {
+    if (validateStep && currentStep < totalSteps) {
       setCurrentStep((prev) => prev + 1);
     }
   };
@@ -209,8 +211,8 @@ export function MultiStepFormModal({
 
         petName: "",
         serviceId: "",
-        breed: "",
-        weight: "",
+        breedid: "",
+        weightclassid: "",
 
         startDate: "",
         stylistId: "",
@@ -237,8 +239,8 @@ export function MultiStepFormModal({
 
           petName: "",
           serviceId: "",
-          breed: "",
-          weight: "",
+          breedid: "",
+          weightclassid: "",
 
           startDate: "",
           stylistId: "",
@@ -306,53 +308,6 @@ export function MultiStepFormModal({
 
       case 3:
         return (
-          // <div className="space-y-4">
-          //   <div className={BOOKING_MODAL_FIELD}>
-          //     <Label htmlFor="pet-name">{t("bookingModal.petName")}</Label>
-          //     <Input
-          //       id="pet-name"
-          //       placeholder={t("placeholder.petName")}
-          //       value={formData.petName}
-          //       onChange={(e) => updateFormData("petName", e.target.value)}
-          //     />
-          //   </div>
-          //   {breedsData.length > 1 && (
-          //     <div className={BOOKING_MODAL_FIELD}>
-          //       <Label htmlFor="breed">{t("bookingModal.breed")}</Label>
-          //       <Select
-          //         value={formData.breed}
-          //         onValueChange={(value) => updateFormData("breed", value)}
-          //       >
-          //         <SelectTrigger id="breed">
-          //           <SelectValue placeholder={t("placeholder.breed")} />
-          //         </SelectTrigger>
-          //         <SelectContent>
-          //           {breedsData.map((breed) => (
-          //             <SelectItem value={breed?.id}>{breed?.name}</SelectItem>
-          //           ))}
-          //         </SelectContent>
-          //       </Select>
-          //     </div>
-          //   )}
-          //   {weightClassesData.length > 1 && (
-          //     <div className={BOOKING_MODAL_FIELD}>
-          //       <Label htmlFor="weight">{t("bookingModal.weight")}</Label>
-          //       <Select
-          //         value={formData.weight}
-          //         onValueChange={(value) => updateFormData("weight", value)}
-          //       >
-          //         <SelectTrigger id="weight">
-          //           <SelectValue placeholder={t("placeholder.weight")} />
-          //         </SelectTrigger>
-          //         <SelectContent>
-          //           {weightClassesData.map((weight) => (
-          //             <SelectItem value={weight.id}>{weight.label}</SelectItem>
-          //           ))}
-          //         </SelectContent>
-          //       </Select>
-          //     </div>
-          //   )}
-          // </div>
           <PetStep
             formData={formData}
             updateFormData={updateFormData}
