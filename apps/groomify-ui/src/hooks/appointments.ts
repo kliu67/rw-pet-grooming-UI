@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getAppointments, createAppointment, updateAppointment, deleteAppointment } from "@/api/appointments";
+import { getAppointments, getAppointmentByStylistId, getUpcomingAppointmentsByStylistId, createAppointment, updateAppointment, deleteAppointment } from "@/api/appointments";
 import { APPOINTMENTS_QUERY_KEY } from "@/constants";
 
 export function useAppointments() {
@@ -7,6 +7,19 @@ export function useAppointments() {
     queryKey: [APPOINTMENTS_QUERY_KEY],
     queryFn: getAppointments
   });
+}
+export function useAppointmentsByStylistId(stylistId: number | string | undefined){
+  return useQuery({
+    queryKey: [APPOINTMENTS_QUERY_KEY, stylistId],
+    queryFn: ()=>getAppointmentByStylistId(stylistId)
+  })
+}
+
+export function useUpcomingAppointmentsByStylistId(stylistId: number | string | undefined){
+  return useQuery({
+    queryKey: [APPOINTMENTS_QUERY_KEY, stylistId],
+    queryFn: ()=>getUpcomingAppointmentsByStylistId(stylistId)
+  })
 }
 
 export function useCreateAppointment() {

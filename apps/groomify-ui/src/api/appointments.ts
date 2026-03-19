@@ -4,6 +4,14 @@ export function getAppointments() {
   return apiFetch("/api/appointments");
 }
 
+export function getAppointmentByStylistId(id) {
+  return apiFetch(`/api/appointments/stylist/${id}`);
+}
+
+export function getUpcomingAppointmentsByStylistId(id) {
+  return apiFetch(`/api/appointments/stylist/${id}/upcoming`);
+}
+
 export function createAppointment(data: unknown) {
   return apiFetch("/api/appointments", {
     method: "POST",
