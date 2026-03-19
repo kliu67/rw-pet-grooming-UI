@@ -47,7 +47,8 @@
     "service": "Select a service",
     "message": "Leave a message",
     "breed": "Select your pet's breed",
-    "weight": "Select your pet's weight"
+    "weight": "Select your pet's weight",
+    "time": "Select a time"
   },
   "clients": {
     "errors": {
