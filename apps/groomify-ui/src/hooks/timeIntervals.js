@@ -1,9 +1,13 @@
 const toHourString = (date) => {
   let hour = date.getHours();
   if (hour < 10){
-    return `0${hour}`;
+    return `${hour}`;
   }
   if (hour > 12){
+    if(hour - 12 < 10){
+      return `${hour - 12}`; 
+    }
+    else
     return `${hour - 12}`;
   }
   return `${hour}`
