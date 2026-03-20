@@ -9,14 +9,14 @@ import { CLASSNAMES } from "../../styles/classNames";
 import {
   MAX_FIRST_NAME_LENGTH,
   MAX_PHONE_LENGTH,
-  MAX_EMAIL_LENGTH
+  MAX_EMAIL_LENGTH,
 } from "../../constants";
+
 const { BOOKING_MODAL_FIELD_TWO } = CLASSNAMES;
+
 export const PersonalStep = ({
-  formData = {},
-  updateFormData,
   onValidityChange,
-  showErrors = false
+  showErrors = false,
 }) => {
   const { bookingData, updateBookingData } = useBooking();
   const [touched, setTouched] = useState({});
@@ -24,10 +24,10 @@ export const PersonalStep = ({
     firstName: "",
     lastName: "",
     phone: "",
-    email: ""
+    email: "",
   });
   const { t } = useTranslation();
-  const { firstName, lastName, phone, email } = formData;
+  const { firstName, lastName, phone, email } = bookingData;
   const validateFields = (field, value) => {
     if (field === "firstName") {
       if (!value) {
@@ -66,15 +66,15 @@ export const PersonalStep = ({
     return "";
   };
   const stepIsValid =
-    validateFields("firstName", formData.firstName) === "" &&
-    validateFields("lastName", formData.lastName) === "" &&
-    validateFields("phone", formData.phone) === "";
+    validateFields("firstName", bookingData.firstName) === "" &&
+    validateFields("lastName", bookingData.lastName) === "" &&
+    validateFields("phone", bookingData.phone) === "";
 
   const updateFieldError = (name, value) => {
     const errorMsg = validateFields(name, value);
     setErrors((prev) => ({
       ...prev,
-      [name]: errorMsg
+      [name]: errorMsg,
     }));
   };
 
@@ -90,7 +90,7 @@ export const PersonalStep = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    updateFormData(name, value);
+    updateBookingData({[name]: value});
     updateFieldError(name, value);
   };
 
@@ -105,21 +105,21 @@ export const PersonalStep = ({
       firstName: true,
       lastName: true,
       phone: true,
-      email: true
+      email: true,
     }));
     setErrors((prev) => ({
       ...prev,
-      firstName: validateFields("firstName", formData.firstName),
-      lastName: validateFields("lastName", formData.lastName),
-      phone: validateFields("phone", formData.phone),
-      email: validateFields("email", formData.email)
+      firstName: validateFields("firstName", bookingData.firstName),
+      lastName: validateFields("lastName", bookingData.lastName),
+      phone: validateFields("phone", bookingData.phone),
+      email: validateFields("email", bookingData.email),
     }));
   }, [
     showErrors,
-    formData.firstName,
-    formData.lastName,
-    formData.phone,
-    formData.email
+    bookingData.firstName,
+    bookingData.lastName,
+    bookingData.phone,
+    bookingData.email,
   ]);
 
   return (

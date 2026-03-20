@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useBooking } from "@/context/BookingContext";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import {
@@ -8,25 +9,25 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "../ui/select";
 import { CLASSNAMES } from "../../styles/classNames";
 import { MAX_PET_NAME_LENGTH } from "../../constants";
 import { DropdownSearch } from "../DropdownSearch";
 const { BOOKING_MODAL_FIELD_TWO } = CLASSNAMES;
 export const PetStep = ({
-  formData = {},
-  updateFormData,
   breedsData = [],
   weightClassesData = [],
   onValidityChange,
-  showErrors = false
+  showErrors = false,
 }) => {
   const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({
-    petName: ""
+    petName: "",
   });
   const [searchTerm, setSearchTerm] = useState("");
+  const { bookingData, updateBookingData } = useBooking();
+  const { petName, breed, weightClass } = bookingData;
 
   const { t } = useTranslation();
 
@@ -36,20 +37,20 @@ export const PetStep = ({
         return t("pets.errors.notEmpty", { input: "Name" });
       } else if (value.length > MAX_PET_NAME_LENGTH) {
         return t("pets.errors.nameLengthViolation", {
-          max: MAX_PET_NAME_LENGTH
+          max: MAX_PET_NAME_LENGTH,
         });
       }
     }
     return "";
   };
 
-  const stepIsValid = validateFields("petName", formData.petName) === "";
+  const stepIsValid = validateFields("petName", bookingData.petName) === "";
 
   const updateFieldError = (name, value) => {
     const errorMsg = validateFields(name, value);
     setErrors((prev) => ({
       ...prev,
-      [name]: errorMsg
+      [name]: errorMsg,
     }));
   };
 
@@ -65,7 +66,7 @@ export const PetStep = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    updateFormData(name, value);
+    updateBookingData({ [name]: value });
     updateFieldError(name, value);
   };
 
@@ -81,13 +82,13 @@ export const PetStep = ({
     if (!showErrors) return;
     setTouched((prev) => ({
       ...prev,
-      petName: true
+      petName: true,
     }));
     setErrors((prev) => ({
       ...prev,
-      petName: validateFields("petName", formData.petName)
+      petName: validateFields("petName", bookingData.petName),
     }));
-  }, [showErrors, formData.petName]);
+  }, [showErrors, bookingData.petName]);
 
   return (
     <div className="space-y-4">
@@ -100,7 +101,7 @@ export const PetStep = ({
           id="pet-name"
           name="petName"
           placeholder={t("placeholder.petName")}
-          value={formData.petName}
+          value={petName}
           onChange={handleChange}
           onBlur={handleBlur}
         />
@@ -110,8 +111,12 @@ export const PetStep = ({
           <Label htmlFor="breed">{t("bookingModal.breed")}</Label>
           <Select
             name="breed"
-            value={formData.breedId}
-            onValueChange={(value) => updateFormData("breedId", value)}
+            value={breed?.id}
+            onValueChange={(e) => {
+              updateBookingData({
+                breed: breedsData.find((breed)=>breed.id===e),
+              });
+            }}
           >
             <SelectTrigger id="breedId">
               <SelectValue placeholder={t("placeholder.breed")} />
@@ -134,19 +139,24 @@ export const PetStep = ({
         <div className={BOOKING_MODAL_FIELD_TWO}>
           <Label htmlFor="weight-class">{t("bookingModal.weight")}</Label>
           <Select
-          name="weight-class"
-            value={formData.weightClassId}
-            onValueChange={(value) => updateFormData("weightClassId", value)}
+            name="weightClass"
+            value={weightClass?.id}
+            onValueChange={(e) =>
+              updateBookingData({
+                weightClass: weightClassesData.find((wc) => wc.id === e),
+              })
+            }
           >
             <SelectTrigger id="weightClassId">
               <SelectValue placeholder={t("placeholder.weight")} />
             </SelectTrigger>
             <SelectContent>
-              {weightClassesData.map((weight) => (
-                <SelectItem key={weight?.id} value={weight?.id}>
-                  <span className="font-semibold">{weight?.label}</span>{" "}
+              {weightClassesData.map((weightClass) => (
+                <SelectItem key={weightClass?.id} value={weightClass?.id}>
+                  <span className="font-semibold">{weightClass?.label}</span>{" "}
                   <span>
-                    {weight?.weight_bounds[0]}-{weight?.weight_bounds[1]}
+                    {weightClass?.weight_bounds[0]}-
+                    {weightClass?.weight_bounds[1]}
                   </span>{" "}
                   <span className="text-gray-600 text-sm">
                     {t("pets.pounds")}

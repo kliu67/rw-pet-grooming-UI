@@ -1,17 +1,16 @@
 import React, { useEffect } from "react";
-import { useState, useMemo, useCallback } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useBooking } from "@/context/BookingContext";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { CLASSNAMES } from "../../styles/classNames";
 import { MAX_PET_NAME_LENGTH } from "../../constants";
 import { DateTimePicker } from "../DateTimePicker";
-const { BOOKING_MODAL_FIELD_TWO, TIME_BTN_DISABLED, TIME_BTN_ACTIVE } =
+const { BOOKING_MODAL_FIELD_TWO } =
   CLASSNAMES;
 
 export const DateTimeStep = ({
-  formData = {},
-  updateFormData,
   availabilityData = [],
   timeOffsData = [],
   appointmentsData = [],
@@ -27,7 +26,7 @@ export const DateTimeStep = ({
   });
 
   const { t } = useTranslation();
-
+  const { bookingData, updateBookingData } = useBooking();
 
   const validateFields = (field, value) => {
     if (field === "petName") {
@@ -42,7 +41,7 @@ export const DateTimeStep = ({
     return "";
   };
 
-  const stepIsValid = validateFields("petName", formData.description) === "";
+  const stepIsValid = validateFields("petName", bookingData.description) === "";
 
   const updateFieldError = (name, value) => {
     const errorMsg = validateFields(name, value);
@@ -65,10 +64,10 @@ export const DateTimeStep = ({
   const handleChange = (e) => {
     const { name } = e.target;
     let { value } = e.target;
-    if (formData.startTime === value) {
+    if (bookingData.startTime === value) {
       value = "";
     }
-    updateFormData(name, value);
+    updateBookingData({ [name]: value });
     updateFieldError(name, value);
   };
 
@@ -84,33 +83,34 @@ export const DateTimeStep = ({
     }));
     setErrors((prev) => ({
       ...prev,
-      petName: validateFields("petName", formData.description),
+      petName: validateFields("petName", bookingData.description),
     }));
-  }, [showErrors, formData.description]);
+  }, [showErrors, bookingData.description]);
 
   return (
     <div className="space-y-4">
       <div className={`${BOOKING_MODAL_FIELD_TWO}`}>
         <DateTimePicker
-        configData={configData}
-        availabilityData={availabilityData}
-        timeOffsData={timeOffsData}
-        appointmentsData={appointmentsData}
-        onSelect={handleChange}
-        isLoading={false}
-        isError={false}
-        
+          configData={configData}
+          availabilityData={availabilityData}
+          timeOffsData={timeOffsData}
+          appointmentsData={appointmentsData}
+          onSelect={handleChange}
+          isLoading={false}
+          isError={false}
         />
-
       </div>
       <div className={BOOKING_MODAL_FIELD_TWO}>
         <Label htmlFor="description">{t("bookingModal.message")}</Label>
+        {errors.description && touched.description && (
+          <p className="text-sm text-red-600 mt-1">{errors.description}</p>
+        )}
         <Textarea
           id="description"
           placeholder={t("placeholder.message")}
           className="min-h-32"
-          value={formData.description}
-          onChange={(e) => updateFormData("description", e.target.value)}
+          value={bookingData.description}
+          onChange={(e) => updateBookingData({ description: e.target.value })}
         />
       </div>
     </div>

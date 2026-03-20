@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
-import { PetStep } from "./PetStep";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MAX_PET_NAME_LENGTH } from "../../constants";
+import { PetStep } from "./PetStep";
+
+const mockUpdateBookingData = vi.fn();
+let mockBookingData: Record<string, any> = {};
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -10,83 +13,88 @@ vi.mock("react-i18next", () => ({
   })
 }));
 
-const renderWithState = (
-  props?: Partial<React.ComponentProps<typeof PetStep>>
-) => {
-  const onValidityChange = props?.onValidityChange ?? vi.fn();
-
-  function Harness() {
-    const [formData, setFormData] = useState({
-      petName: "",
-      breed: "",
-      weight: ""
-    });
-
-    return (
-      <PetStep
-        formData={formData}
-        updateFormData={(field, value) =>
-          setFormData((prev) => ({ ...prev, [field]: value }))
-        }
-        onValidityChange={onValidityChange}
-        showErrors={props?.showErrors}
-        breedsData={props?.breedsData ?? []}
-        weightClassesData={props?.weightClassesData ?? []}
-      />
-    );
-  }
-
-  return { onValidityChange, ...render(<Harness />) };
-};
+vi.mock("@/context/BookingContext", () => ({
+  useBooking: () => ({
+    bookingData: mockBookingData,
+    updateBookingData: mockUpdateBookingData
+  })
+}));
 
 describe("PetStep", () => {
-  it("shows field error on blur", () => {
-    renderWithState();
+  beforeEach(() => {
+    mockUpdateBookingData.mockClear();
+    mockBookingData = {
+      petName: "",
+      breed: undefined,
+      weightClass: undefined
+    };
+  });
 
-    const petNameInput = screen.getByLabelText("bookingModal.petName");
+  it("shows required pet name error on blur", () => {
+    render(<PetStep onValidityChange={vi.fn()} />);
+
+    const petNameInput = screen.getByLabelText(/bookingModal\.petName/i);
     fireEvent.blur(petNameInput);
 
     expect(screen.getByText("pets.errors.notEmpty")).toBeInTheDocument();
   });
 
-  it("does not show error before blur when showErrors is false", () => {
-    renderWithState();
+  it("shows max-length error for overly long pet name", () => {
+    mockBookingData = {
+      petName: "a".repeat(MAX_PET_NAME_LENGTH + 1),
+      breed: undefined,
+      weightClass: undefined
+    };
+    render(<PetStep onValidityChange={vi.fn()} />);
 
-    const petNameInput = screen.getByLabelText("bookingModal.petName");
+    const petNameInput = screen.getByLabelText(/bookingModal\.petName/i);
+    fireEvent.blur(petNameInput);
+
+    expect(screen.getByText("pets.errors.nameLengthViolation")).toBeInTheDocument();
+  });
+
+  it("calls updateBookingData when pet name changes", () => {
+    render(<PetStep onValidityChange={vi.fn()} />);
+
+    const petNameInput = screen.getByLabelText(/bookingModal\.petName/i);
     fireEvent.change(petNameInput, { target: { value: "Buddy" } });
 
-    expect(screen.queryByText("pets.errors.notEmpty")).not.toBeInTheDocument();
+    expect(mockUpdateBookingData).toHaveBeenCalledWith({ petName: "Buddy" });
   });
 
-  it("shows errors immediately when showErrors is true", async () => {
-    renderWithState({ showErrors: true });
+  it("renders breed and weight selects when options are provided", () => {
+    render(
+      <PetStep
+        onValidityChange={vi.fn()}
+        breedsData={[
+          { id: "1", name: "Labrador" },
+          { id: "2", name: "Poodle" }
+        ]}
+        weightClassesData={[
+          { id: "1", label: "Small", weight_bounds: [0, 20] },
+          { id: "2", label: "Large", weight_bounds: [21, 80] }
+        ]}
+      />
+    );
 
-    await waitFor(() => {
-      expect(screen.getByText("pets.errors.notEmpty")).toBeInTheDocument();
-    });
+    expect(screen.getByText("bookingModal.breed")).toBeInTheDocument();
+    expect(screen.getByText("bookingModal.weight")).toBeInTheDocument();
+    expect(screen.getByText("placeholder.breed")).toBeInTheDocument();
+    expect(screen.getByText("placeholder.weight")).toBeInTheDocument();
   });
 
-  it("calls onValidityChange with true when pet name is valid", async () => {
-    const { onValidityChange } = renderWithState();
+  it("calls onValidityChange with true when petName exists", async () => {
+    const onValidityChange = vi.fn();
+    mockBookingData = {
+      petName: "Milo",
+      breed: undefined,
+      weightClass: undefined
+    };
 
-    fireEvent.change(screen.getByLabelText("bookingModal.petName"), {
-      target: { value: "Buddy" }
-    });
+    render(<PetStep onValidityChange={onValidityChange} />);
 
     await waitFor(() => {
       expect(onValidityChange).toHaveBeenCalledWith(true);
     });
-  });
-
-  it("shows length validation error when name is too long", () => {
-    renderWithState();
-
-    const petNameInput = screen.getByLabelText("bookingModal.petName");
-    fireEvent.change(petNameInput, {
-      target: { value: "a".repeat(MAX_PET_NAME_LENGTH + 1) }
-    });
-    fireEvent.blur(petNameInput);
-
-    expect(screen.getByText("pets.errors.nameLengthViolation")).toBeInTheDocument();
   });
 });

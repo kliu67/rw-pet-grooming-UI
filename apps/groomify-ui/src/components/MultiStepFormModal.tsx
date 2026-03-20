@@ -7,7 +7,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Progress } from "./ui/progress";
@@ -25,7 +25,7 @@ import {
   DEFAULT_STYLIST,
   staticServiceData,
   serviceImageMap,
-  defaultImage
+  defaultImage,
 } from "../constants";
 import { ServiceCard } from "./ServiceCard";
 import { PersonalStep } from "./BookingSteps/PersonalStep";
@@ -59,36 +59,14 @@ interface FormData {
 const { BOOKING_MODAL_FIELD_TWO: BOOKING_MODAL_FIELD } = CLASSNAMES;
 export function MultiStepFormModal({
   open,
-  onOpenChange
+  onOpenChange,
 }: MultiStepFormModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [stepIsValid, setStepIsValid] = useState(false);
   const [showPersonalErrors, setShowPersonalErrors] = useState(false);
   const [showPetErrors, setShowPetErrors] = useState(false);
-  const [stepForm, setStepForm] = useState({});
-  const [formData, setFormData] = useState<FormData>({
-    firstName: "Kai",
-    lastName: "Liu",
-    email: "derekkailiu@gmail.com",
-    phone: "6476172401",
-
-    petName: "test Pet",
-    serviceId: 36,
-    breedId: 3,
-    weightClassId: 4,
-
-    startDate: "",
-    stylistId: "",
-    description: ""
-  });
-  const { bookingData, updateBookingData } = useBooking();
-
-  const [personalForm, setPersonalForm] = useState({
-    firstName: bookingData.personalInfo?.firstName || "",
-    lastName: bookingData.personalInfo?.lastName || "",
-    email: bookingData.personalInfo?.email || "",
-    phone: bookingData.personalInfo?.phone || ""
-  });
+  const [showMessageErrors, setShowMessageErrors] = useState(false);
+  const { bookingData, updateBookingData, resetBooking } = useBooking();
 
   const { t } = useTranslation();
   const totalSteps = 5;
@@ -97,160 +75,125 @@ export function MultiStepFormModal({
   const steps = [
     {
       id: 1,
-      label: t("bookingModal.serviceStep")
+      label: t("bookingModal.serviceStep"),
     },
     {
       id: 2,
-      label: t("bookingModal.personalStep")
+      label: t("bookingModal.personalStep"),
     },
     {
       id: 3,
-      label: t("bookingModal.petStep")
+      label: t("bookingModal.petStep"),
     },
     {
       id: 4,
-      label: t("bookingModal.dateTimeStep")
+      label: t("bookingModal.dateTimeStep"),
     },
     {
       id: 5,
-      label: t("bookingModal.reviewStep")
-    }
+      label: t("bookingModal.reviewStep"),
+    },
   ];
 
   const {
     data: serviceData = [],
     isLoading: servicesIsLoading,
-    error: servicesError
+    error: servicesError,
   } = useServices();
 
   const {
     data: breedsData = [],
     isLoading: breedsIsLoading,
-    error: breedsError
+    error: breedsError,
   } = useBreeds();
 
   const {
     data: weightClassesData = [],
     isLoading: weightClassesIsLoading,
-    error: weightClassesError
+    error: weightClassesError,
   } = useWeightClasses();
 
   const {
     data: stylistAvailability = [],
     isLoading: availabilityIsLoading,
-    error: availabilityError
+    error: availabilityError,
   } = useAvailabiltyByStylistId(DEFAULT_STYLIST);
 
   const {
     data: timeOffsData = [],
     isLoading: timeOffsIsLoading,
-    error: timeOffsError
+    error: timeOffsError,
   } = useUpcomingTimeOffsByStylistId(DEFAULT_STYLIST);
 
   const {
     data: stylistAppointmentsData = [],
     isLoading: appIsLoading,
-    error: appError
+    error: appError,
   } = useUpcomingAppointmentsByStylistId(DEFAULT_STYLIST);
 
   const {
     data: configData = {},
     isLoading: configIsLoading,
-    error: configError
+    error: configError,
   } = useConfigByFKs({
-    serviceId: formData.serviceId,
-    breedId: formData.breedId,
-    weightClassId: formData.weightClassId
+    serviceId: bookingData.service?.id,
+    breedId: bookingData?.breed?.id,
+    weightClassId: bookingData?.weightClass?.id,
   });
 
-  const services = serviceData.map((service) => {
-    const match = staticServiceData.find((s) => s.code === service.code);
-    return {
-      name: service.name,
-      price: `From $${service.base_price}`,
-      description: service.description,
-      code: service.code
-    };
-  });
-
-  const updateFormData = (field: keyof FormData, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    console.log(formData);
-  };
-
-  const updatePersonalForm = (field: keyof FormData, value) => {
-    setPersonalForm((prev) => ({ ...prev, [field]: value }));
-    console.log(personalForm);
-  };
-
-  const updateStepForm = (field: keyof FormData, value) => {
-    setStepForm((prev) => ({ ...prev, [field]: value }));
-    console.log(`stepform:`);
-    console.log(stepForm);
-    console.log("booking data: ");
-    console.log(bookingData);
-  };
 
   const validateStep = () => {
     switch (currentStep) {
       case 1:
-        return stepForm.serviceId;
+        return true;
       case 2:
         return (
-          stepForm.firstName &&
-          stepForm.lastName &&
-          stepForm.phone &&
+          !!bookingData?.firstName &&
+          !!bookingData?.lastName &&
+          !!bookingData?.phone &&
           stepIsValid
         );
       case 3:
-        return formData.petName && formData.breedId && formData.weightclassId;
+        const { breed, weightClass } = bookingData;
+        return (
+          !!bookingData?.petName &&
+          !!breed?.id &&
+          !!weightClass?.id &&
+          stepIsValid
+        );
       case 4:
-        return formData.startDate;
+        return !!bookingData?.startTime && stepIsValid;
       default:
         return false;
     }
   };
 
-const handleNext = (form: FormData) => {
+  const handleNext = () => {
     if (currentStep === 2) {
       setShowPersonalErrors(true);
     }
     if (currentStep === 3) {
       setShowPetErrors(true);
     }
-    if (validateStep && currentStep < totalSteps) {
-      updateBookingData({...form});
-      setStepForm({});
+    if (validateStep() && currentStep < totalSteps) {
       setCurrentStep((prev) => prev + 1);
+      console.log("bookingData");
+      console.log(bookingData);
     }
   };
 
   const handleBack = () => {
     if (currentStep > 1) {
-    setStepForm({});
-    setCurrentStep((prev) => prev - 1);
+      setCurrentStep((prev) => prev - 1);
     }
   };
 
+
   const handleSubmit = () => {
     if (validateStep()) {
-      console.log("Form submitted:", formData);
+      console.log("Form submitted:", bookingData);
       // Reset form and close modal
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-
-        petName: "",
-        serviceId: "",
-        breedid: "",
-        weightclassid: "",
-
-        startDate: "",
-        stylistId: "",
-        description: ""
-      });
+      resetBooking();
       setCurrentStep(1);
       onOpenChange(false);
     }
@@ -264,21 +207,7 @@ const handleNext = (form: FormData) => {
         setStepIsValid(false);
         setShowPersonalErrors(false);
         setShowPetErrors(false);
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          phone: "",
-
-          petName: "",
-          serviceId: "",
-          breedid: "",
-          weightclassid: "",
-
-          startDate: "",
-          stylistId: "",
-          description: ""
-        });
+        resetBooking();
       }, RESET_DELAY_MS);
     }
     onOpenChange(nextOpen);
@@ -321,8 +250,14 @@ const handleNext = (form: FormData) => {
                         String(bookingData?.serviceId) === String(service?.id)
                       }
                       onClick={(field, value) => {
-                        const nextForm = { ...stepForm, [field]: value };
-                        handleNext(nextForm);
+                        const serviceForm = {
+                          svcId: value?.id,
+                          svcName: value?.name,
+                          svcBasePrice: value?.base_price,
+                          svcCode: value.code,
+                        };
+                        updateBookingData({'service': service});
+                        handleNext();
                       }}
                     />
                   );
@@ -333,9 +268,6 @@ const handleNext = (form: FormData) => {
       case 2:
         return (
           <PersonalStep
-            formData={stepForm}
-            // updateFormData={updateFormData}
-            updateFormData={updateStepForm}
             onValidityChange={(isValid) => setStepIsValid(isValid)}
             showErrors={showPersonalErrors}
           />
@@ -344,8 +276,6 @@ const handleNext = (form: FormData) => {
       case 3:
         return (
           <PetStep
-            formData={stepForm}
-            updateFormData={updateStepForm}
             weightClassesData={weightClassesData}
             breedsData={breedsData}
             onValidityChange={(isValid) => setStepIsValid(isValid)}
@@ -356,8 +286,6 @@ const handleNext = (form: FormData) => {
       case 4:
         return (
           <DateTimeStep
-            formData={formData}
-            updateFormData={updateFormData}
             availabilityData={stylistAvailability}
             timeOffsData={timeOffsData}
             appointmentsData={stylistAppointmentsData}
@@ -442,7 +370,7 @@ const handleNext = (form: FormData) => {
                 type="button"
                 onClick={handleNext}
                 className="disabled:opacity-60 disabled:cursor-not-allowed"
-                disabled={currentStep === 2 && !validateStep()}
+                disabled={!validateStep()}
               >
                 Next
               </Button>
