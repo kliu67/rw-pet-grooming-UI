@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState } from "react";
+import React, { useMemo, useCallback, useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { INTERVAL_MINUTES } from "@/constants";
 import { Label } from "./ui/label";
@@ -29,6 +29,8 @@ export const DateTimePicker = ({
   const [date, setDate] = useState(new Date());
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [selectedTimeSlot, setSelectedTimeSlot] = useState();
+  const timePickerRef = useRef(null);
+  const prevDateKeyRef = useRef(null);
   const isTimeDisabled = !isObjectNotEmpty(configData);
   const { t } = useTranslation();
   const appointmentDurationMinutes = useMemo(() => {
@@ -130,6 +132,24 @@ export const DateTimePicker = ({
     appointmentDurationMinutes,
   });
 
+  useEffect(() => {
+    const dateKey = date ? date.toDateString() : null;
+    if (!dateKey || prevDateKeyRef.current === dateKey) return;
+    prevDateKeyRef.current = dateKey;
+
+    requestAnimationFrame(() => {
+      const firstBookable = timePickerRef.current?.querySelector(
+        '[data-bookable="true"]',
+      );
+
+      firstBookable?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "nearest",
+      });
+    });
+  }, [date, timeSlots]);
+
   return (
     <div className={BOOKING_MODAL_FIELD_TWO}>
       <div
@@ -163,20 +183,22 @@ export const DateTimePicker = ({
           <Label htmlFor="timeInterval">{t("bookingModal.time")}</Label>
           <div
             id="time-picker"
-            className="flex flex-wrap overflow-y-auto max-h-[280px] lg:flex-1"
+            ref={timePickerRef}
+            className="flex flex-wrap overflow-y-auto max-h-[280px] lg:flex-1 scroll-smooth"
           >
             {" "}
             {timeSlots.map((time) => (
               <div
                 key={time.start.toISOString()}
+                data-bookable={time.bookable ? "true" : "false"}
                 className={`w-full ${time.bookable ? TIME_BTN_ACTIVE : TIME_BTN_DISABLED} ${
                   getTimestamp(selectedTimeSlot) === getTimestamp(time.start)
-                    ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-200"
+                    ? "bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-500"
                     : "bg-white hover:bg-gray-100"
                 }`}
               >
                 <button
-                  className="w-full h-full p-0 m-0 text-center disabled:bg-gray-200"
+                  className="w-full h-full p-0 m-0 text-center active:bg-emerald-600 active:text-white disabled:bg-gray-200"
                   name="startTime"
                   value={time.start.toISOString()}
                   type="button"
