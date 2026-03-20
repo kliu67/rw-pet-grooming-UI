@@ -1,18 +1,18 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "./ui/select";
-import { CLASSNAMES } from "../styles/classNames";
-import { MAX_PET_NAME_LENGTH } from "../constants";
-import { DropdownSearch } from "./DropdownSearch";
+} from "../ui/select";
+import { CLASSNAMES } from "../../styles/classNames";
+import { MAX_PET_NAME_LENGTH } from "../../constants";
+import { DropdownSearch } from "../DropdownSearch";
 const { BOOKING_MODAL_FIELD_TWO } = CLASSNAMES;
 export const PetStep = ({
   formData = {},

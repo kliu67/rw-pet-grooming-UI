@@ -5,7 +5,7 @@ export const ServiceCard = ({
   Icon = "",
   service = {},
   isSelected = false,
-  onClick = () => {},
+  onClick: onSelectService = () => {},
 }) => {
   const { t } = useTranslation();
   const { id, name, description, base_price } = service;
@@ -18,9 +18,9 @@ export const ServiceCard = ({
       }`}
       role="button"
       tabIndex={0}
-      onClick={() => onClick("serviceId", id)}
+      onClick={() => onSelectService("service", service)}
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") onClick("serviceId", id);
+        if (e.key === "Enter" || e.key === " ") onSelectService("serviceId", service);
       }}
     >
       <div className="h-36 overflow-hidden relative">

@@ -1,15 +1,16 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useBooking } from "@/context/BookingContext";
 import { isValidPhone, isValidEmail } from "@shared-utils";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import { CLASSNAMES } from "../styles/classNames";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { CLASSNAMES } from "../../styles/classNames";
 import {
   MAX_FIRST_NAME_LENGTH,
   MAX_PHONE_LENGTH,
   MAX_EMAIL_LENGTH
-} from "../constants";
+} from "../../constants";
 const { BOOKING_MODAL_FIELD_TWO } = CLASSNAMES;
 export const PersonalStep = ({
   formData = {},
@@ -17,6 +18,7 @@ export const PersonalStep = ({
   onValidityChange,
   showErrors = false
 }) => {
+  const { bookingData, updateBookingData } = useBooking();
   const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({
     firstName: "",

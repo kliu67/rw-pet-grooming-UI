@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { PetStep } from "./PetStep";
-import { MAX_PET_NAME_LENGTH } from "../constants";
+import { MAX_PET_NAME_LENGTH } from "../../constants";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({

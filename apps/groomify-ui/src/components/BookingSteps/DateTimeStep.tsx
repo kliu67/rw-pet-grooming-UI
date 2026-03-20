@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Label } from "./ui/label";
-import { Textarea } from "./ui/textarea";
-import { CLASSNAMES } from "../styles/classNames";
-import { MAX_PET_NAME_LENGTH } from "../constants";
-import { DateTimePicker } from "./DateTimePicker";
+import { Label } from "../ui/label";
+import { Textarea } from "../ui/textarea";
+import { CLASSNAMES } from "../../styles/classNames";
+import { MAX_PET_NAME_LENGTH } from "../../constants";
+import { DateTimePicker } from "../DateTimePicker";
 const { BOOKING_MODAL_FIELD_TWO, TIME_BTN_DISABLED, TIME_BTN_ACTIVE } =
   CLASSNAMES;
 

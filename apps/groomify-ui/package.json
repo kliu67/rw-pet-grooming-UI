@@ -33,6 +33,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "*",
     "cmdk": "^1.1.1",
+    "date-fn": "^0.0.2",
     "embla-carousel-react": "^8.6.0",
     "i18next": "^25.8.18",
     "input-otp": "^1.4.2",
@@ -44,6 +45,7 @@
     "react-hook-form": "^7.55.0",
     "react-i18next": "^16.5.8",
     "react-resizable-panels": "^2.1.7",
+    "react-router": "^7.13.1",
     "recharts": "^2.15.2",
     "sonner": "^2.0.3",
     "tailwind-merge": "*",
@@ -52,9 +54,9 @@
     "vaul": "^1.1.2"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.2.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
-    "@tailwindcss/vite": "^4.2.2",
     "@types/node": "^20.10.0",
     "@vitejs/plugin-react-swc": "^3.10.2",
     "vite": "6.3.5"

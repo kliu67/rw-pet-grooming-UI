@@ -1,12 +1,13 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import { useBooking } from "@/context/BookingContext";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Progress } from "./ui/progress";
@@ -24,12 +25,13 @@ import {
   DEFAULT_STYLIST,
   staticServiceData,
   serviceImageMap,
-  defaultImage,
+  defaultImage
 } from "../constants";
 import { ServiceCard } from "./ServiceCard";
-import { PersonalStep } from "./PersonalStep";
-import { PetStep } from "./PetStep";
-import { DateTimeStep } from "./DateTimeStep";
+import { PersonalStep } from "./BookingSteps/PersonalStep";
+import { PetStep } from "./BookingSteps/PetStep";
+import { DateTimeStep } from "./BookingSteps/DateTimeStep";
+import { ReviewStep } from "./BookingSteps/ReviewStep";
 
 interface MultiStepFormModalProps {
   open: boolean;
@@ -57,12 +59,13 @@ interface FormData {
 const { BOOKING_MODAL_FIELD_TWO: BOOKING_MODAL_FIELD } = CLASSNAMES;
 export function MultiStepFormModal({
   open,
-  onOpenChange,
+  onOpenChange
 }: MultiStepFormModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [stepIsValid, setStepIsValid] = useState(false);
   const [showPersonalErrors, setShowPersonalErrors] = useState(false);
   const [showPetErrors, setShowPetErrors] = useState(false);
+  const [stepForm, setStepForm] = useState({});
   const [formData, setFormData] = useState<FormData>({
     firstName: "Kai",
     lastName: "Liu",
@@ -76,7 +79,15 @@ export function MultiStepFormModal({
 
     startDate: "",
     stylistId: "",
-    description: "",
+    description: ""
+  });
+  const { bookingData, updateBookingData } = useBooking();
+
+  const [personalForm, setPersonalForm] = useState({
+    firstName: bookingData.personalInfo?.firstName || "",
+    lastName: bookingData.personalInfo?.lastName || "",
+    email: bookingData.personalInfo?.email || "",
+    phone: bookingData.personalInfo?.phone || ""
   });
 
   const { t } = useTranslation();
@@ -86,71 +97,71 @@ export function MultiStepFormModal({
   const steps = [
     {
       id: 1,
-      label: t("bookingModal.serviceStep"),
+      label: t("bookingModal.serviceStep")
     },
     {
       id: 2,
-      label: t("bookingModal.personalStep"),
+      label: t("bookingModal.personalStep")
     },
     {
       id: 3,
-      label: t("bookingModal.petStep"),
+      label: t("bookingModal.petStep")
     },
     {
       id: 4,
-      label: t("bookingModal.dateTimeStep"),
+      label: t("bookingModal.dateTimeStep")
     },
     {
       id: 5,
-      label: t("bookingModal.reviewStep"),
-    },
+      label: t("bookingModal.reviewStep")
+    }
   ];
 
   const {
     data: serviceData = [],
     isLoading: servicesIsLoading,
-    error: servicesError,
+    error: servicesError
   } = useServices();
 
   const {
     data: breedsData = [],
     isLoading: breedsIsLoading,
-    error: breedsError,
+    error: breedsError
   } = useBreeds();
 
   const {
     data: weightClassesData = [],
     isLoading: weightClassesIsLoading,
-    error: weightClassesError,
+    error: weightClassesError
   } = useWeightClasses();
 
   const {
     data: stylistAvailability = [],
     isLoading: availabilityIsLoading,
-    error: availabilityError,
+    error: availabilityError
   } = useAvailabiltyByStylistId(DEFAULT_STYLIST);
 
   const {
     data: timeOffsData = [],
     isLoading: timeOffsIsLoading,
-    error: timeOffsError,
+    error: timeOffsError
   } = useUpcomingTimeOffsByStylistId(DEFAULT_STYLIST);
 
   const {
     data: stylistAppointmentsData = [],
     isLoading: appIsLoading,
-    error: appError,
+    error: appError
   } = useUpcomingAppointmentsByStylistId(DEFAULT_STYLIST);
 
   const {
     data: configData = {},
     isLoading: configIsLoading,
-    error: configError,
-  } = useConfigByFKs(
-    {serviceId: formData.serviceId,
+    error: configError
+  } = useConfigByFKs({
+    serviceId: formData.serviceId,
     breedId: formData.breedId,
-    weightClassId: formData.weightClassId}
-  );
+    weightClassId: formData.weightClassId
+  });
 
   const services = serviceData.map((service) => {
     const match = staticServiceData.find((s) => s.code === service.code);
@@ -158,7 +169,7 @@ export function MultiStepFormModal({
       name: service.name,
       price: `From $${service.base_price}`,
       description: service.description,
-      code: service.code,
+      code: service.code
     };
   });
 
@@ -167,15 +178,28 @@ export function MultiStepFormModal({
     console.log(formData);
   };
 
+  const updatePersonalForm = (field: keyof FormData, value) => {
+    setPersonalForm((prev) => ({ ...prev, [field]: value }));
+    console.log(personalForm);
+  };
+
+  const updateStepForm = (field: keyof FormData, value) => {
+    setStepForm((prev) => ({ ...prev, [field]: value }));
+    console.log(`stepform:`);
+    console.log(stepForm);
+    console.log("booking data: ");
+    console.log(bookingData);
+  };
+
   const validateStep = () => {
     switch (currentStep) {
       case 1:
-        return formData.serviceId;
+        return stepForm.serviceId;
       case 2:
         return (
-          formData.firstName &&
-          formData.lastName &&
-          formData.phone &&
+          stepForm.firstName &&
+          stepForm.lastName &&
+          stepForm.phone &&
           stepIsValid
         );
       case 3:
@@ -187,7 +211,7 @@ export function MultiStepFormModal({
     }
   };
 
-  const handleNext = () => {
+const handleNext = (form: FormData) => {
     if (currentStep === 2) {
       setShowPersonalErrors(true);
     }
@@ -195,14 +219,17 @@ export function MultiStepFormModal({
       setShowPetErrors(true);
     }
     if (validateStep && currentStep < totalSteps) {
+      updateBookingData({...form});
+      setStepForm({});
       setCurrentStep((prev) => prev + 1);
     }
   };
 
   const handleBack = () => {
-    // if (currentStep > 1) {
+    if (currentStep > 1) {
+    setStepForm({});
     setCurrentStep((prev) => prev - 1);
-    // }
+    }
   };
 
   const handleSubmit = () => {
@@ -222,7 +249,7 @@ export function MultiStepFormModal({
 
         startDate: "",
         stylistId: "",
-        description: "",
+        description: ""
       });
       setCurrentStep(1);
       onOpenChange(false);
@@ -250,7 +277,7 @@ export function MultiStepFormModal({
 
           startDate: "",
           stylistId: "",
-          description: "",
+          description: ""
         });
       }, RESET_DELAY_MS);
     }
@@ -258,10 +285,10 @@ export function MultiStepFormModal({
   };
 
   useEffect(() => {
-    if (formData.serviceId) {
+    if (bookingData.serviceId) {
       setCurrentStep(2);
     }
-  }, [formData.serviceId]);
+  }, [bookingData.serviceId]);
 
   useEffect(() => {
     if (currentStep !== 2 && showPersonalErrors) {
@@ -272,6 +299,7 @@ export function MultiStepFormModal({
       setShowPetErrors(false);
     }
   }, [currentStep, showPersonalErrors, showPetErrors]);
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -290,11 +318,11 @@ export function MultiStepFormModal({
                       service={service}
                       image={image}
                       isSelected={
-                        String(formData.serviceId) === String(service?.id)
+                        String(bookingData?.serviceId) === String(service?.id)
                       }
                       onClick={(field, value) => {
-                        setCurrentStep(2);
-                        updateFormData(field, value);
+                        const nextForm = { ...stepForm, [field]: value };
+                        handleNext(nextForm);
                       }}
                     />
                   );
@@ -305,8 +333,9 @@ export function MultiStepFormModal({
       case 2:
         return (
           <PersonalStep
-            formData={formData}
-            updateFormData={updateFormData}
+            formData={stepForm}
+            // updateFormData={updateFormData}
+            updateFormData={updateStepForm}
             onValidityChange={(isValid) => setStepIsValid(isValid)}
             showErrors={showPersonalErrors}
           />
@@ -315,8 +344,8 @@ export function MultiStepFormModal({
       case 3:
         return (
           <PetStep
-            formData={formData}
-            updateFormData={updateFormData}
+            formData={stepForm}
+            updateFormData={updateStepForm}
             weightClassesData={weightClassesData}
             breedsData={breedsData}
             onValidityChange={(isValid) => setStepIsValid(isValid)}
@@ -337,6 +366,8 @@ export function MultiStepFormModal({
             showErrors={showPetErrors}
           />
         );
+      case 5:
+        return <ReviewStep formData={formData} />;
         return null;
     }
   };

@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BookingProvider } from "./context/BookingContext.js";
 import App from "./App.tsx";
 import "./index.css";
 import "./i18n";
@@ -16,6 +17,8 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
+    <BookingProvider>
     <App />
+    </BookingProvider>
   </QueryClientProvider>
 );

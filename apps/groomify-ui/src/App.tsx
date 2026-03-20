@@ -4,7 +4,6 @@ import { Hero } from './components/Hero';
 import { Services } from './components/Services';
 import { Testimonials } from './components/Testimonials';
 import { Footer } from './components/Footer';
-import { BookingModal } from './components/BookingModal';
 import { MultiStepFormModal } from './components/MultiStepFormModal';
 
 export default function App() {
