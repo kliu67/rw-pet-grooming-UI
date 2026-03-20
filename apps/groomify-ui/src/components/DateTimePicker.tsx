@@ -5,14 +5,18 @@ import { Label } from "./ui/label";
 import { Calendar } from "./ui/calendar";
 import { CLASSNAMES } from "@/styles/classNames";
 import { getTimestamp, isObjectNotEmpty } from "@shared-utils";
-import { useOpenTimeRanges, getOpenTimeRanges, getAvailableTimeRanges } from "@/hooks/openTimeRanges";
 import {
-  computeDateTimeIntervals,
-  getDaysInMonth,
-} from "@/hooks/timeIntervals";
+  getTimeSlotsForDate,
+  useTimeSlotsForDate,
+} from "@/hooks/openTimeRanges";
+import { getDaysInMonth } from "@/hooks/timeIntervals";
 
-const { BOOKING_MODAL_FIELD_TWO, TIME_BTN_DISABLED, TIME_BTN_ACTIVE } =
-  CLASSNAMES;
+const {
+  BOOKING_MODAL_FIELD_TWO,
+  TIME_BTN_DIV_DISABLED: TIME_BTN_DISABLED,
+  TIME_BTN_DIV_ACTIVE: TIME_BTN_ACTIVE,
+} = CLASSNAMES;
+
 export const DateTimePicker = ({
   configData,
   availabilityData,
@@ -27,6 +31,12 @@ export const DateTimePicker = ({
   const [selectedTimeSlot, setSelectedTimeSlot] = useState();
   const isTimeDisabled = !isObjectNotEmpty(configData);
   const { t } = useTranslation();
+  const appointmentDurationMinutes = useMemo(() => {
+    const duration = Number(configData?.duration_minutes) || 0;
+    const buffer = Number(configData?.buffer_minutes) || 0;
+    const total = duration + buffer;
+    return total > 0 ? total : INTERVAL_MINUTES;
+  }, [configData?.duration_minutes, configData?.buffer_minutes]);
 
   const appointmentsForRanges = useMemo(() => {
     return appointmentsData.map((app) => ({
@@ -35,32 +45,31 @@ export const DateTimePicker = ({
     }));
   }, [appointmentsData]);
 
-  const bookableTimeRanges = useOpenTimeRanges({
-    availabilityData,
-    timeOffsData,
-    appointments: appointmentsForRanges,
-    date,
-  });
-
-
   const monthAvailability = useMemo(() => {
     if (!availabilityData?.length) return [];
 
     const thisMonth = calendarMonth?.getMonth();
     const thisYear = calendarMonth?.getFullYear();
-    const appointmentsByStylist = appointmentsForRanges;
 
-    return getDaysInMonth(thisYear, thisMonth).map((day) =>
-      getOpenTimeRanges({
+    return getDaysInMonth(thisYear, thisMonth).map((day) => {
+      const daySlots = getTimeSlotsForDate({
         availabilityData,
         timeOffsData,
-        appointments: appointmentsByStylist,
+        appointments: appointmentsForRanges,
         date: day,
-      }),
-    );
-  }, [availabilityData, appointmentsForRanges, timeOffsData, calendarMonth]);
+        slotMinutes: INTERVAL_MINUTES,
+        appointmentDurationMinutes,
+      });
 
-
+      return daySlots.filter((slot) => slot.bookable);
+    });
+  }, [
+    availabilityData,
+    appointmentsForRanges,
+    timeOffsData,
+    calendarMonth,
+    appointmentDurationMinutes,
+  ]);
 
   const monthBookableDates = useMemo(() => {
     if (!availabilityData?.length) return new Set();
@@ -111,84 +120,82 @@ export const DateTimePicker = ({
       monthBookableDates,
     ],
   );
-  const timeIntervals = useMemo(() => {
-    if (!bookableTimeRanges || !date || !configData) return [];
 
-    return bookableTimeRanges.flatMap((range) =>
-      computeDateTimeIntervals(
-        range,
-        date,
-        configData.duration_minutes,
-        INTERVAL_MINUTES,
-      ),
-    );
-  }, [bookableTimeRanges, date, configData]);
+  const timeSlots = useTimeSlotsForDate({
+    availabilityData,
+    timeOffsData,
+    appointments: appointmentsForRanges,
+    date,
+    slotMinutes: INTERVAL_MINUTES,
+    appointmentDurationMinutes,
+  });
+
   return (
-    timeIntervals.length > 0 && (
-      <div className={BOOKING_MODAL_FIELD_TWO}>
-        <div id="date-time-picker-container" className="flex flex-col md:flex-row md:items-stretch gap-4">
+    <div className={BOOKING_MODAL_FIELD_TWO}>
+      <div
+        id="date-time-picker-container"
+        className="flex flex-col md:flex-row md:items-stretch gap-4"
+      >
+        <div
+          className={`${BOOKING_MODAL_FIELD_TWO} md:w-1/2 lg:w-1/3 lg:flex lg:flex-col lg:max-h-[280px]`}
+        >
+          <Label htmlFor="date">{t("bookingModal.date")}</Label>
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            month={calendarMonth}
+            onMonthChange={setCalendarMonth}
+            className="mx-auto rounded-md border"
+            classNames={{
+              months: "flex flex-col sm:flex-row gap-2 justify-center",
+              month: "flex flex-col items-center gap-4 mx-auto",
+              table: "mx-auto border-collapse space-x-1",
+              head_row: "flex justify-center",
+              row: "flex justify-center mt-2",
+            }}
+            disabled={isDateDisabled}
+          />
+        </div>
+        <div
+          className={`${BOOKING_MODAL_FIELD_TWO} md:w-1/2 lg:w-2/3 lg:flex lg:flex-col lg:min-h-[280px]`}
+        >
+          <Label htmlFor="timeInterval">{t("bookingModal.time")}</Label>
           <div
-            className={`${BOOKING_MODAL_FIELD_TWO} md:w-1/2 lg:w-1/3 lg:flex lg:flex-col lg:max-h-[280px]`}
+            id="time-picker"
+            className="flex flex-wrap overflow-y-auto max-h-[280px] lg:flex-1"
           >
-            <Label htmlFor="date">{t("bookingModal.date")}</Label>
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              month={calendarMonth}
-              onMonthChange={setCalendarMonth}
-              className="mx-auto rounded-md border"
-              classNames={{
-                months: "flex flex-col sm:flex-row gap-2 justify-center",
-                month: "flex flex-col items-center gap-4 mx-auto",
-                table: "mx-auto border-collapse space-x-1",
-                head_row: "flex justify-center",
-                row: "flex justify-center mt-2",
-              }}
-              disabled={isDateDisabled}
-            />
-          </div>
-          <div
-            className={`${BOOKING_MODAL_FIELD_TWO} md:w-1/2 lg:w-2/3 lg:flex lg:flex-col lg:min-h-[280px]`}
-          >
-            <Label htmlFor="timeInterval">{t("bookingModal.time")}</Label>
-            <div
-              id="time-picker"
-              className="flex flex-wrap overflow-y-auto max-h-[280px] lg:flex-1 flex flex-wrap gap-1 overflow-y-auto"
-            >
-              {" "}
-              {timeIntervals.map((time, index) => (
-                <div
-                  key={time.start.toISOString()}
-                  className={`w-full ${isTimeDisabled ? TIME_BTN_DISABLED : TIME_BTN_ACTIVE} ${
-                    getTimestamp(selectedTimeSlot) === getTimestamp(time.start)
-                      ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-200"
-                      : "bg-white hover:bg-gray-100"
-                  }`}
+            {" "}
+            {timeSlots.map((time) => (
+              <div
+                key={time.start.toISOString()}
+                className={`w-full ${time.bookable ? TIME_BTN_ACTIVE : TIME_BTN_DISABLED} ${
+                  getTimestamp(selectedTimeSlot) === getTimestamp(time.start)
+                    ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-200"
+                    : "bg-white hover:bg-gray-100"
+                }`}
+              >
+                <button
+                  className="w-full h-full p-0 m-0 text-center disabled:bg-gray-200"
+                  name="startTime"
+                  value={time.start.toISOString()}
+                  type="button"
+                  disabled={!time.bookable}
+                  onClick={(e) => {
+                    const current = selectedTimeSlot || "";
+                    const clicked = time.start.toISOString();
+                    const value = current === clicked ? "" : clicked;
+                    setSelectedTimeSlot(value);
+                    onSelect(e);
+                  }}
                 >
-                  <button
-                    className="w-full text-center"
-                    name="startTime"
-                    value={time.start}
-                    type="button"
-                    disabled={!configData}
-                    onClick={(e) => {
-                      let value;
-                      const current = getTimestamp(selectedTimeSlot);
-                      const clicked = getTimestamp(time.start);
-                      value = current === clicked ? "" : time.start;
-                      setSelectedTimeSlot(value);
-                      onSelect(e);
-                    }}
-                  >
-                    {`${time.startStrAMPM}`}
-                  </button>
-                </div>
-              ))}
-            </div>
+                  {`${time.startStrAMPM}`}
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       </div>
-    )
+    </div>
   );
 };

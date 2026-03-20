@@ -351,7 +351,6 @@ export function MultiStepFormModal({
                 type="button"
                 variant="outline"
                 onClick={handleBack}
-                // disabled={currentStep === 1}
               >
                 {t("general.cancel")}
               </Button>
@@ -360,7 +359,6 @@ export function MultiStepFormModal({
                 type="button"
                 variant="outline"
                 onClick={handleBack}
-                // disabled={currentStep === 1}
               >
                 {t("general.back")}
               </Button>

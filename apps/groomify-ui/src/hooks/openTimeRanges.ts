@@ -12,6 +12,14 @@ type OpenRange = {
   end: string;
 };
 
+type TimeSlot = {
+  start: Date;
+  end: Date;
+  startStrAMPM: string;
+  endStrAMPM: string;
+  bookable: boolean;
+};
+
 type UseOpenTimeRangesParams = {
   availabilityData?: unknown;
   timeOffsData?: unknown;
@@ -278,10 +286,46 @@ function subtractRanges(open: TimeRange[], blocked: TimeRange[]): TimeRange[] {
   });
 }
 
+export function addRanges(base: TimeRange[], added: TimeRange[]): TimeRange[] {
+  const allRanges = [...base, ...added]
+    .filter((range) => range.endMinutes > range.startMinutes)
+    .sort((a, b) => a.startMinutes - b.startMinutes);
+
+  if (!allRanges.length) return [];
+
+  const merged: TimeRange[] = [{ ...allRanges[0] }];
+
+  for (let i = 1; i < allRanges.length; i += 1) {
+    const current = allRanges[i];
+    const last = merged[merged.length - 1];
+
+    if (current.startMinutes <= last.endMinutes) {
+      last.endMinutes = Math.max(last.endMinutes, current.endMinutes);
+      continue;
+    }
+
+    merged.push({ ...current });
+  }
+
+  return merged;
+}
+
 function minutesToTimeString(minutes: number) {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+function toAMPMString(date: Date) {
+  const hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const period = hours >= 12 ? "PM" : "AM";
+  const normalizedHours = hours % 12 || 12;
+  return `${normalizedHours}:${minutes}${period}`;
+}
+
+function rangesOverlap(a: TimeRange, b: TimeRange) {
+  return a.startMinutes < b.endMinutes && b.startMinutes < a.endMinutes;
 }
 
 export function useOpenTimeRanges({
@@ -354,19 +398,168 @@ export function getBlockedTimeRanges({
     }));
 }
 
-export function getAvailableTimeRanges({
+export function getTimeSlotsForDate({
+  availabilityData,
+  timeOffsData,
+  appointments = [],
+  date,
+  slotMinutes,
+  appointmentDurationMinutes,
+  now = new Date(),
+}: UseOpenTimeRangesParams & {
+  slotMinutes: number;
+  appointmentDurationMinutes?: number;
+  now?: Date;
+}): TimeSlot[] {
+  if (!date || !Number.isFinite(slotMinutes) || slotMinutes <= 0) return [];
+  const durationMinutes = Number(appointmentDurationMinutes) || slotMinutes;
+
+  const availabilityRanges = toArray(availabilityData)
+    .flatMap((item) => toRangesForSelectedDay(item, date))
+    .sort((a, b) => a.startMinutes - b.startMinutes);
+
+  const blockedRanges = toArray(timeOffsData).flatMap((item) =>
+    toRangesForSelectedDay(item, date),
+  );
+
+  const bookedRanges = toArray(appointments).flatMap((item) =>
+    toRangesForSelectedDay(item, date),
+  );
+
+  const unavailableRanges = [...blockedRanges, ...bookedRanges];
+  const minBookableAt = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+  const dayStart = getDateOnly(date);
+
+  const slots: TimeSlot[] = [];
+
+  for (const range of availabilityRanges) {
+    for (
+      let cursor = range.startMinutes;
+      cursor + slotMinutes <= range.endMinutes;
+      cursor += slotMinutes
+    ) {
+      const slotRange: TimeRange = {
+        startMinutes: cursor,
+        endMinutes: cursor + slotMinutes,
+      };
+      const appointmentRange: TimeRange = {
+        startMinutes: cursor,
+        endMinutes: cursor + durationMinutes,
+      };
+
+      const slotStart = new Date(dayStart);
+      slotStart.setHours(0, slotRange.startMinutes, 0, 0);
+      const slotEnd = new Date(dayStart.getTime() + slotRange.endMinutes * 60 * 1000);
+      const slotIsFutureEnough = slotStart.getTime() > minBookableAt.getTime();
+      const fitsAvailability = appointmentRange.endMinutes <= range.endMinutes;
+      const hasOverlap = unavailableRanges.some((r) => rangesOverlap(appointmentRange, r));
+
+      slots.push({
+        start: new Date(slotStart),
+        end: slotEnd,
+        startStrAMPM: toAMPMString(slotStart),
+        endStrAMPM: toAMPMString(slotEnd),
+        bookable: slotIsFutureEnough && fitsAvailability && !hasOverlap,
+      });
+    }
+  }
+
+  return slots;
+}
+
+export function useTimeSlotsForDate({
+  availabilityData,
+  timeOffsData,
+  appointments = [],
+  date,
+  slotMinutes,
+  appointmentDurationMinutes,
+  now,
+}: UseOpenTimeRangesParams & {
+  slotMinutes: number;
+  appointmentDurationMinutes?: number;
+  now?: Date;
+}): TimeSlot[] {
+  return useMemo(
+    () =>
+      getTimeSlotsForDate({
+        availabilityData,
+        timeOffsData,
+        appointments,
+        date,
+        slotMinutes,
+        appointmentDurationMinutes,
+        now,
+      }),
+    [
+      availabilityData,
+      timeOffsData,
+      appointments,
+      date,
+      slotMinutes,
+      appointmentDurationMinutes,
+      now,
+    ],
+  );
+}
+
+export function useAvailableTimeRanges({
   availabilityData,
   date,
 }: UseOpenTimeRangesParams): OpenRange[] {
   if (!date) return [];
 
-  const availabilityRanges = toArray(availabilityData)
-    .flatMap((item) => toRangesForSelectedDay(item, date))
+  return useMemo(() => {
+    const availabilityRanges = toArray(availabilityData)
+      .flatMap((item) => toRangesForSelectedDay(item, date))
+      .sort((a, b) => a.startMinutes - b.startMinutes)
+      .map((range) => ({
+        start: minutesToTimeString(range.startMinutes),
+        end: minutesToTimeString(range.endMinutes),
+      }));
+
+    return availabilityRanges;
+  }, [availabilityData, date]);
+}
+
+export function useClosedTimeRanges({
+  timeOffsData,
+  appointments,
+  date,
+}: UseOpenTimeRangesParams) {
+  return useMemo(() => {
+    return getClosedTimeRanges({
+      timeOffsData,
+      appointments,
+      date,
+    });
+  }, [date, appointments, timeOffsData]);
+}
+
+ function getClosedTimeRanges({
+  availabilityData,
+  timeOffsData,
+  appointments = [],
+  date,
+}: UseOpenTimeRangesParams): OpenRange[] {
+  if (!date) return [];
+
+  const availabilityRanges = toArray(availabilityData).flatMap((item) =>
+    toRangesForSelectedDay(item, date),
+  );
+
+  const blockedRanges = toArray(timeOffsData).flatMap((item) =>
+    toRangesForSelectedDay(item, date),
+  );
+
+  const bookedRanges = toArray(appointments).flatMap((app) =>
+    toRangesForSelectedDay(app, date),
+  );
+
+  return addRanges(blockedRanges, bookedRanges)
     .sort((a, b) => a.startMinutes - b.startMinutes)
     .map((range) => ({
       start: minutesToTimeString(range.startMinutes),
       end: minutesToTimeString(range.endMinutes),
     }));
-
-  return availabilityRanges;
 }

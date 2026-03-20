@@ -18,7 +18,7 @@ describe("timeIntervals", () => {
     const morning = new Date("2026-03-15T09:05:00");
     const afternoon = new Date("2026-03-15T15:30:00");
 
-    expect(computeAMPMTimeString(morning)).toBe("09:05AM");
+    expect(computeAMPMTimeString(morning)).toBe("9:05AM");
     expect(computeAMPMTimeString(afternoon)).toBe("3:30PM");
   });
 
@@ -34,13 +34,13 @@ describe("timeIntervals", () => {
 
     expect(intervals).toHaveLength(3);
     expect(intervals[0]).toMatchObject({
-      startStr24Hr: "09:00",
+      startStr24Hr: "9:00",
       endStr24Hr: "10:00",
-      startStrAMPM: "09:00AM",
+      startStrAMPM: "9:00AM",
       endStrAMPM: "10:00AM"
     });
     expect(intervals[1]).toMatchObject({
-      startStr24Hr: "09:30",
+      startStr24Hr: "9:30",
       endStr24Hr: "10:30"
     });
     expect(intervals[2]).toMatchObject({

@@ -5,7 +5,7 @@ import { useBooking } from "@/context/BookingContext";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { CLASSNAMES } from "../../styles/classNames";
-import { MAX_PET_NAME_LENGTH } from "../../constants";
+import { MAX_APPOINTMENTS_DESC_LENGTH } from "../../constants";
 import { DateTimePicker } from "../DateTimePicker";
 const { BOOKING_MODAL_FIELD_TWO } =
   CLASSNAMES;
@@ -29,12 +29,10 @@ export const DateTimeStep = ({
   const { bookingData, updateBookingData } = useBooking();
 
   const validateFields = (field, value) => {
-    if (field === "petName") {
-      if (!value) {
-        return t("pets.errors.notEmpty", { input: "Name" });
-      } else if (value.length > MAX_PET_NAME_LENGTH) {
-        return t("pets.errors.nameLengthViolation", {
-          max: MAX_PET_NAME_LENGTH,
+    if (field === "description") {
+     if (value.length > MAX_APPOINTMENTS_DESC_LENGTH) {
+        return t("pets.errors.nameLengthdescriptionLengthViolationViolation", {
+          max: MAX_APPOINTMENTS_DESC_LENGTH,
         });
       }
     }
@@ -107,10 +105,11 @@ export const DateTimeStep = ({
         )}
         <Textarea
           id="description"
+          name="description"
           placeholder={t("placeholder.message")}
           className="min-h-32"
           value={bookingData.description}
-          onChange={(e) => updateBookingData({ description: e.target.value })}
+          onChange={handleChange}
         />
       </div>
     </div>

@@ -68,5 +68,10 @@
       "notEmpty": "\"{{input}}\" field cannot be empty",
       "loading": "Error loading pets"
     }
+  },
+  "appointment":{
+    "errors":{
+      "descriptionLengthViolation": "description cannot be over \"{{max}}\" characters"
+    }
   }
 }
