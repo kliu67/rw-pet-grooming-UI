@@ -2,7 +2,7 @@
 import { Scissors, Droplets, Heart, Sparkles, Brush } from "lucide-react";
 
 export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-export const INTERVAL_MINUTES = 30;
+export const INTERVAL_MINUTES = 20;
 export const CONFIRM_DELETE = "DELETE";
 //service constants
 export const MAX_SERVICE_NAME_LENGTH = 60;
@@ -68,7 +68,7 @@ export const passwordRegex = new RegExp(
 );
 
 
-export const DEFAULT_STYLIST=1;
+export const DEFAULT_STYLIST=2;
 
 export const staticServiceData = [
   {

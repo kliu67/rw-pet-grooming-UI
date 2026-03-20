@@ -26,7 +26,7 @@ import {
 } from "@shared-utils";
 import { useAvailabiltyById } from "@/hooks/availability";
 import { useTimeOffById } from "@/hooks/timeOffs";
-import { getOpenTimeRanges, useOpenTimeRanges } from "@/hooks/openTimeRanges";
+import { getBookableTimeRanges, useOpenTimeRanges } from "@/hooks/openTimeRanges";
 import { Calendar } from "../ui/calendar";
 import { DropdownSearch } from "../DropdownSearch";
 import {
@@ -231,7 +231,7 @@ export default function AppointmentModal({
     const appointmentsByStylist = appointmentsForRanges;
 
     return getDaysInMonth(thisYear, thisMonth).map((day) =>
-      getOpenTimeRanges({
+      getBookableTimeRanges({
         availabilityData,
         timeOffsData,
         appointments: appointmentsByStylist,

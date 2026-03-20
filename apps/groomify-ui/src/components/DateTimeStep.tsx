@@ -21,9 +21,6 @@ export const DateTimeStep = ({
   isError = false,
   showErrors = false,
 }) => {
-  const [date, setDate] = useState(new Date());
-  const [calendarMonth, setCalendarMonth] = useState(new Date());
-
   const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({
     petName: "",

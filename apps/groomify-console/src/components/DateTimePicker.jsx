@@ -6,7 +6,7 @@ import { INTERVAL_MINUTES } from "@/constants";
 import { TIME_BTN_ACTIVE, TIME_BTN_DISABLED } from "@/styles/classNames";
 import { useAvailabiltyById } from "@/hooks/availability";
 import { useTimeOffById } from "@/hooks/timeOffs";
-import { getOpenTimeRanges, useOpenTimeRanges } from "@/hooks/openTimeRanges";
+import { getBookableTimeRanges, useOpenTimeRanges } from "@/hooks/openTimeRanges";
 import { Calendar } from "../ui/calendar";
 import {
     computeDateTimeIntervals,

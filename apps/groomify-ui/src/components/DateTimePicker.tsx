@@ -5,7 +5,7 @@ import { Label } from "./ui/label";
 import { Calendar } from "./ui/calendar";
 import { CLASSNAMES } from "@/styles/classNames";
 import { getTimestamp, isObjectNotEmpty } from "@shared-utils";
-import { useOpenTimeRanges, getOpenTimeRanges } from "@/hooks/openTimeRanges";
+import { useOpenTimeRanges, getOpenTimeRanges, getAvailableTimeRanges } from "@/hooks/openTimeRanges";
 import {
   computeDateTimeIntervals,
   getDaysInMonth,
@@ -35,12 +35,14 @@ export const DateTimePicker = ({
     }));
   }, [appointmentsData]);
 
-  const timeRanges = useOpenTimeRanges({
+  const bookableTimeRanges = useOpenTimeRanges({
     availabilityData,
     timeOffsData,
     appointments: appointmentsForRanges,
     date,
   });
+
+
   const monthAvailability = useMemo(() => {
     if (!availabilityData?.length) return [];
 
@@ -57,6 +59,8 @@ export const DateTimePicker = ({
       }),
     );
   }, [availabilityData, appointmentsForRanges, timeOffsData, calendarMonth]);
+
+
 
   const monthBookableDates = useMemo(() => {
     if (!availabilityData?.length) return new Set();
@@ -108,9 +112,9 @@ export const DateTimePicker = ({
     ],
   );
   const timeIntervals = useMemo(() => {
-    if (!timeRanges || !date || !configData) return [];
+    if (!bookableTimeRanges || !date || !configData) return [];
 
-    return timeRanges.flatMap((range) =>
+    return bookableTimeRanges.flatMap((range) =>
       computeDateTimeIntervals(
         range,
         date,
@@ -118,7 +122,7 @@ export const DateTimePicker = ({
         INTERVAL_MINUTES,
       ),
     );
-  }, [timeRanges, date, configData]);
+  }, [bookableTimeRanges, date, configData]);
   return (
     timeIntervals.length > 0 && (
       <div className={BOOKING_MODAL_FIELD_TWO}>
