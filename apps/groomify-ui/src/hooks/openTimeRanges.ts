@@ -58,7 +58,10 @@ function parseTimeToMinutes(value: unknown): number | null {
   return hours * 60 + minutes;
 }
 
-function getMinutesFromRecord(record: UnknownRecord, keys: string[]): number | null {
+function getMinutesFromRecord(
+  record: UnknownRecord,
+  keys: string[],
+): number | null {
   for (const key of keys) {
     const raw = record[key];
     const fromString = parseTimeToMinutes(raw);
@@ -101,12 +104,26 @@ function getDateTimeFromRecord(record: UnknownRecord, keys: string[]) {
   return null;
 }
 
-function getDateRelation(record: UnknownRecord, selectedDate: Date): DayRelation {
+function getDateRelation(
+  record: UnknownRecord,
+  selectedDate: Date,
+): DayRelation {
   const selectedDay = getDateOnly(selectedDate);
   const previousDay = addDays(selectedDay, -1);
   const explicitDate =
-    getDateTimeFromRecord(record, ["date", "start_date", "work_date", "available_date", "day"]) ??
-    getDateTimeFromRecord(record, ["start_datetime", "startDateTime", "start_at", "from_datetime"]);
+    getDateTimeFromRecord(record, [
+      "date",
+      "start_date",
+      "work_date",
+      "available_date",
+      "day",
+    ]) ??
+    getDateTimeFromRecord(record, [
+      "start_datetime",
+      "startDateTime",
+      "start_at",
+      "from_datetime",
+    ]);
 
   if (explicitDate) {
     const dateOnly = getDateOnly(explicitDate);
@@ -154,20 +171,23 @@ function toRange(record: UnknownRecord): TimeRange | null {
   return { startMinutes, endMinutes };
 }
 
-function getDateTimeRangesForSelectedDay(record: UnknownRecord, selectedDate: Date): TimeRange[] | null {
+function getDateTimeRangesForSelectedDay(
+  record: UnknownRecord,
+  selectedDate: Date,
+): TimeRange[] | null {
   const startAt = getDateTimeFromRecord(record, [
     "start_datetime",
     "startDateTime",
     "start_at",
     "from_datetime",
-    "startTime"
+    "startTime",
   ]);
   const endAt = getDateTimeFromRecord(record, [
     "end_datetime",
     "endDateTime",
     "end_at",
     "to_datetime",
-    "endTime"
+    "endTime",
   ]);
 
   if (!startAt || !endAt) return null;
@@ -195,7 +215,10 @@ function getDateTimeRangesForSelectedDay(record: UnknownRecord, selectedDate: Da
   return [{ startMinutes, endMinutes }];
 }
 
-function toRangesForSelectedDay(record: UnknownRecord, selectedDate: Date): TimeRange[] {
+function toRangesForSelectedDay(
+  record: UnknownRecord,
+  selectedDate: Date,
+): TimeRange[] {
   const fromDateTimes = getDateTimeRangesForSelectedDay(record, selectedDate);
   if (fromDateTimes) return fromDateTimes;
 
@@ -236,7 +259,10 @@ function subtractRanges(open: TimeRange[], blocked: TimeRange[]): TimeRange[] {
         }
 
         if (seg.startMinutes < overlapStart) {
-          next.push({ startMinutes: seg.startMinutes, endMinutes: overlapStart });
+          next.push({
+            startMinutes: seg.startMinutes,
+            endMinutes: overlapStart,
+          });
         }
 
         if (overlapEnd < seg.endMinutes) {
@@ -290,11 +316,14 @@ export function getOpenTimeRanges({
     toRangesForSelectedDay(item, date),
   );
 
-  const bookedRanges = toArray(appointments).flatMap((app)=>
-    toRangesForSelectedDay(app,date),
+  const bookedRanges = toArray(appointments).flatMap((app) =>
+    toRangesForSelectedDay(app, date),
   );
 
-  return subtractRanges(subtractRanges(availabilityRanges, blockedRanges),bookedRanges)
+  return subtractRanges(
+    subtractRanges(availabilityRanges, blockedRanges),
+    bookedRanges,
+  )
     .sort((a, b) => a.startMinutes - b.startMinutes)
     .map((range) => ({
       start: minutesToTimeString(range.startMinutes),
@@ -323,4 +352,21 @@ export function getBlockedTimeRanges({
       start: minutesToTimeString(range.startMinutes),
       end: minutesToTimeString(range.endMinutes),
     }));
+}
+
+export function getAvailableTimeRanges({
+  availabilityData,
+  date,
+}: UseOpenTimeRangesParams): OpenRange[] {
+  if (!date) return [];
+
+  const availabilityRanges = toArray(availabilityData)
+    .flatMap((item) => toRangesForSelectedDay(item, date))
+    .sort((a, b) => a.startMinutes - b.startMinutes)
+    .map((range) => ({
+      start: minutesToTimeString(range.startMinutes),
+      end: minutesToTimeString(range.endMinutes),
+    }));
+
+  return availabilityRanges;
 }
