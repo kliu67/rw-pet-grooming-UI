@@ -141,7 +141,6 @@ export function MultiStepFormModal({
     weightClassId: bookingData?.weightClass?.id,
   });
 
-
   const validateStep = () => {
     switch (currentStep) {
       case 1:
@@ -188,7 +187,6 @@ export function MultiStepFormModal({
     }
   };
 
-
   const handleSubmit = () => {
     if (validateStep()) {
       console.log("Form submitted:", bookingData);
@@ -229,6 +227,12 @@ export function MultiStepFormModal({
     }
   }, [currentStep, showPersonalErrors, showPetErrors]);
 
+  useEffect(()=>{
+    if(configData){
+      updateBookingData({'serviceConfig': configData})
+    }
+  },[configData])
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -256,7 +260,7 @@ export function MultiStepFormModal({
                           svcBasePrice: value?.base_price,
                           svcCode: value.code,
                         };
-                        updateBookingData({'service': service});
+                        updateBookingData({ service: service });
                         handleNext();
                       }}
                     />
@@ -295,7 +299,9 @@ export function MultiStepFormModal({
           />
         );
       case 5:
-        return <ReviewStep formData={formData} />;
+        return <ReviewStep 
+        onSubmit={() => {}}
+        onEdit={()=> {}} />;
         return null;
     }
   };

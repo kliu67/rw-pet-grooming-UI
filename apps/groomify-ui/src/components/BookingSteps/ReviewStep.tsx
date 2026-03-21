@@ -1,33 +1,7 @@
-// import React from "react";
-// import { useTranslation } from "react-i18next";
-// import { Label } from "../ui/label";
-// export const ReviewStep = ({ formData = {} }) => {
-
-// const { t } = useTranslation();
-// const reviewObj={
-//     firstName{
-//         label:
-//         value:
-//     }
-// }
-//   return (
-//     <div>
-//       {Object.keys(formData).map((key) => (
-//         <div>
-//         <Label>{key}</Label>
-//         <Label>{formData[key]}</Label>
-//         </div>
-//       ))}
-//     </div>
-//   );
-// };
-
-import { useNavigate } from 'react-router';
-// import { useBooking } from '../context/BookingContext';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
-import { Separator } from '../ui/separator';
-import { Badge } from '../ui/badge';
+import { useBooking } from "@/context/BookingContext";
+import { Card } from "../ui/card";
+import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
 import {
   ChevronLeft,
   Calendar,
@@ -36,45 +10,68 @@ import {
   Mail,
   Phone,
   FileText,
-  DollarSign,
   Edit2,
-} from 'lucide-react';
-import { format } from 'date-fns';
+  Dog,
+  Bone,
+  PawPrint,
+  MessageSquare,
+} from "lucide-react";
+import { BOOKING_STEPS } from "@/constants";
+export const ReviewStep = ({ onEdit = () => {}, onSubmit = () => {} }) => {
+  const { SERVICE, PET, PERSONAL, DATETIME } = BOOKING_STEPS;
 
-export const ReviewStep = ({formData={}}) => {
-//   const navigate = useNavigate();
-//   const { bookingData } = useBooking();
-
-  const handleConfirm = () => {
-    navigate('/confirmation');
+  const handleEdit = (step) => {
+    onEdit(step);
   };
 
-//   if (!bookingData.service || !bookingData.date || !bookingData.personalInfo) {
-//     navigate('/');
-//     return null;
-//   }
+  const locale = "en-US";
 
-  const bookingData = {...formData};
+  const { bookingData } = useBooking();
+  const {
+    service,
+    startTime,
+    serviceConfig,
+    petName,
+    breed,
+    weightClass,
+    description,
+  } = bookingData;
 
-//   const formattedDate = format(new Date(bookingData.startDate), 'EEEE, MMMM d, yyyy');
-  const formattedDate = new Date(bookingData.startDate);
+  if (
+    !bookingData.service ||
+    !bookingData.startTime ||
+    !bookingData.serviceConfig ||
+    !bookingData.petName ||
+    !bookingData.breed ||
+    !bookingData.weightClass
+  ) {
+    // navigate("/");
+    return null;
+    //TODO add error state
+  }
+  //   const formattedDate = format(new Date(bookingData.startDate), 'EEEE, MMMM d, yyyy');
+  const dateTime = new Date(startTime);
+  const localDateString = dateTime.toLocaleDateString(locale);
+  const localTimeString = dateTime.toLocaleTimeString(locale);
 
-
+  const priceModifier =
+    Number(serviceConfig?.price || 0) - Number(service?.base_price || 0);
   return (
     <div className="mx-auto max-w-3xl">
       <Card className="p-6">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => {}
-            // navigate('/personal-info')
-            }>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                handleEdit(PERSONAL);
+              }}
+            >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <h2>Review Your Booking</h2>
+            <h2 className="text-xl font-semibold">Booking Summary</h2>
           </div>
-          <Badge variant="secondary" className="text-sm">
-            Almost Done!
-          </Badge>
         </div>
 
         <div className="space-y-6">
@@ -88,7 +85,9 @@ export const ReviewStep = ({formData={}}) => {
               <Button
                 variant="ghost"
                 size="sm"
-                // onClick={() => navigate('/')}
+                onClick={() => {
+                  handleEdit(SERVICE);
+                }}
                 className="text-indigo-600 hover:text-indigo-700"
               >
                 <Edit2 className="mr-1 h-3 w-3" />
@@ -97,17 +96,16 @@ export const ReviewStep = ({formData={}}) => {
             </div>
             <div className="space-y-3">
               <div>
-                <p className="text-sm text-gray-600">Service</p>
-                <p className="font-medium">{bookingData.serviceId}</p>
+                <p className="text-lg font-medium">{service?.name}</p>
               </div>
-              <div className="flex gap-6">
+              <div className="flex items-center justify-between gap-6">
                 <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Clock className="h-4 w-4" />
-                  {/* <span>{bookingData.service.duration} minutes</span> */}
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <DollarSign className="h-4 w-4" />
-                  {/* <span>${bookingData.service.price}</span> */}
+                  <Dog className="h-4 w-4" />
+                  <span>{petName}</span>
+                  <Bone className="h-4 w-4" />
+                  <span>{breed.name}</span>
+                  <PawPrint className="h-4 w-4" />
+                  <span>{weightClass.label}</span>
                 </div>
               </div>
             </div>
@@ -123,7 +121,9 @@ export const ReviewStep = ({formData={}}) => {
               <Button
                 variant="ghost"
                 size="sm"
-                // onClick={() => navigate('/date-time')}
+                onClick={() => {
+                  handleEdit(DATETIME);
+                }}
                 className="text-indigo-600 hover:text-indigo-700"
               >
                 <Edit2 className="mr-1 h-3 w-3" />
@@ -131,8 +131,28 @@ export const ReviewStep = ({formData={}}) => {
               </Button>
             </div>
             <div className="space-y-2">
-              {/* <p className="font-medium">{formattedDate}</p> */}
-              {/* <p className="text-sm text-gray-600">{bookingData.time}</p> */}
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
+                <div className="flex items-center gap-2">
+                  <p className="font-medium">
+                    {`${localDateString} - ${localTimeString}`}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Clock className="h-4 w-4" />
+                  <span>{`${serviceConfig.duration_minutes} minutes`}</span>
+                </div>
+              </div>
+
+              {description && (
+                <>
+                  <Separator />
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <MessageSquare className="h-4 w-4" />{" "}
+                    <p className="text-sm text-gray-600">Message</p>
+                    <span>{description}</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -146,7 +166,9 @@ export const ReviewStep = ({formData={}}) => {
               <Button
                 variant="ghost"
                 size="sm"
-                // onClick={() => navigate('/personal-info')}
+                onClick={() => {
+                  handleEdit(PERSONAL);
+                }}
                 className="text-indigo-600 hover:text-indigo-700"
               >
                 <Edit2 className="mr-1 h-3 w-3" />
@@ -155,25 +177,20 @@ export const ReviewStep = ({formData={}}) => {
             </div>
             <div className="space-y-3">
               <div>
-                <p className="text-sm text-gray-600">Name</p>
                 <p className="font-medium">
-                  {/* {bookingData.personalInfo.firstName} {bookingData.personalInfo.lastName} */}
+                  {bookingData.firstName} {bookingData.lastName}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-gray-400" />
-                {/* <p className="text-sm">{bookingData.personalInfo.email}</p> */}
-              </div>
-              <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-gray-400" />
-                {/* <p className="text-sm">{bookingData.personalInfo.phone}</p> */}
-              </div>
-              {/* {bookingData.personalInfo.notes && (
-                <div className="mt-3 rounded-md bg-white p-3">
-                  <p className="mb-1 text-sm font-medium text-gray-600">Additional Notes</p>
-                  <p className="text-sm text-gray-700">{bookingData.personalInfo.notes}</p>
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-gray-400" />
+                  <p className="text-sm">{bookingData.email}</p>
                 </div>
-              )} */}
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-gray-400" />
+                  <p className="text-sm">{bookingData.phone}</p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -184,20 +201,26 @@ export const ReviewStep = ({formData={}}) => {
             <h3 className="mb-4">Payment Summary</h3>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Service Fee</span>
-                {/* <span className="font-medium">${bookingData.service.price.toFixed(2)}</span> */}
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Tax (10%)</span>
+                <span className="text-gray-600">Base price</span>
                 <span className="font-medium">
-                  {/* ${(bookingData.service.price * 0.1).toFixed(2)} */}
+                  ${(service.base_price * 1.0).toFixed(2)}
                 </span>
               </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Weight charge</span>
+                <span className="font-medium">${priceModifier.toFixed(2)}</span>
+              </div>
+              {/* <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Tax (10%)</span>
+                <span className="font-medium">
+                  ${(bookingData.service.price * 0.1).toFixed(2)}
+                </span>
+              </div> */}
               <Separator className="my-2" />
               <div className="flex justify-between">
                 <span className="font-medium">Total Amount</span>
                 <span className="font-medium text-indigo-600">
-                  {/* ${(bookingData.service.price * 1.1).toFixed(2)} */}
+                  ${(serviceConfig.price * 1.0).toFixed(2)}
                 </span>
               </div>
             </div>
@@ -206,9 +229,15 @@ export const ReviewStep = ({formData={}}) => {
           {/* Terms & Conditions */}
           <div className="rounded-lg border border-gray-200 bg-white p-4">
             <p className="text-xs text-gray-600">
-              By confirming this booking, you agree to our{' '}
-              <button className="text-indigo-600 hover:underline">Terms of Service</button> and{' '}
-              <button className="text-indigo-600 hover:underline">Cancellation Policy</button>.
+              By confirming this booking, you agree to our{" "}
+              <button className="text-indigo-600 hover:underline">
+                Terms of Service
+              </button>{" "}
+              and{" "}
+              <button className="text-indigo-600 hover:underline">
+                Cancellation Policy
+              </button>
+              .
               {/* You will receive a confirmation email at {bookingData.personalInfo.email}. */}
             </p>
           </div>
@@ -225,5 +254,4 @@ export const ReviewStep = ({formData={}}) => {
       </Card>
     </div>
   );
-}
-
+};
