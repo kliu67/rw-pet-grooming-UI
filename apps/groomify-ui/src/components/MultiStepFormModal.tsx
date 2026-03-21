@@ -32,6 +32,7 @@ import { PersonalStep } from "./BookingSteps/PersonalStep";
 import { PetStep } from "./BookingSteps/PetStep";
 import { DateTimeStep } from "./BookingSteps/DateTimeStep";
 import { ReviewStep } from "./BookingSteps/ReviewStep";
+import { BOOKING_STEPS } from "../constants";
 
 interface MultiStepFormModalProps {
   open: boolean;
@@ -57,6 +58,9 @@ interface FormData {
   description: string;
 }
 const { BOOKING_MODAL_FIELD_TWO: BOOKING_MODAL_FIELD } = CLASSNAMES;
+const { SERVICE, PET, DATE_TIME, PERSONAL, REVIEW, CONFIRMATION } =
+  BOOKING_STEPS;
+
 export function MultiStepFormModal({
   open,
   onOpenChange,
@@ -65,32 +69,31 @@ export function MultiStepFormModal({
   const [stepIsValid, setStepIsValid] = useState(false);
   const [showPersonalErrors, setShowPersonalErrors] = useState(false);
   const [showPetErrors, setShowPetErrors] = useState(false);
-  const [showMessageErrors, setShowMessageErrors] = useState(false);
+  const [showDateTimeErrors, setShowDateTimeErrors] = useState(false);
   const { bookingData, updateBookingData, resetBooking } = useBooking();
 
   const { t } = useTranslation();
   const totalSteps = 5;
   const progress = (currentStep / totalSteps) * 100;
-
   const steps = [
     {
-      id: 1,
+      id: SERVICE,
       label: t("bookingModal.serviceStep"),
     },
     {
-      id: 2,
-      label: t("bookingModal.personalStep"),
-    },
-    {
-      id: 3,
+      id: PET,
       label: t("bookingModal.petStep"),
     },
     {
-      id: 4,
+      id: DATE_TIME,
       label: t("bookingModal.dateTimeStep"),
     },
     {
-      id: 5,
+      id: PERSONAL,
+      label: t("bookingModal.personalStep"),
+    },
+    {
+      id: REVIEW,
       label: t("bookingModal.reviewStep"),
     },
   ];
@@ -143,16 +146,16 @@ export function MultiStepFormModal({
 
   const validateStep = () => {
     switch (currentStep) {
-      case 1:
+      case SERVICE:
         return true;
-      case 2:
+      case PERSONAL:
         return (
           !!bookingData?.firstName &&
           !!bookingData?.lastName &&
           !!bookingData?.phone &&
           stepIsValid
         );
-      case 3:
+      case PET:
         const { breed, weightClass } = bookingData;
         return (
           !!bookingData?.petName &&
@@ -160,7 +163,7 @@ export function MultiStepFormModal({
           !!weightClass?.id &&
           stepIsValid
         );
-      case 4:
+      case DATE_TIME:
         return !!bookingData?.startTime && stepIsValid;
       default:
         return false;
@@ -168,11 +171,14 @@ export function MultiStepFormModal({
   };
 
   const handleNext = () => {
-    if (currentStep === 2) {
-      setShowPersonalErrors(true);
-    }
-    if (currentStep === 3) {
+    if (currentStep === PET) {
       setShowPetErrors(true);
+    }
+    if (currentStep === DATE_TIME) {
+      setShowDateTimeErrors(true);
+    }
+    if (currentStep === PERSONAL) {
+      setShowPersonalErrors(true);
     }
     if (validateStep() && currentStep < totalSteps) {
       setCurrentStep((prev) => prev + 1);
@@ -205,10 +211,15 @@ export function MultiStepFormModal({
         setStepIsValid(false);
         setShowPersonalErrors(false);
         setShowPetErrors(false);
+        setShowDateTimeErrors(false);
         resetBooking();
       }, RESET_DELAY_MS);
     }
     onOpenChange(nextOpen);
+  };
+
+  const handleNavigate = (step: number) => {
+    setCurrentStep(step);
   };
 
   useEffect(() => {
@@ -218,24 +229,28 @@ export function MultiStepFormModal({
   }, [bookingData.serviceId]);
 
   useEffect(() => {
-    if (currentStep !== 2 && showPersonalErrors) {
+    if (currentStep !== PERSONAL && showPersonalErrors) {
       setShowPersonalErrors(false);
     }
 
-    if (currentStep !== 3 && showPetErrors) {
+    if (currentStep !== PET && showPetErrors) {
       setShowPetErrors(false);
     }
-  }, [currentStep, showPersonalErrors, showPetErrors]);
 
-  useEffect(()=>{
-    if(configData){
-      updateBookingData({'serviceConfig': configData})
+    if (currentStep !== DATE_TIME && showDateTimeErrors) {
+      setShowDateTimeErrors(false);
     }
-  },[configData])
+  }, [currentStep, showPersonalErrors, showPetErrors, showDateTimeErrors]);
+
+  useEffect(() => {
+    if (configData) {
+      updateBookingData({ serviceConfig: configData });
+    }
+  }, [configData]);
 
   const renderStep = () => {
     switch (currentStep) {
-      case 1:
+      case SERVICE:
         return (
           <div className="space-y-4">
             <div
@@ -269,15 +284,8 @@ export function MultiStepFormModal({
             </div>
           </div>
         );
-      case 2:
-        return (
-          <PersonalStep
-            onValidityChange={(isValid) => setStepIsValid(isValid)}
-            showErrors={showPersonalErrors}
-          />
-        );
 
-      case 3:
+      case PET:
         return (
           <PetStep
             weightClassesData={weightClassesData}
@@ -287,7 +295,7 @@ export function MultiStepFormModal({
           />
         );
 
-      case 4:
+      case DATE_TIME:
         return (
           <DateTimeStep
             availabilityData={stylistAvailability}
@@ -295,14 +303,19 @@ export function MultiStepFormModal({
             appointmentsData={stylistAppointmentsData}
             configData={configData}
             onValidityChange={(isValid) => setStepIsValid(isValid)}
-            showErrors={showPetErrors}
+            showErrors={showDateTimeErrors}
           />
         );
-      case 5:
-        return <ReviewStep 
-        onSubmit={() => {}}
-        onEdit={()=> {}} />;
-        return null;
+      case PERSONAL:
+        return (
+          <PersonalStep
+            onValidityChange={(isValid) => setStepIsValid(isValid)}
+            showErrors={showPersonalErrors}
+          />
+        );
+
+      case REVIEW:
+        return <ReviewStep onSubmit={handleNavigate} onEdit={handleNavigate} />;
     }
   };
 
