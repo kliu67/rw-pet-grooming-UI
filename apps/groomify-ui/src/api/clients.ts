@@ -3,4 +3,4 @@ import { apiFetch } from "./api";
 
 const clientsApi = createClientsApi({ apiFetch });
 
-export const { getClients, createClient, updateClient, deleteClient } = clientsApi;
+export const { getClients, getClient, lookupClient, createClient, updateClient, deleteClient } = clientsApi;

@@ -1,15 +1,31 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createClient, deleteClient, updateClient } from "@/api/clients";
-import { useCreateClient, useDeleteClient, useUpdateClient } from "./clients";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  createClient,
+  deleteClient,
+  getClient,
+  lookupClient,
+  updateClient
+} from "@/api/clients";
+import {
+  useClient,
+  useLookupClient,
+  useCreateClient,
+  useDeleteClient,
+  useUpdateClient
+} from "./clients";
+import { CLIENTS_QUERY_KEY } from "@/constants";
 
 vi.mock("@tanstack/react-query", () => ({
+  useQuery: vi.fn(),
   useMutation: vi.fn(),
   useQueryClient: vi.fn()
 }));
 
 vi.mock("@/api/clients", () => ({
   createClient: vi.fn(),
+  getClient: vi.fn(),
+  lookupClient: vi.fn(),
   updateClient: vi.fn(),
   deleteClient: vi.fn()
 }));
@@ -26,7 +42,81 @@ function createQueryClientMock() {
 describe("hooks/clients", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useQuery).mockImplementation((config: unknown) => config as never);
     vi.mocked(useMutation).mockImplementation((config: unknown) => config as never);
+  });
+
+  it("useClient configures single client query", () => {
+    const query = useClient(7) as {
+      queryKey: unknown[];
+      queryFn: () => unknown;
+      enabled: boolean;
+    };
+
+    expect(query.queryKey).toEqual([CLIENTS_QUERY_KEY, 7]);
+    expect(query.enabled).toBe(true);
+    query.queryFn();
+    expect(getClient).toHaveBeenCalledWith(7);
+  });
+
+  it("useClient disables query when id is missing", () => {
+    const query = useClient(undefined) as {
+      queryKey: unknown[];
+      enabled: boolean;
+    };
+
+    expect(query.queryKey).toEqual([CLIENTS_QUERY_KEY, undefined]);
+    expect(query.enabled).toBe(false);
+  });
+
+  it("useLookupClient configures lookup query", () => {
+    const params = {
+      firstName: "Jane",
+      lastName: "Doe",
+      phone: "1234567890"
+    };
+
+    const query = useLookupClient(params, { enabled: true }) as {
+      queryKey: unknown[];
+      queryFn: () => unknown;
+      enabled: boolean;
+    };
+
+    expect(query.queryKey).toEqual([
+      CLIENTS_QUERY_KEY,
+      "lookup",
+      "Jane",
+      "Doe",
+      "1234567890"
+    ]);
+    expect(query.enabled).toBe(true);
+    query.queryFn();
+    expect(lookupClient).toHaveBeenCalledWith(params);
+  });
+
+  it("useLookupClient is manual by default (no mount fetch)", () => {
+    const query = useLookupClient({
+      firstName: "Jane",
+      lastName: "Doe",
+      phone: "1234567890"
+    }) as {
+      enabled: boolean;
+    };
+
+    expect(query.enabled).toBe(false);
+  });
+
+  it("useLookupClient disables query when required params are missing", () => {
+    const query = useLookupClient({
+      firstName: "Jane",
+      lastName: "Doe"
+    }, {
+      enabled: true
+    }) as {
+      enabled: boolean;
+    };
+
+    expect(query.enabled).toBe(false);
   });
 
   it("useCreateClient invalidates clients after success", () => {

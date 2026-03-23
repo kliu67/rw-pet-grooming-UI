@@ -1,11 +1,61 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createClient, updateClient, deleteClient, getClients } from "@/api/clients";
+import {
+  createClient,
+  updateClient,
+  deleteClient,
+  getClients,
+  getClient,
+  lookupClient
+} from "@/api/clients";
 import { CLIENTS_QUERY_KEY } from "@/constants";
+
+type ClientLookupParams =
+  | {
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+  }
+  | undefined;
+
+type LookupClientOptions = {
+  enabled?: boolean;
+};
 
 export function useClients() {
   return useQuery({
     queryKey: [CLIENTS_QUERY_KEY],
     queryFn: getClients
+  });
+}
+
+export function useClient(id: number | string | undefined) {
+  return useQuery({
+    queryKey: [CLIENTS_QUERY_KEY, id],
+    queryFn: () => getClient(id),
+    enabled: id !== undefined && id !== null
+  });
+}
+
+export function useLookupClient(
+  data: ClientLookupParams,
+  options: LookupClientOptions = {}
+) {
+  const hasRequiredParams =
+    data?.firstName !== undefined &&
+    data?.lastName !== undefined &&
+    data?.phone !== undefined;
+  const enabled = options.enabled ?? false;
+
+  return useQuery({
+    queryKey: [
+      CLIENTS_QUERY_KEY,
+      "lookup",
+      data?.firstName,
+      data?.lastName,
+      data?.phone
+    ],
+    queryFn: () => lookupClient(data),
+    enabled: enabled && hasRequiredParams
   });
 }
 
