@@ -145,7 +145,7 @@ export default function ClientModal({
   // ---------- Reset form when editing another row ----------
   useEffect(() => {
     setForm({
-      first_name: clientData?.name || "",
+      first_name: clientData?.first_name || "",
       last_name: clientData?.last_name || "",
       phone: clientData?.phone || "",
       email: clientData?.email || "",
