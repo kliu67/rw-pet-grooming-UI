@@ -52,7 +52,7 @@ describe("pets api", () => {
 
     await expect(updatePet(2, data)).resolves.toEqual(payload);
     expect(apiFetch).toHaveBeenCalledWith("/api/pets/2", {
-      method: "PUT",
+      method: "PATCH",
       body: JSON.stringify(data)
     });
   });
