@@ -70,7 +70,7 @@ export function MultiStepFormModal({
   const [showPersonalErrors, setShowPersonalErrors] = useState(false);
   const [showPetErrors, setShowPetErrors] = useState(false);
   const [showDateTimeErrors, setShowDateTimeErrors] = useState(false);
-  const { bookingData, updateBookingData, resetBooking } = useBooking();
+  const { bookingData, updateBookingData, resetBooking, removeStartTime } = useBooking();
 
   const { t } = useTranslation();
   const totalSteps = 5;
@@ -155,7 +155,7 @@ export function MultiStepFormModal({
           !!bookingData?.phone &&
           stepIsValid
         );
-      case PET:
+      case PET: {
         const { breed, weightClass } = bookingData;
         return (
           !!bookingData?.petName &&
@@ -163,8 +163,29 @@ export function MultiStepFormModal({
           !!weightClass?.id &&
           stepIsValid
         );
+      }
       case DATE_TIME:
         return !!bookingData?.startTime && stepIsValid;
+      case REVIEW: {
+        const {
+          firstName,
+          lastName,
+          phone,
+          breed,
+          weightClass,
+          service,
+          petName,
+        } = bookingData;
+        return (
+          firstName &&
+          lastName &&
+          phone &&
+          breed?.id &&
+          weightClass?.id &&
+          service?.id &&
+          petName
+        );
+      }
       default:
         return false;
     }
@@ -196,7 +217,6 @@ export function MultiStepFormModal({
   const handleSubmit = () => {
     if (validateStep()) {
       console.log("Form submitted:", bookingData);
-      // Reset form and close modal
       resetBooking();
       setCurrentStep(1);
       onOpenChange(false);
@@ -275,7 +295,9 @@ export function MultiStepFormModal({
                           svcBasePrice: value?.base_price,
                           svcCode: value.code,
                         };
-                        updateBookingData({ service: service });
+                        const { startTime, ...rest } = bookingData;
+                        removeStartTime();
+                        updateBookingData({ service: service, ...rest });
                         handleNext();
                       }}
                     />

@@ -26,7 +26,7 @@ export const PetStep = ({
     petName: "",
   });
   const [searchTerm, setSearchTerm] = useState("");
-  const { bookingData, updateBookingData } = useBooking();
+  const { bookingData, updateBookingData, removeStartTime } = useBooking();
   const { petName, breed, weightClass } = bookingData;
 
   const { t } = useTranslation();
@@ -114,7 +114,7 @@ export const PetStep = ({
             value={breed?.id}
             onValueChange={(e) => {
               updateBookingData({
-                breed: breedsData.find((breed)=>breed.id===e),
+                breed: breedsData.find((breed) => breed.id === e),
               });
             }}
           >
@@ -141,11 +141,12 @@ export const PetStep = ({
           <Select
             name="weightClass"
             value={weightClass?.id}
-            onValueChange={(e) =>
+            onValueChange={(e) => {
+              removeStartTime();
               updateBookingData({
                 weightClass: weightClassesData.find((wc) => wc.id === e),
-              })
-            }
+              });
+            }}
           >
             <SelectTrigger id="weightClassId">
               <SelectValue placeholder={t("placeholder.weight")} />
