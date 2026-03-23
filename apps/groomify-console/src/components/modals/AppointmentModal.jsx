@@ -26,7 +26,7 @@ import {
 } from "@shared-utils";
 import { useAvailabiltyById } from "@/hooks/availability";
 import { useTimeOffById } from "@/hooks/timeOffs";
-import { getBookableTimeRanges, useOpenTimeRanges } from "@/hooks/openTimeRanges";
+import { getOpenTimeRanges, useOpenTimeRanges } from "@/hooks/openTimeRanges";
 import { Calendar } from "../ui/calendar";
 import { DropdownSearch } from "../DropdownSearch";
 import {

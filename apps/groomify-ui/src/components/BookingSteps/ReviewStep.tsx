@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { BOOKING_STEPS } from "@/constants";
 export const ReviewStep = ({ onEdit = () => {}, onSubmit = () => {} }) => {
-  const { SERVICE, PET, PERSONAL, DATETIME } = BOOKING_STEPS;
+  const { SERVICE, PET, PERSONAL, DATE_TIME } = BOOKING_STEPS;
 
   const handleEdit = (step) => {
     onEdit(step);
@@ -122,7 +122,7 @@ export const ReviewStep = ({ onEdit = () => {}, onSubmit = () => {} }) => {
                 variant="ghost"
                 size="sm"
                 onClick={() => {
-                  handleEdit(DATETIME);
+                  handleEdit(DATE_TIME);
                 }}
                 className="text-indigo-600 hover:text-indigo-700"
               >
