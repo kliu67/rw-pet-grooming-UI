@@ -1,4 +1,10 @@
-import React, { useMemo, useCallback, useState, useEffect, useRef } from "react";
+import React, {
+  useMemo,
+  useCallback,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { INTERVAL_MINUTES } from "@/constants";
 import { Label } from "./ui/label";
@@ -25,10 +31,11 @@ export const DateTimePicker = ({
   onSelect,
   isLoading,
   isError,
+  selected,
 }) => {
-  const [date, setDate] = useState(new Date());
-  const [calendarMonth, setCalendarMonth] = useState(new Date());
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState();
+  const [date, setDate] = useState(selected || new Date());
+  const [calendarMonth, setCalendarMonth] = useState(selected || new Date());
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState("");
   const timePickerRef = useRef(null);
   const prevDateKeyRef = useRef(null);
   const isTimeDisabled = !isObjectNotEmpty(configData);
@@ -114,11 +121,9 @@ export const DateTimePicker = ({
       return !monthBookableDates.has(normalizedDay.toDateString());
     },
     [
-      configData,
       isLoading,
       isError,
       availabilityData,
-      timeOffsData,
       monthBookableDates,
     ],
   );
@@ -132,9 +137,37 @@ export const DateTimePicker = ({
     appointmentDurationMinutes,
   });
 
+  const handleDateSelect = useCallback((nextDate) => {
+    if (!nextDate) return;
+    setSelectedTimeSlot("");
+    setDate(nextDate);
+  }, []);
+
+  const handleMonthChange = useCallback((nextMonth) => {
+    setSelectedTimeSlot("");
+    setCalendarMonth(nextMonth);
+  }, []);
+
+  useEffect(() => {
+    if (getTimestamp(selectedTimeSlot) === null) return;
+
+    requestAnimationFrame(() => {
+      const selectedSlotEl = timePickerRef.current?.querySelector(
+        '[data-selected="true"]',
+      );
+
+      selectedSlotEl?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "nearest",
+      });
+    });
+  }, [selectedTimeSlot, timeSlots]);
+
   useEffect(() => {
     const dateKey = date ? date.toDateString() : null;
     if (!dateKey || prevDateKeyRef.current === dateKey) return;
+    if (getTimestamp(selectedTimeSlot) !== null) return;
     prevDateKeyRef.current = dateKey;
 
     requestAnimationFrame(() => {
@@ -150,6 +183,21 @@ export const DateTimePicker = ({
     });
   }, [date, timeSlots]);
 
+  useEffect(() => {
+    if (!selected) return;
+
+    setDate(selected);
+    setCalendarMonth(selected);
+  }, [selected]);
+
+  useEffect(() => {
+    if (!selected || !timeSlots.length) return;
+    const matchedSlot = timeSlots.find(
+      (time) => time.start.getTime() === selected.getTime(),
+    );
+    setSelectedTimeSlot(matchedSlot ? matchedSlot.start.toISOString() : "");
+  }, [selected, timeSlots]);
+
   return (
     <div className={BOOKING_MODAL_FIELD_TWO}>
       <div
@@ -163,9 +211,9 @@ export const DateTimePicker = ({
           <Calendar
             mode="single"
             selected={date}
-            onSelect={setDate}
+            onSelect={handleDateSelect}
             month={calendarMonth}
-            onMonthChange={setCalendarMonth}
+            onMonthChange={handleMonthChange}
             className="mx-auto rounded-md border"
             classNames={{
               months: "flex flex-col sm:flex-row gap-2 justify-center",
@@ -191,6 +239,11 @@ export const DateTimePicker = ({
               <div
                 key={time.start.toISOString()}
                 data-bookable={time.bookable ? "true" : "false"}
+                data-selected={
+                  getTimestamp(selectedTimeSlot) === getTimestamp(time.start)
+                    ? "true"
+                    : "false"
+                }
                 className={`w-full ${time.bookable ? TIME_BTN_ACTIVE : TIME_BTN_DISABLED} ${
                   getTimestamp(selectedTimeSlot) === getTimestamp(time.start)
                     ? "bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-500"
@@ -198,7 +251,7 @@ export const DateTimePicker = ({
                 }`}
               >
                 <button
-                  className="w-full h-full p-0 m-0 text-center active:bg-emerald-600 active:text-white disabled:bg-gray-200"
+                  className={`w-full h-full p-0 m-0 text-center active:bg-emerald-600 active:text-white disabled:bg-gray-200`}
                   name="startTime"
                   value={time.start.toISOString()}
                   type="button"

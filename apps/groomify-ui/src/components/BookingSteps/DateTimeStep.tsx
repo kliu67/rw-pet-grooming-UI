@@ -7,8 +7,7 @@ import { Textarea } from "../ui/textarea";
 import { CLASSNAMES } from "../../styles/classNames";
 import { MAX_APPOINTMENTS_DESC_LENGTH } from "../../constants";
 import { DateTimePicker } from "../DateTimePicker";
-const { BOOKING_MODAL_FIELD_TWO } =
-  CLASSNAMES;
+const { BOOKING_MODAL_FIELD_TWO } = CLASSNAMES;
 
 export const DateTimeStep = ({
   availabilityData = [],
@@ -22,16 +21,18 @@ export const DateTimeStep = ({
 }) => {
   const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({
-    petName: "",
+    description: "",
   });
 
   const { t } = useTranslation();
-  const { bookingData, updateBookingData } = useBooking();
+  const { bookingData, updateBookingData } = useBooking()
+  const selectedDateTime =
+    bookingData.startTime ? new Date(bookingData.startTime) : null;
 
   const validateFields = (field, value) => {
     if (field === "description") {
-     if (value.length > MAX_APPOINTMENTS_DESC_LENGTH) {
-        return t("pets.errors.nameLengthdescriptionLengthViolationViolation", {
+      if (value?.length > MAX_APPOINTMENTS_DESC_LENGTH) {
+        return t("appointment.errors.descriptionLengthViolation", {
           max: MAX_APPOINTMENTS_DESC_LENGTH,
         });
       }
@@ -39,7 +40,7 @@ export const DateTimeStep = ({
     return "";
   };
 
-  const stepIsValid = validateFields("petName", bookingData.description) === "";
+  const stepIsValid = validateFields("description", bookingData.description) === "";
 
   const updateFieldError = (name, value) => {
     const errorMsg = validateFields(name, value);
@@ -77,11 +78,11 @@ export const DateTimeStep = ({
     if (!showErrors) return;
     setTouched((prev) => ({
       ...prev,
-      petName: true,
+      description: true,
     }));
     setErrors((prev) => ({
       ...prev,
-      petName: validateFields("petName", bookingData.description),
+      description: validateFields("description", bookingData.description),
     }));
   }, [showErrors, bookingData.description]);
 
@@ -96,6 +97,7 @@ export const DateTimeStep = ({
           onSelect={handleChange}
           isLoading={false}
           isError={false}
+          selected={selectedDateTime}
         />
       </div>
       <div className={BOOKING_MODAL_FIELD_TWO}>
@@ -110,6 +112,7 @@ export const DateTimeStep = ({
           className="min-h-32"
           value={bookingData.description}
           onChange={handleChange}
+          onBlur={handleBlur}
         />
       </div>
     </div>
