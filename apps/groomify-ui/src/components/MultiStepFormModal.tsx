@@ -26,18 +26,15 @@ import { useAvailabiltyByStylistId } from "../hooks/availability";
 import { useUpcomingAppointmentsByStylistId } from "@/hooks/appointments";
 import { useUpcomingTimeOffsByStylistId } from "../hooks/timeOffs";
 import { useConfigByFKs } from "@/hooks/serviceConfigurations";
-import {
-  DEFAULT_STYLIST,
-  serviceImageMap,
-  defaultImage,
-} from "../constants";
+import { DEFAULT_STYLIST, serviceImageMap, defaultImage } from "../constants";
 import { CONFIRMATION, ERROR } from "@/static/paths";
 import { ServiceCard } from "./ServiceCard";
 import { PersonalStep } from "./BookingSteps/PersonalStep";
 import { PetStep } from "./BookingSteps/PetStep";
 import { DateTimeStep } from "./BookingSteps/DateTimeStep";
 import { ReviewStep } from "./BookingSteps/ReviewStep";
-import { BOOKING_STEPS } from "../constants";
+import { LoadingSpinnerButton } from "./LoadingSpinner";
+import { BOOKING_STEPS, DEFAULT_STATUS } from "../constants";
 
 interface MultiStepFormModalProps {
   open: boolean;
@@ -63,8 +60,7 @@ interface FormData {
   description: string;
 }
 const { BOOKING_MODAL_FIELD_TWO: BOOKING_MODAL_FIELD } = CLASSNAMES;
-const { SERVICE, PET, DATE_TIME, PERSONAL, REVIEW } =
-  BOOKING_STEPS;
+const { SERVICE, PET, DATE_TIME, PERSONAL, REVIEW } = BOOKING_STEPS;
 
 const TOTAL_STEPS = 5;
 
@@ -166,6 +162,11 @@ export function MultiStepFormModal({
   const { refetch: lookupClientRefetch, isFetching: isLookingUpClient } =
     useLookupClient(clientLookupParams); // manual by default
 
+  const isSubmitting =
+    isLookingUpClient ||
+    createClientMutation.isPending ||
+    createPetMutation.isPending ||
+    createAppMutation.isPending;
   const validateStep = () => {
     switch (currentStep) {
       case SERVICE:
@@ -305,26 +306,25 @@ export function MultiStepFormModal({
           pet_id: resolvedPetId,
           service_id: service.id,
           service_configuration_id: serviceConfig?.id,
-          stylist_id: bookingData.stylist_id,
+          stylist_id: bookingData.stylist_id || DEFAULT_STYLIST,
           start_time: startTime,
           description: bookingData.description || null,
-          status
+          status: status || DEFAULT_STATUS,
         };
-        const appointment = await createAppMutation.mutateAsync(appointmentForm);
+        const appointment =
+          await createAppMutation.mutateAsync(appointmentForm);
         let path;
-        if(appointment){
-          console.log('success');
+        if (appointment) {
+          console.log("success");
           path = `${CONFIRMATION}${appointment?.id}`;
-        }
-        else {
+        } else {
           path = ERROR;
         }
         navigate(path);
       } catch (err) {
         console.log(err);
         navigate(ERROR);
-      }
-      finally{
+      } finally {
         resetBooking();
         setCurrentStep(1);
         onOpenChange(false);
@@ -535,19 +535,21 @@ export function MultiStepFormModal({
                 type="button"
                 onClick={handleNext}
                 className="active:bg-emerald-600 active:border-emerald-600 active:text-white active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                disabled={!validateStep()}
+                disabled={!validateStep() || isSubmitting}
               >
                 Next
               </Button>
             ) : (
-              <Button
-                type="button"
-                onClick={handleSubmit}
-                className="active:bg-emerald-600 active:border-emerald-600 active:text-white active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                disabled={!validateStep()}
-              >
-                Submit
-              </Button>
+              <>
+                <Button
+                  type="button"
+                  onClick={handleSubmit}
+                  className="active:bg-emerald-600 active:border-emerald-600 active:text-white active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                  disabled={!validateStep() || isSubmitting}
+                >
+                  {isSubmitting ? <LoadingSpinnerButton size="sm" /> : "Submit"}
+                </Button>
+              </>
             )}
           </DialogFooter>
         )}
