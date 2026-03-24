@@ -45,7 +45,6 @@ export const ReviewStep = ({ onEdit = () => {}, onSubmit = () => {} }) => {
     !bookingData.breed ||
     !bookingData.weightClass
   ) {
-    // navigate("/");
     return null;
     //TODO add error state
   }
@@ -210,12 +209,6 @@ export const ReviewStep = ({ onEdit = () => {}, onSubmit = () => {} }) => {
                 <span className="text-gray-600">Weight charge</span>
                 <span className="font-medium">${priceModifier.toFixed(2)}</span>
               </div>
-              {/* <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Tax (10%)</span>
-                <span className="font-medium">
-                  ${(bookingData.service.price * 0.1).toFixed(2)}
-                </span>
-              </div> */}
               <Separator className="my-2" />
               <div className="flex justify-between">
                 <span className="font-medium">Total Amount</span>
@@ -241,15 +234,6 @@ export const ReviewStep = ({ onEdit = () => {}, onSubmit = () => {} }) => {
               {/* You will receive a confirmation email at {bookingData.personalInfo.email}. */}
             </p>
           </div>
-        </div>
-
-        <div className="mt-8 flex justify-end gap-3">
-          {/* <Button variant="outline" onClick={() => navigate('/personal-info')} size="lg">
-            Back
-          </Button> */}
-          {/* <Button onClick={handleConfirm} size="lg" className="min-w-40">
-            Confirm Booking
-          </Button> */}
         </div>
       </Card>
     </div>
