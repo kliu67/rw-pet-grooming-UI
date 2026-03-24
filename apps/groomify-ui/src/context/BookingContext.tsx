@@ -27,6 +27,7 @@ export interface BookingData {
     name: string;
   };
   serviceConfig: {
+    id: number;
     buffer_minutes: number;
     duration_minutes: number;
     price: string;
@@ -34,6 +35,7 @@ export interface BookingData {
   stylist_id: number;
   startTime: string;
   status: string;
+  description?: string;
 }
 
 interface BookingContextType {
@@ -71,6 +73,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       name: "Akita",
     },
     serviceConfig:{
+      id: 190,
       duration_minutes: 90,
       buffer_minutes: 20,
       price: "50.00",
