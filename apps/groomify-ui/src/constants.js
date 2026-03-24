@@ -152,3 +152,5 @@ export const BOOKING_STEPS={
   REVIEW: 5,
   CONFIRM: 6
 }
+
+export const DEFAULT_STATUS = 'booked';

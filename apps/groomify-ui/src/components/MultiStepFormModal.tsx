@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useBooking } from "@/context/BookingContext";
+import { useNavigate } from "react-router";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +15,10 @@ import { Progress } from "./ui/progress";
 import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { CLASSNAMES } from "../styles/classNames";
+import { useCreateClient, useLookupClient } from "@/hooks/clients";
+import { useCreatePet } from "@/hooks/pets";
+import { getPetByOwner } from "@/api/pets";
+import { useCreateAppointment } from "@/hooks/appointments";
 import { useServices } from "../hooks/services";
 import { useBreeds } from "../hooks/breeds";
 import { useWeightClasses } from "../hooks/weightClasses";
@@ -23,10 +28,10 @@ import { useUpcomingTimeOffsByStylistId } from "../hooks/timeOffs";
 import { useConfigByFKs } from "@/hooks/serviceConfigurations";
 import {
   DEFAULT_STYLIST,
-  staticServiceData,
   serviceImageMap,
   defaultImage,
 } from "../constants";
+import { CONFIRMATION, ERROR } from "@/static/paths";
 import { ServiceCard } from "./ServiceCard";
 import { PersonalStep } from "./BookingSteps/PersonalStep";
 import { PetStep } from "./BookingSteps/PetStep";
@@ -58,8 +63,10 @@ interface FormData {
   description: string;
 }
 const { BOOKING_MODAL_FIELD_TWO: BOOKING_MODAL_FIELD } = CLASSNAMES;
-const { SERVICE, PET, DATE_TIME, PERSONAL, REVIEW, CONFIRMATION } =
+const { SERVICE, PET, DATE_TIME, PERSONAL, REVIEW } =
   BOOKING_STEPS;
+
+const TOTAL_STEPS = 5;
 
 export function MultiStepFormModal({
   open,
@@ -70,11 +77,23 @@ export function MultiStepFormModal({
   const [showPersonalErrors, setShowPersonalErrors] = useState(false);
   const [showPetErrors, setShowPetErrors] = useState(false);
   const [showDateTimeErrors, setShowDateTimeErrors] = useState(false);
-  const { bookingData, updateBookingData, resetBooking, removeStartTime } = useBooking();
+  const { bookingData, updateBookingData, resetBooking, removeStartTime } =
+    useBooking();
+  const [ownerId, setOwnerId] = useState<number | null>(null);
 
   const { t } = useTranslation();
-  const totalSteps = 5;
-  const progress = (currentStep / totalSteps) * 100;
+  const createClientMutation = useCreateClient();
+  const createPetMutation = useCreatePet();
+  const createAppMutation = useCreateAppointment();
+  const navigate = useNavigate();
+
+  const progress = (currentStep / TOTAL_STEPS) * 100;
+  const clientLookupParams = {
+    firstName: bookingData.firstName,
+    lastName: bookingData.lastName,
+    phone: bookingData.phone,
+  };
+
   const steps = [
     {
       id: SERVICE,
@@ -140,9 +159,12 @@ export function MultiStepFormModal({
     error: configError,
   } = useConfigByFKs({
     serviceId: bookingData.service?.id,
-    breedId: bookingData?.breed?.id,
-    weightClassId: bookingData?.weightClass?.id,
+    breedId: bookingData.breed?.id,
+    weightClassId: bookingData.weightClass?.id,
   });
+
+  const { refetch: lookupClientRefetch, isFetching: isLookingUpClient } =
+    useLookupClient(clientLookupParams); // manual by default
 
   const validateStep = () => {
     switch (currentStep) {
@@ -201,10 +223,8 @@ export function MultiStepFormModal({
     if (currentStep === PERSONAL) {
       setShowPersonalErrors(true);
     }
-    if (validateStep() && currentStep < totalSteps) {
+    if (validateStep() && currentStep < TOTAL_STEPS) {
       setCurrentStep((prev) => prev + 1);
-      console.log("bookingData");
-      console.log(bookingData);
     }
   };
 
@@ -214,12 +234,101 @@ export function MultiStepFormModal({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateStep()) {
-      console.log("Form submitted:", bookingData);
-      resetBooking();
-      setCurrentStep(1);
-      onOpenChange(false);
+      let resolvedOwnerId = null;
+      let resolvedPetId = null;
+      const { petName, breed, weightClass } = bookingData;
+      try {
+        const client = await lookupClientRefetch();
+        if (client.isSuccess) {
+          //client is found
+          resolvedOwnerId = client.data?.id ?? null;
+
+          //look up pets owned by client
+          const ownedPets = await getPetByOwner(resolvedOwnerId);
+          if (ownedPets) {
+            //pets are found
+            console.log(ownedPets);
+            const findPet = ownedPets.find(
+              //find the pet by name, breed id, and wc id
+              (pet) =>
+                pet.name === petName &&
+                pet.breed_id === breed.id &&
+                pet.weight_class_id === weightClass?.id,
+            );
+            if (findPet) {
+              resolvedPetId = findPet.id;
+            } else {
+              //create pet if not found, using client id as owner
+              const petForm = {
+                owner: resolvedOwnerId,
+                name: petName,
+                weight_class_id: weightClass.id,
+                breed: breed.id,
+              };
+              const createPet = await createPetMutation.mutateAsync(petForm);
+              if (createPet.id) {
+                resolvedPetId = createPet.id;
+              }
+            }
+          }
+        } else {
+          //if client not exist, create the client and pet
+          const { firstName, lastName, phone, email } = bookingData;
+          const clientForm = {
+            first_name: firstName,
+            last_name: lastName,
+            phone: phone,
+            email: email || null,
+          };
+
+          const client = await createClientMutation.mutateAsync(clientForm);
+          if (client) {
+            console.log(client);
+            resolvedOwnerId = client.id;
+            const petForm = {
+              name: petName,
+              breed: breed?.id,
+              weightClassId: weightClass?.id,
+              owner: client?.id,
+            };
+            const createPet = await createPetMutation.mutateAsync(petForm);
+            if (createPet.id) {
+              resolvedPetId = createPet.id;
+            }
+          }
+        }
+        const { service, startTime, serviceConfig, status } = bookingData;
+        const appointmentForm = {
+          client_id: resolvedOwnerId,
+          pet_id: resolvedPetId,
+          service_id: service.id,
+          service_configuration_id: serviceConfig?.id,
+          stylist_id: bookingData.stylist_id,
+          start_time: startTime,
+          description: bookingData.description || null,
+          status
+        };
+        const appointment = await createAppMutation.mutateAsync(appointmentForm);
+        let path;
+        if(appointment){
+          console.log('success');
+          path = `${CONFIRMATION}${appointment?.id}`;
+        }
+        else {
+          path = ERROR;
+        }
+        navigate(path);
+      } catch (err) {
+        console.log(err);
+        navigate(ERROR);
+      }
+      finally{
+        resetBooking();
+        setCurrentStep(1);
+        onOpenChange(false);
+      }
     }
   };
 
@@ -263,10 +372,25 @@ export function MultiStepFormModal({
   }, [currentStep, showPersonalErrors, showPetErrors, showDateTimeErrors]);
 
   useEffect(() => {
-    if (configData) {
-      updateBookingData({ serviceConfig: configData });
-    }
-  }, [configData]);
+    if (
+      !configData?.id ||
+      !configData?.breed_id ||
+      !configData?.weight_class_id ||
+      !configData?.service_id
+    )
+      return;
+    const { id, duration_minutes, buffer_minutes, price } = configData;
+    if (
+      bookingData?.serviceConfig?.id === id &&
+      bookingData?.serviceConfig?.duration_minutes === duration_minutes &&
+      bookingData?.serviceConfig?.buffer_minutes === buffer_minutes &&
+      bookingData?.serviceConfig?.price === price
+    )
+      return;
+    updateBookingData({
+      serviceConfig: { id, duration_minutes, buffer_minutes, price },
+    });
+  }, [configData, updateBookingData]);
 
   const renderStep = () => {
     switch (currentStep) {
@@ -350,7 +474,7 @@ export function MultiStepFormModal({
         <DialogHeader>
           <DialogTitle>{t("bookingModal.title")}</DialogTitle>
           <DialogDescription>
-            Step {currentStep} of {totalSteps}
+            Step {currentStep} of {TOTAL_STEPS}
           </DialogDescription>
         </DialogHeader>
 
@@ -406,7 +530,7 @@ export function MultiStepFormModal({
                 {t("general.back")}
               </Button>
             )}
-            {currentStep < totalSteps ? (
+            {currentStep < TOTAL_STEPS ? (
               <Button
                 type="button"
                 onClick={handleNext}
