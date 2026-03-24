@@ -5,6 +5,8 @@ const useMutationMock = vi.fn();
 const useQueryClientMock = vi.fn();
 
 const getPetsMock = vi.fn();
+const getPetMock = vi.fn();
+const getPetByOwnerMock = vi.fn();
 const createPetMock = vi.fn();
 const updatePetMock = vi.fn();
 const deletePetMock = vi.fn();
@@ -17,6 +19,8 @@ vi.mock("@tanstack/react-query", () => ({
 
 vi.mock("@/api/pets", () => ({
   getPets: (...args: any[]) => getPetsMock(...args),
+  getPet: (...args: any[]) => getPetMock(...args),
+  getPetByOwner: (...args: any[]) => getPetByOwnerMock(...args),
   createPet: (...args: any[]) => createPetMock(...args),
   updatePet: (...args: any[]) => updatePetMock(...args),
   deletePet: (...args: any[]) => deletePetMock(...args)
@@ -24,6 +28,8 @@ vi.mock("@/api/pets", () => ({
 
 import {
   usePets,
+  usePet,
+  usePetsByOwner,
   useCreatePet,
   useUpdatePet,
   useDeletePet
@@ -42,6 +48,42 @@ describe("pets hooks", () => {
     expect(config.queryKey).toEqual([PETS_QUERY_KEY]);
     config.queryFn();
     expect(getPetsMock).toHaveBeenCalled();
+  });
+
+  it("usePet configures single-pet query", () => {
+    usePet(11);
+
+    const config = useQueryMock.mock.calls[0][0];
+    expect(config.queryKey).toEqual([PETS_QUERY_KEY, 11]);
+    expect(config.enabled).toBe(true);
+    config.queryFn();
+    expect(getPetMock).toHaveBeenCalledWith(11);
+  });
+
+  it("usePet disables query when id is missing", () => {
+    usePet(undefined);
+
+    const config = useQueryMock.mock.calls[0][0];
+    expect(config.queryKey).toEqual([PETS_QUERY_KEY, undefined]);
+    expect(config.enabled).toBe(false);
+  });
+
+  it("usePetsByOwner configures owner pets query", () => {
+    usePetsByOwner(8);
+
+    const config = useQueryMock.mock.calls[0][0];
+    expect(config.queryKey).toEqual([PETS_QUERY_KEY, "owner", 8]);
+    expect(config.enabled).toBe(true);
+    config.queryFn();
+    expect(getPetByOwnerMock).toHaveBeenCalledWith(8);
+  });
+
+  it("usePetsByOwner disables query when clientId is missing", () => {
+    usePetsByOwner(undefined);
+
+    const config = useQueryMock.mock.calls[0][0];
+    expect(config.queryKey).toEqual([PETS_QUERY_KEY, "owner", undefined]);
+    expect(config.enabled).toBe(false);
   });
 
   it("useCreatePet invalidates pets on success", () => {

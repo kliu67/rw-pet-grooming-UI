@@ -1,11 +1,44 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getPets, createPet, updatePet, deletePet } from "@/api/pets";
+import {
+  getPets,
+  getPet,
+  getPetByOwner,
+  createPet,
+  updatePet,
+  deletePet,
+} from "@/api/pets";
 import { PETS_QUERY_KEY } from "@/constants";
+
+type UsePetsByOwnerOptions = {
+  enabled?: boolean;
+};
 
 export function usePets() {
   return useQuery({
     queryKey: [PETS_QUERY_KEY],
-    queryFn: getPets
+    queryFn: getPets,
+  });
+}
+
+export function usePet(id: number | string | undefined) {
+  return useQuery({
+    queryKey: [PETS_QUERY_KEY, id],
+    queryFn: () => getPet(id),
+    enabled: id !== undefined && id !== null,
+  });
+}
+
+export function usePetsByOwner(
+  clientId: number | string | undefined,
+  options: UsePetsByOwnerOptions = {},
+) {
+  const hasClientId = clientId !== undefined && clientId !== null;
+  const enabled = options.enabled ?? false; // manual by default
+
+  return useQuery({
+    queryKey: [PETS_QUERY_KEY, "owner", clientId],
+    queryFn: () => getPetByOwner(clientId),
+    enabled: enabled && hasClientId,
   });
 }
 
@@ -17,7 +50,7 @@ export function useCreatePet() {
     onSuccess: () => {
       // refresh services table
       queryClient.invalidateQueries({ queryKey: [PETS_QUERY_KEY] });
-    }
+    },
   });
 }
 
@@ -33,9 +66,7 @@ export function useUpdatePet() {
       const previousPets = queryClient.getQueryData([PETS_QUERY_KEY]);
 
       queryClient.setQueryData([PETS_QUERY_KEY], (old) =>
-        old?.map((pet) =>
-          pet.id === id ? { ...pet, ...data } : pet
-        )
+        old?.map((pet) => (pet.id === id ? { ...pet, ...data } : pet)),
       );
 
       return { previousPets };
@@ -51,7 +82,7 @@ export function useUpdatePet() {
     // 🔥 Ensure server truth
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [PETS_QUERY_KEY] });
-    }
+    },
   });
 }
 
@@ -66,7 +97,7 @@ export function useDeletePet() {
       const previousPets = queryClient.getQueryData([PETS_QUERY_KEY]);
 
       queryClient.setQueryData([PETS_QUERY_KEY], (old: any[]) =>
-        old?.filter((pet) => pet.id !== id)
+        old?.filter((pet) => pet.id !== id),
       );
 
       return { previousPets };
@@ -82,6 +113,6 @@ export function useDeletePet() {
     // 🔹 Ensure server truth
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [PETS_QUERY_KEY] });
-    }
+    },
   });
 }
