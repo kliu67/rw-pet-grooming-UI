@@ -75,7 +75,6 @@ export function MultiStepFormModal({
   const [showDateTimeErrors, setShowDateTimeErrors] = useState(false);
   const { bookingData, updateBookingData, resetBooking, removeStartTime } =
     useBooking();
-  const [ownerId, setOwnerId] = useState<number | null>(null);
 
   const { t } = useTranslation();
   const createClientMutation = useCreateClient();
@@ -150,7 +149,7 @@ export function MultiStepFormModal({
   } = useUpcomingAppointmentsByStylistId(DEFAULT_STYLIST);
 
   const {
-    data: configData = {},
+    data: configData,
     isLoading: configIsLoading,
     error: configError,
   } = useConfigByFKs({
@@ -198,6 +197,7 @@ export function MultiStepFormModal({
           weightClass,
           service,
           petName,
+          serviceConfig,
         } = bookingData;
         return (
           firstName &&
@@ -206,6 +206,7 @@ export function MultiStepFormModal({
           breed?.id &&
           weightClass?.id &&
           service?.id &&
+          serviceConfig?.id &&
           petName
         );
       }
@@ -242,36 +243,32 @@ export function MultiStepFormModal({
       const { petName, breed, weightClass } = bookingData;
       try {
         const client = await lookupClientRefetch();
-        if (client.isSuccess) {
+        if (client.isSuccess && client.data?.id) {
           //client is found
-          resolvedOwnerId = client.data?.id ?? null;
-
-          //look up pets owned by client
-          const ownedPets = await getPetByOwner(resolvedOwnerId);
-          if (ownedPets) {
-            //pets are found
-            console.log(ownedPets);
-            const findPet = ownedPets.find(
-              //find the pet by name, breed id, and wc id
-              (pet) =>
-                pet.name === petName &&
-                pet.breed_id === breed.id &&
-                pet.weight_class_id === weightClass?.id,
-            );
-            if (findPet) {
-              resolvedPetId = findPet.id;
-            } else {
-              //create pet if not found, using client id as owner
-              const petForm = {
-                owner: resolvedOwnerId,
-                name: petName,
-                weight_class_id: weightClass.id,
-                breed: breed.id,
-              };
-              const createPet = await createPetMutation.mutateAsync(petForm);
-              if (createPet.id) {
-                resolvedPetId = createPet.id;
-              }
+          resolvedOwnerId = client.data?.id;
+          const ownedPets = await getPetByOwner(resolvedOwnerId); //look up pets owned by client
+          const pets = Array.isArray(ownedPets) ? ownedPets : [];
+          //pets are found
+          const findPet = pets.find(
+            //find the pet by name, breed id, and wc id
+            (pet) =>
+              pet.name === petName &&
+              pet.breed_id === breed.id &&
+              pet.weight_class_id === weightClass?.id,
+          );
+          if (findPet) {
+            resolvedPetId = findPet.id;
+          } else {
+            //create pet if not found, using client id as owner
+            const petForm = {
+              name: petName,
+              owner: resolvedOwnerId,
+              breed: breed.id,
+              weight_class_id: weightClass.id,
+            };
+            const createPet = await createPetMutation.mutateAsync(petForm);
+            if (createPet.id) {
+              resolvedPetId = createPet.id;
             }
           }
         } else {
@@ -286,13 +283,12 @@ export function MultiStepFormModal({
 
           const client = await createClientMutation.mutateAsync(clientForm);
           if (client) {
-            console.log(client);
             resolvedOwnerId = client.id;
             const petForm = {
               name: petName,
-              breed: breed?.id,
-              weightClassId: weightClass?.id,
               owner: client?.id,
+              breed: breed?.id,
+              weight_class_id: weightClass?.id,
             };
             const createPet = await createPetMutation.mutateAsync(petForm);
             if (createPet.id) {
@@ -301,10 +297,22 @@ export function MultiStepFormModal({
           }
         }
         const { service, startTime, serviceConfig, status } = bookingData;
+        if (
+          !resolvedOwnerId ||
+          !resolvedPetId ||
+          !startTime ||
+          !service?.id ||
+          !serviceConfig?.id
+        ) {
+          throw new Error(
+            "Unable to resolve appointment fields before appointment creation.",
+          );
+        }
+
         const appointmentForm = {
           client_id: resolvedOwnerId,
           pet_id: resolvedPetId,
-          service_id: service.id,
+          service_id: service?.id,
           service_configuration_id: serviceConfig?.id,
           stylist_id: bookingData.stylist_id || DEFAULT_STYLIST,
           start_time: startTime,
@@ -313,20 +321,14 @@ export function MultiStepFormModal({
         };
         const appointment =
           await createAppMutation.mutateAsync(appointmentForm);
-        let path;
         if (appointment) {
-          console.log("success");
-          path = `${CONFIRMATION}${appointment?.id}`;
-        } else {
-          path = ERROR;
-        }
-        navigate(path);
+          navigate(`${CONFIRMATION}${appointment?.id}`);
+        } 
+        else navigate(ERROR);
       } catch (err) {
         console.log(err);
         navigate(ERROR);
       } finally {
-        resetBooking();
-        setCurrentStep(1);
         onOpenChange(false);
       }
     }
@@ -352,10 +354,10 @@ export function MultiStepFormModal({
   };
 
   useEffect(() => {
-    if (bookingData.serviceId) {
+    if (bookingData.service?.id) {
       setCurrentStep(2);
     }
-  }, [bookingData.serviceId]);
+  }, [bookingData.service?.id]);
 
   useEffect(() => {
     if (currentStep !== PERSONAL && showPersonalErrors) {
@@ -401,7 +403,7 @@ export function MultiStepFormModal({
               id="services-container"
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
             >
-              {serviceData.length > 1 &&
+              {serviceData.length > 0 &&
                 serviceData.map((service, index) => {
                   const image = serviceImageMap[service?.code] ?? defaultImage;
                   return (
@@ -410,7 +412,7 @@ export function MultiStepFormModal({
                       service={service}
                       image={image}
                       isSelected={
-                        String(bookingData?.serviceId) === String(service?.id)
+                        String(bookingData?.service?.id) === String(service?.id)
                       }
                       onClick={(field, value) => {
                         const serviceForm = {
@@ -421,7 +423,7 @@ export function MultiStepFormModal({
                         };
                         const { startTime, ...rest } = bookingData;
                         removeStartTime();
-                        updateBookingData({ service: service, ...rest });
+                        updateBookingData({ ...rest, service: service });
                         handleNext();
                       }}
                     />
