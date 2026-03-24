@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-
+import { DEFAULT_STYLIST, DEFAULT_STATUS } from "@/constants";
 export interface BookingData {
   service?: {
     id: number;
@@ -26,25 +26,32 @@ export interface BookingData {
     id: number;
     name: string;
   };
+  serviceConfig: {
+    buffer_minutes: number;
+    duration_minutes: number;
+    price: string;
+  };
+  stylist_id: number;
   startTime: string;
+  status: string;
 }
 
 interface BookingContextType {
   bookingData: BookingData;
   updateBookingData: (data: Partial<BookingData>) => void;
   resetBooking: () => void;
-  removeStartTime : () => void;
+  removeStartTime: () => void;
 }
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
 
 export function BookingProvider({ children }: { children: ReactNode }) {
   const [bookingData, setBookingData] = useState<BookingData>({
-    firstName: "Kai",
-    lastName: "Liu",
+    firstName: "test",
+    lastName: "client1",
     phone: "1234567890",
     email: "derekkailiu@gmail.com",
-    petName: "Lou",
+    petName: "testpet1",
     service: {
       base_price: "40.00",
       code: "BATH_BRUSH",
@@ -54,15 +61,23 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       uuid: "0855aa36-21b7-48ce-8625-252767cafe47",
     },
     weightClass: {
-      code: "LARGE",
-      id: 3,
-      label: "large",
-      weight_bounds: [41, 60],
+      code: "MEDIUM",
+      id: 2,
+      label: "medium",
+      weight_bounds: [21, 40],
     },
     breed: {
-      id: 15,
-      name: "Alpine Spaniel",
+      id: 10,
+      name: "Akita",
     },
+    serviceConfig:{
+      duration_minutes: 90,
+      buffer_minutes: 20,
+      price: "50.00",
+    },
+    stylist_id: DEFAULT_STYLIST,
+    startTime: "2026-03-26T17:00:00.000Z",
+    status: DEFAULT_STATUS,
   });
 
   const updateBookingData = (data: Partial<BookingData>) => {
@@ -80,7 +95,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
 
   return (
     <BookingContext.Provider
-      value={{ bookingData, updateBookingData, resetBooking, removeStartTime}}
+      value={{ bookingData, updateBookingData, resetBooking, removeStartTime }}
     >
       {children}
     </BookingContext.Provider>
