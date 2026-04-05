@@ -18,6 +18,7 @@ export default defineConfig({
         'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
         'react-i18next': path.resolve(__dirname, './node_modules/react-i18next'),
         'i18next': path.resolve(__dirname, './node_modules/i18next'),
+        'jspdf': path.resolve(__dirname, './node_modules/jspdf'),
         'vaul@1.1.2': 'vaul',
         'sonner@2.0.3': 'sonner',
         'recharts@2.15.2': 'recharts',
@@ -58,7 +59,9 @@ export default defineConfig({
         '@radix-ui/react-accordion@1.2.3': '@radix-ui/react-accordion',
         '@': path.resolve(__dirname, './src'),
         '@shared-api': path.resolve(__dirname, '../../packages/shared-api/src'),
+        '@shared-api/': `${path.resolve(__dirname, '../../packages/shared-api/src')}/`,
         '@shared-utils': path.resolve(__dirname, '../../packages/shared-utils/src'),
+        '@shared-utils/': `${path.resolve(__dirname, '../../packages/shared-utils/src')}/`,
       },
     },
     build: {

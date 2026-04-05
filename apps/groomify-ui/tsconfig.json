@@ -11,7 +11,9 @@
     "paths": {
       "@/*": ["src/*"],
       "@shared-api": ["../../packages/shared-api/src"],
-      "@shared-utils": ["../../packages/shared-utils/src"]
+      "@shared-api/*": ["../../packages/shared-api/src/*"],
+      "@shared-utils": ["../../packages/shared-utils/src"],
+      "@shared-utils/*": ["../../packages/shared-utils/src/*"]
     },
     "allowJs": true,
     "skipLibCheck": true,
