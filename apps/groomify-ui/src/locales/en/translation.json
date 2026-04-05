@@ -106,6 +106,12 @@
     "emailBooking": "Email Confirmation",
     "reminder": "Need to make changes/cancel? Contact us at {{email}} or call {{phone}}. Changes or cancellations must be made 24 hours in advance."
   },
+  "errorPage": {
+    "message": "We couldn't complete your booking at this time. This might be due to a temporary issue or the selected time slot may no longer be available.",
+    "contactSupport": "Please try again later or contact us at {{phone}} or {{email}}",
+    "returnHomeLabel": "Return to Home",
+    "errorCode": "Error Code"
+  },
   "Price":{
     "total": "Total"
   }

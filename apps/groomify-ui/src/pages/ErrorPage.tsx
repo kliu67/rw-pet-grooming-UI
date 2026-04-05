@@ -1,15 +1,18 @@
-
-
-
-import { AlertCircle, Home, RefreshCw, Phone } from 'lucide-react';
-
+import { AlertCircle, Home } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
+import { CONTACT_INFO } from "@/constants";
 export const ErrorPage = ({}) => {
-  const handleRetry = () => {
-    window.location.reload();
-  };
+  const {email, phone} = CONTACT_INFO;
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  
+  // const handleRetry = () => {
+  //   window.location.reload();
+  // };
 
   const handleGoHome = () => {
-    console.log('Navigate to home');
+    navigate("/");
   };
 
   return (
@@ -23,50 +26,41 @@ export const ErrorPage = ({}) => {
 
             <div className="space-y-2">
               <h1 className="text-foreground">Booking Error</h1>
-              <p className="text-muted-foreground">
-                We couldn't complete your booking at this time. This might be due to a temporary issue or the selected time slot may no longer be available.
-              </p>
+              <p className="text-muted-foreground">{t("errorPage.message")} </p>
             </div>
 
             <div className="w-full space-y-3">
-              <button
+              {/* <button
                 onClick={handleRetry}
                 className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
               >
                 <RefreshCw className="w-5 h-5" />
                 Try Again
-              </button>
+              </button> */}
 
               <button
                 onClick={handleGoHome}
                 className="w-full flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-6 py-3 rounded-lg hover:bg-secondary/80 transition-colors"
               >
                 <Home className="w-5 h-5" />
-                Return to Home
+                {t('errorPage.returnHomeLabel')}
               </button>
             </div>
 
             <div className="pt-4 border-t border-border w-full">
               <p className="text-sm text-muted-foreground mb-3">
-                Need help? Contact our support team
+                {t('errorPage.contactSupport', {email, phone})}
               </p>
-              <a
-                href="tel:1-800-123-4567"
-                className="inline-flex items-center gap-2 text-primary hover:underline"
-              >
-                <Phone className="w-4 h-4" />
-                1-800-123-4567
-              </a>
             </div>
           </div>
         </div>
 
         <div className="mt-6 text-center">
           <p className="text-sm text-muted-foreground">
-            Error Code: BK-2024-E001
+            {`${t('errorPage.errorCode')} BK-2024-E001`}
           </p>
         </div>
       </div>
     </div>
   );
-}
+};
