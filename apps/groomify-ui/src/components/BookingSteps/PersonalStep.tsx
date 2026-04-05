@@ -8,16 +8,14 @@ import { Input } from "../ui/input";
 import { CLASSNAMES } from "../../styles/classNames";
 import {
   MAX_FIRST_NAME_LENGTH,
+  MAX_LAST_NAME_LENGTH,
   MAX_PHONE_LENGTH,
   MAX_EMAIL_LENGTH,
 } from "../../constants";
 
 const { BOOKING_MODAL_FIELD_TWO } = CLASSNAMES;
 
-export const PersonalStep = ({
-  onValidityChange,
-  showErrors = false,
-}) => {
+export const PersonalStep = ({ onValidityChange, showErrors = false }) => {
   const { bookingData, updateBookingData } = useBooking();
   const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({
@@ -41,8 +39,8 @@ export const PersonalStep = ({
     if (field === "lastName") {
       if (!value) {
         return t("clients.errors.notEmpty", { input: "Last Name" });
-      } else if (value.length > MAX_FIRST_NAME_LENGTH) {
-        return t("clients.errors.lastName", { max: MAX_FIRST_NAME_LENGTH });
+      } else if (value.length > MAX_LAST_NAME_LENGTH) {
+        return t("clients.errors.lastName", { max: MAX_LAST_NAME_LENGTH });
       }
       return "";
     }
@@ -90,7 +88,7 @@ export const PersonalStep = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    updateBookingData({[name]: value});
+    updateBookingData({ [name]: value });
     updateFieldError(name, value);
   };
 

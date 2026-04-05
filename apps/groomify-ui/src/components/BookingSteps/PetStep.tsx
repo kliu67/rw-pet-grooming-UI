@@ -106,15 +106,15 @@ export const PetStep = ({
           onBlur={handleBlur}
         />
       </div>
-      {breedsData.length > 1 && (
+      {breedsData.length > 0 && (
         <div className={BOOKING_MODAL_FIELD_TWO}>
           <Label htmlFor="breed">{t("bookingModal.breed")}</Label>
           <Select
             name="breed"
-            value={breed?.id}
-            onValueChange={(e) => {
+            value={breed?.id != null ? String(breed.id) : undefined}
+            onValueChange={(value) => {
               updateBookingData({
-                breed: breedsData.find((breed) => breed.id === e),
+                breed: breedsData.find((b) => String(b.id) === String(value)),
               });
             }}
           >
@@ -127,7 +127,7 @@ export const PetStep = ({
                 onChange={handleSearchChange}
               ></DropdownSearch>
               {breedsData.map((breed) => (
-                <SelectItem key={breed?.id} value={breed?.id}>
+                <SelectItem key={breed?.id} value={String(breed.id)}>
                   {breed?.name}
                 </SelectItem>
               ))}
@@ -135,16 +135,18 @@ export const PetStep = ({
           </Select>
         </div>
       )}
-      {weightClassesData.length > 1 && (
+      {weightClassesData.length > 0 && (
         <div className={BOOKING_MODAL_FIELD_TWO}>
           <Label htmlFor="weight-class">{t("bookingModal.weight")}</Label>
           <Select
             name="weightClass"
-            value={weightClass?.id}
-            onValueChange={(e) => {
+            value={weightClass?.id != null ? String(weightClass.id) : undefined}
+            onValueChange={(value) => {
               removeStartTime();
               updateBookingData({
-                weightClass: weightClassesData.find((wc) => wc.id === e),
+                weightClass: weightClassesData.find(
+                  (wc) => String(wc.id) === String(value),
+                ),
               });
             }}
           >
@@ -153,7 +155,7 @@ export const PetStep = ({
             </SelectTrigger>
             <SelectContent>
               {weightClassesData.map((weightClass) => (
-                <SelectItem key={weightClass?.id} value={weightClass?.id}>
+                <SelectItem key={weightClass?.id} value={String(weightClass?.id)}>
                   <span className="font-semibold">{weightClass?.label}</span>{" "}
                   <span>
                     {weightClass?.weight_bounds[0]}-

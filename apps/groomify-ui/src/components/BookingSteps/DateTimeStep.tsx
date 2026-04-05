@@ -63,7 +63,7 @@ export const DateTimeStep = ({
   const handleChange = (e) => {
     const { name } = e.target;
     let { value } = e.target;
-    if (bookingData.startTime === value) {
+    if (name === "startTime" && bookingData.startTime === value) {
       value = "";
     }
     updateBookingData({ [name]: value });
@@ -95,8 +95,8 @@ export const DateTimeStep = ({
           timeOffsData={timeOffsData}
           appointmentsData={appointmentsData}
           onSelect={handleChange}
-          isLoading={false}
-          isError={false}
+          isLoading={isLoading}
+          isError={isError}
           selected={selectedDateTime}
         />
       </div>
