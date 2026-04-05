@@ -28,6 +28,7 @@ export function Header({ onBookNow }: HeaderProps) {
           <div className="hidden md:flex items-center">
             <button 
               onClick={onBookNow}
+              data-testid="open-booking"
               className="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-full font-medium transition-all transform hover:scale-105 shadow-md"
             >
               Book Appointment
@@ -58,6 +59,7 @@ export function Header({ onBookNow }: HeaderProps) {
                 setIsMenuOpen(false);
                 onBookNow();
               }}
+              data-testid="open-booking"
               className="mt-4 w-[90%] bg-teal-600 text-white px-5 py-3 rounded-lg font-medium"
             >
               Book Appointment
