@@ -107,4 +107,13 @@ describe("DateTimeStep", () => {
       expect(onValidityChange).toHaveBeenCalledWith(true);
     });
   });
+
+  it("passes loading and error flags to DateTimePicker", () => {
+    render(
+      <DateTimeStep onValidityChange={vi.fn()} isLoading isError />,
+    );
+
+    expect(pickerPropsRef.current.isLoading).toBe(true);
+    expect(pickerPropsRef.current.isError).toBe(true);
+  });
 });

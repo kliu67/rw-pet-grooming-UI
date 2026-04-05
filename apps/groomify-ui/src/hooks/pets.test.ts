@@ -68,8 +68,18 @@ describe("pets hooks", () => {
     expect(config.enabled).toBe(false);
   });
 
-  it("usePetsByOwner configures owner pets query", () => {
+  it("usePetsByOwner is manual by default", () => {
     usePetsByOwner(8);
+
+    const config = useQueryMock.mock.calls[0][0];
+    expect(config.queryKey).toEqual([PETS_QUERY_KEY, "owner", 8]);
+    expect(config.enabled).toBe(false);
+    config.queryFn();
+    expect(getPetByOwnerMock).toHaveBeenCalledWith(8);
+  });
+
+  it("usePetsByOwner enables query when explicitly enabled", () => {
+    usePetsByOwner(8, { enabled: true });
 
     const config = useQueryMock.mock.calls[0][0];
     expect(config.queryKey).toEqual([PETS_QUERY_KEY, "owner", 8]);

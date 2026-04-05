@@ -5,6 +5,7 @@ import { MAX_PET_NAME_LENGTH } from "../../constants";
 import { PetStep } from "./PetStep";
 
 const mockUpdateBookingData = vi.fn();
+const mockRemoveStartTime = vi.fn();
 let mockBookingData: Record<string, any> = {};
 
 vi.mock("react-i18next", () => ({
@@ -16,13 +17,36 @@ vi.mock("react-i18next", () => ({
 vi.mock("@/context/BookingContext", () => ({
   useBooking: () => ({
     bookingData: mockBookingData,
-    updateBookingData: mockUpdateBookingData
+    updateBookingData: mockUpdateBookingData,
+    removeStartTime: mockRemoveStartTime
   })
+}));
+
+vi.mock("../ui/select", () => ({
+  Select: ({ name, value, onValueChange, children }: any) => (
+    <div>
+      <label htmlFor={name}>{name}</label>
+      <select
+        id={name}
+        data-testid={`${name}-select`}
+        value={value ?? ""}
+        onChange={(e) => onValueChange(e.target.value)}
+      >
+        <option value="">placeholder</option>
+        {children}
+      </select>
+    </div>
+  ),
+  SelectTrigger: ({ children }: any) => <>{children}</>,
+  SelectValue: ({ placeholder }: any) => <span>{placeholder}</span>,
+  SelectContent: ({ children }: any) => <>{children}</>,
+  SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>
 }));
 
 describe("PetStep", () => {
   beforeEach(() => {
     mockUpdateBookingData.mockClear();
+    mockRemoveStartTime.mockClear();
     mockBookingData = {
       petName: "",
       breed: undefined,
@@ -95,6 +119,47 @@ describe("PetStep", () => {
 
     await waitFor(() => {
       expect(onValidityChange).toHaveBeenCalledWith(true);
+    });
+  });
+
+  it("updates breed when breed select value changes", () => {
+    render(
+      <PetStep
+        onValidityChange={vi.fn()}
+        breedsData={[
+          { id: 1, name: "Labrador" },
+          { id: 2, name: "Poodle" }
+        ]}
+      />
+    );
+
+    fireEvent.change(screen.getByTestId("breed-select"), {
+      target: { value: "2" }
+    });
+
+    expect(mockUpdateBookingData).toHaveBeenCalledWith({
+      breed: { id: 2, name: "Poodle" }
+    });
+  });
+
+  it("updates weight class and removes startTime on weight select change", () => {
+    render(
+      <PetStep
+        onValidityChange={vi.fn()}
+        weightClassesData={[
+          { id: 1, label: "Small", weight_bounds: [0, 20] },
+          { id: 2, label: "Large", weight_bounds: [21, 80] }
+        ]}
+      />
+    );
+
+    fireEvent.change(screen.getByTestId("weightClass-select"), {
+      target: { value: "1" }
+    });
+
+    expect(mockRemoveStartTime).toHaveBeenCalled();
+    expect(mockUpdateBookingData).toHaveBeenCalledWith({
+      weightClass: { id: 1, label: "Small", weight_bounds: [0, 20] }
     });
   });
 });
