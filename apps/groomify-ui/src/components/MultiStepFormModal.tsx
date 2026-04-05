@@ -397,7 +397,7 @@ export function MultiStepFormModal({
         );
 
       case REVIEW:
-        return <ReviewStep onSubmit={handleNavigate} onEdit={handleNavigate} />;
+        return <ReviewStep onEdit={handleNavigate} />;
     }
   };
 
