@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useBooking } from "@/context/BookingContext";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -17,15 +18,13 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { BOOKING_STEPS } from "@/constants";
-export const ReviewStep = ({ onEdit = () => {}, onSubmit = () => {} }) => {
-  const { SERVICE, PET, PERSONAL, DATE_TIME } = BOOKING_STEPS;
-
+export const ReviewStep = ({ onEdit = (step) => {} }) => {
+  const { SERVICE, PERSONAL, DATE_TIME } = BOOKING_STEPS;
   const handleEdit = (step) => {
     onEdit(step);
   };
-
   const locale = "en-US";
-
+  const { t } = useTranslation();
   const { bookingData } = useBooking();
   const {
     service,
@@ -48,7 +47,6 @@ export const ReviewStep = ({ onEdit = () => {}, onSubmit = () => {} }) => {
     return null;
     //TODO add error state
   }
-  //   const formattedDate = format(new Date(bookingData.startDate), 'EEEE, MMMM d, yyyy');
   const dateTime = new Date(startTime);
   const localDateString = dateTime.toLocaleDateString(locale);
   const localTimeString = dateTime.toLocaleTimeString(locale);
@@ -160,7 +158,7 @@ export const ReviewStep = ({ onEdit = () => {}, onSubmit = () => {} }) => {
             <div className="mb-4 flex items-center justify-between">
               <h3 className="flex items-center gap-2">
                 <User className="h-5 w-5 text-indigo-600" />
-                Personal Information
+                {t('reviewStep.customerInfo')}
               </h3>
               <Button
                 variant="ghost"
@@ -197,21 +195,21 @@ export const ReviewStep = ({ onEdit = () => {}, onSubmit = () => {} }) => {
 
           {/* Payment Summary */}
           <div className="rounded-lg bg-indigo-50 p-5">
-            <h3 className="mb-4">Payment Summary</h3>
+            <h3 className="mb-4">{t('reviewStep.priceEstimate')}</h3>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Base price</span>
+                <span className="text-gray-600">{t('reviewStep.basePrice')}</span>
                 <span className="font-medium">
                   ${(service.base_price * 1.0).toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Weight charge</span>
+                <span className="text-gray-600">{t('reviewStep.weightCharge')}</span>
                 <span className="font-medium">${priceModifier.toFixed(2)}</span>
               </div>
               <Separator className="my-2" />
               <div className="flex justify-between">
-                <span className="font-medium">Total Amount</span>
+                <span className="font-medium">{t('reviewStep.totalAmount')}</span>
                 <span className="font-medium text-indigo-600">
                   ${(serviceConfig.price * 1.0).toFixed(2)}
                 </span>
