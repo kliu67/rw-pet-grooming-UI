@@ -231,7 +231,7 @@ export default function AppointmentModal({
     const appointmentsByStylist = appointmentsForRanges;
 
     return getDaysInMonth(thisYear, thisMonth).map((day) =>
-      getBookableTimeRanges({
+      getOpenTimeRanges({
         availabilityData,
         timeOffsData,
         appointments: appointmentsByStylist,
