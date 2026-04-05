@@ -15,7 +15,9 @@
     "select": "Select",
     "remarks": "Remarks",
     "login": "Login",
-    "logout": "Logout"
+    "logout": "Logout",
+    "name": "Name",
+    "pounds": "lbs"
   },
   "bookingModal": {
     "title": "Complete Your Booking",
@@ -73,5 +75,38 @@
     "errors":{
       "descriptionLengthViolation": "description cannot be over \"{{max}}\" characters"
     }
+  },
+  "reviewStep": {
+   "summary": "Booking summary",
+    "priceEstimate": "Price Estimate",
+    "basePrice": "Base Price",
+     "totalAmount": "Total Amount",
+    "weightCharge": "Weight Charge",
+    "customerInfo": "Customer Information"
+  },
+  "confirmStep": {
+    "confirm": "Booking Confirmed!",
+    "thankYou": "Thank you for your reservation",
+    "confirmNumber": "Confirmation Number",
+    "details": "Booking details",
+    "price": "Price",
+    "date": "Date",
+    "time": "Time",
+    "duration": "Duration",
+    "minutes": "minutes",
+    "pet": "Pet",
+    "guest": "Guest Information",
+    "priceEstimate": "Price Estimate",
+    "basePrice": "Base Price",
+    "weightCharge": "Weight Charge",
+    "totalAmount": "Total Amount",
+    "customerInfo": "Customer Information",
+    "download": "Download Confirmation",
+    "bookAnother": "Make another booking",
+    "emailBooking": "Email Confirmation",
+    "reminder": "Need to make changes/cancel? Contact us at {{email}} or call {{phone}}. Changes or cancellations must be made 24 hours in advance."
+  },
+  "Price":{
+    "total": "Total"
   }
 }
