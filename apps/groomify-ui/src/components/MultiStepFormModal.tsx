@@ -17,7 +17,6 @@ import { useTranslation } from "react-i18next";
 import { CLASSNAMES } from "../styles/classNames";
 import { useCreateClient, useLookupClient } from "@/hooks/clients";
 import { useCreatePet } from "@/hooks/pets";
-import { getPetByOwner } from "@/api/pets";
 import { useCreateAppointment } from "@/hooks/appointments";
 import { useServices } from "../hooks/services";
 import { useBreeds } from "../hooks/breeds";
@@ -238,82 +237,18 @@ export function MultiStepFormModal({
 
   const handleSubmit = async () => {
     if (validateStep()) {
-      let resolvedOwnerId = null;
-      let resolvedPetId = null;
       const { petName, breed, weightClass } = bookingData;
       try {
-        const client = await lookupClientRefetch();
-        if (client.isSuccess && client.data?.id) {
-          //client is found
-          resolvedOwnerId = client.data?.id;
-          const ownedPets = await getPetByOwner(resolvedOwnerId); //look up pets owned by client
-          const pets = Array.isArray(ownedPets) ? ownedPets : [];
-          //pets are found
-          const findPet = pets.find(
-            //find the pet by name, breed id, and wc id
-            (pet) =>
-              pet.name === petName &&
-              pet.breed_id === breed.id &&
-              pet.weight_class_id === weightClass?.id,
-          );
-          if (findPet) {
-            resolvedPetId = findPet.id;
-          } else {
-            //create pet if not found, using client id as owner
-            const petForm = {
-              name: petName,
-              owner: resolvedOwnerId,
-              breed: breed.id,
-              weight_class_id: weightClass.id,
-            };
-            const createPet = await createPetMutation.mutateAsync(petForm);
-            if (createPet.id) {
-              resolvedPetId = createPet.id;
-            }
-          }
-        } else {
-          //if client not exist, create the client and pet
-          const { firstName, lastName, phone, email } = bookingData;
-          const clientForm = {
-            first_name: firstName,
-            last_name: lastName,
-            phone: phone,
-            email: email || null,
-          };
-
-          const client = await createClientMutation.mutateAsync(clientForm);
-          if (client) {
-            resolvedOwnerId = client.id;
-            const petForm = {
-              name: petName,
-              owner: client?.id,
-              breed: breed?.id,
-              weight_class_id: weightClass?.id,
-            };
-            const createPet = await createPetMutation.mutateAsync(petForm);
-            if (createPet.id) {
-              resolvedPetId = createPet.id;
-            }
-          }
-        }
-        const { service, startTime, serviceConfig, status } = bookingData;
-        if (
-          !resolvedOwnerId ||
-          !resolvedPetId ||
-          !startTime ||
-          !service?.id ||
-          !serviceConfig?.id
-        ) {
-          throw new Error(
-            "Unable to resolve appointment fields before appointment creation.",
-          );
-        }
-
-        const appointmentForm = {
-          client_id: resolvedOwnerId,
-          pet_id: resolvedPetId,
+        const { firstName, lastName, phone, email, service, startTime, serviceConfig, status } = bookingData;
+                const appointmentForm = {
+          first_name: firstName,
+          last_name: lastName,
+          phone: phone,
+          email: email,
+          pet_name: petName,
+          breed_id: breed?.id,
+          weight_class_id: weightClass?.id,
           service_id: service?.id,
-          service_configuration_id: serviceConfig?.id,
           stylist_id: bookingData.stylist_id || DEFAULT_STYLIST,
           start_time: startTime,
           description: bookingData.description || null,
@@ -323,13 +258,12 @@ export function MultiStepFormModal({
           await createAppMutation.mutateAsync(appointmentForm);
         if (appointment) {
           navigate(`${CONFIRMATION}${appointment?.id}`);
-        } 
-        else navigate(ERROR);
+        } else navigate(ERROR);
       } catch (err) {
         console.log(err);
         navigate(ERROR);
       } finally {
-        onOpenChange(false);
+        // onOpenChange(false);
       }
     }
   };

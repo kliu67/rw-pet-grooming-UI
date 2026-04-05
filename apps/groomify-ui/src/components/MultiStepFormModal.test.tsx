@@ -6,11 +6,7 @@ import { MultiStepFormModal } from "./MultiStepFormModal";
 import { CONFIRMATION, ERROR } from "@/static/paths";
 
 const navigateMock = vi.fn();
-const lookupClientRefetchMock = vi.fn();
-const createClientMutateAsyncMock = vi.fn();
-const createPetMutateAsyncMock = vi.fn();
 const createAppointmentMutateAsyncMock = vi.fn();
-const getPetByOwnerMock = vi.fn();
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -76,24 +72,24 @@ vi.mock("@/hooks/serviceConfigurations", () => ({
 
 vi.mock("@/hooks/clients", () => ({
   useLookupClient: () => ({
-    refetch: (...args: any[]) => lookupClientRefetchMock(...args),
+    refetch: vi.fn(),
     isFetching: false,
   }),
   useCreateClient: () => ({
-    mutateAsync: (...args: any[]) => createClientMutateAsyncMock(...args),
+    mutateAsync: vi.fn(),
     isPending: false,
   }),
 }));
 
 vi.mock("@/hooks/pets", () => ({
   useCreatePet: () => ({
-    mutateAsync: (...args: any[]) => createPetMutateAsyncMock(...args),
+    mutateAsync: vi.fn(),
     isPending: false,
   }),
 }));
 
 vi.mock("@/api/pets", () => ({
-  getPetByOwner: (...args: any[]) => getPetByOwnerMock(...args),
+  getPetByOwner: vi.fn(),
 }));
 
 vi.mock("./ServiceCard", () => ({
@@ -160,13 +156,6 @@ describe("MultiStepFormModal", () => {
   }
 
   it("submits appointment using existing client and existing pet", async () => {
-    lookupClientRefetchMock.mockResolvedValue({
-      isSuccess: true,
-      data: { id: 7 },
-    });
-    getPetByOwnerMock.mockResolvedValue([
-      { id: 11, name: "testpet1", breed_id: 10, weight_class_id: 2 },
-    ]);
     createAppointmentMutateAsyncMock.mockResolvedValue({ id: 99 });
 
     renderModal();
@@ -174,18 +163,22 @@ describe("MultiStepFormModal", () => {
     fireEvent.click(screen.getByRole("button", { name: "Submit" }));
 
     await waitFor(() => {
-      expect(getPetByOwnerMock).toHaveBeenCalledWith(7);
-      expect(createClientMutateAsyncMock).not.toHaveBeenCalled();
-      expect(createPetMutateAsyncMock).not.toHaveBeenCalled();
       expect(createAppointmentMutateAsyncMock).toHaveBeenCalledTimes(1);
+      expect(createAppointmentMutateAsyncMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          first_name: expect.any(String),
+          last_name: expect.any(String),
+          service_id: 35,
+          breed_id: 10,
+          weight_class_id: 2,
+          stylist_id: 2,
+        }),
+      );
       expect(navigateMock).toHaveBeenCalledWith(`${CONFIRMATION}99`);
     });
   });
 
-  it("creates client and pet when lookup misses, then submits appointment", async () => {
-    lookupClientRefetchMock.mockResolvedValue({ isSuccess: false, data: null });
-    createClientMutateAsyncMock.mockResolvedValue({ id: 20 });
-    createPetMutateAsyncMock.mockResolvedValue({ id: 30 });
+  it("navigates to confirmation when appointment is created", async () => {
     createAppointmentMutateAsyncMock.mockResolvedValue({ id: 40 });
 
     renderModal();
@@ -193,28 +186,20 @@ describe("MultiStepFormModal", () => {
     fireEvent.click(screen.getByRole("button", { name: "Submit" }));
 
     await waitFor(() => {
-      expect(createClientMutateAsyncMock).toHaveBeenCalledTimes(1);
-      expect(createPetMutateAsyncMock).toHaveBeenCalledTimes(1);
-      expect(createAppointmentMutateAsyncMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          client_id: 20,
-          pet_id: 30,
-        }),
-      );
+      expect(createAppointmentMutateAsyncMock).toHaveBeenCalledTimes(1);
       expect(navigateMock).toHaveBeenCalledWith(`${CONFIRMATION}40`);
     });
   });
 
-  it("navigates to error when IDs cannot be resolved for appointment", async () => {
-    lookupClientRefetchMock.mockResolvedValue({ isSuccess: false, data: null });
-    createClientMutateAsyncMock.mockResolvedValue(null);
+  it("navigates to error when appointment creation fails", async () => {
+    createAppointmentMutateAsyncMock.mockRejectedValue(new Error("boom"));
 
     renderModal();
     await goToReviewStep();
     fireEvent.click(screen.getByRole("button", { name: "Submit" }));
 
     await waitFor(() => {
-      expect(createAppointmentMutateAsyncMock).not.toHaveBeenCalled();
+      expect(createAppointmentMutateAsyncMock).toHaveBeenCalledTimes(1);
       expect(navigateMock).toHaveBeenCalledWith(ERROR);
     });
   });
