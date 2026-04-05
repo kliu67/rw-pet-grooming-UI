@@ -154,3 +154,8 @@ export const BOOKING_STEPS={
 }
 
 export const DEFAULT_STATUS = 'booked';
+export const LOCALE = "en-US";
+export const CONTACT_INFO = {
+  email: 'rwpet@gmail.com',
+  phone: '780-893-1007'
+}
