@@ -43,3 +43,26 @@ export const areAllObjectKeysEmpty = (obj) => {
     const parsed = new Date(value);
     return Number.isNaN(parsed.getTime()) ? null : parsed.getTime();
   };
+
+  export const mapWeightClassLabel = (label) =>{
+    let result = '';
+    switch(label) {
+      case 'small':
+        result = 'S';
+        break;
+      case 'medium':{
+        result = 'M';
+        break;
+      }
+      case 'large': {
+        result = 'L';
+        break;
+      }
+      case 'extra large': {
+        result = 'X';
+        break;
+      }
+      default: result = '';
+    }
+    return result;
+  }
