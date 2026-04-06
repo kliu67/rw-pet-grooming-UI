@@ -2,6 +2,7 @@ import React from "react";
 import { Scissors, Droplets, Heart, Sparkles, Brush } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useServices } from "../hooks/services";
+import { mapWeightClassLabel } from "@shared-utils";
 import { useDistinctConfigsByServiceIds } from "@/hooks/serviceConfigurations";
 import fullServiceImage from "../static/img/full_service.webp";
 import bathImage from "../static/img/bath.webp";
@@ -103,7 +104,7 @@ export const Services = ({}) => {
                   <p className="text-gray-600 text-sm leading-relaxed">
                     {service?.configs.length > 0 &&
                       service?.configs.map((config) => {
-                        const label = config.weight_class_label;
+                        const label = mapWeightClassLabel(config.weight_class_label);
                         const lower = config.weight_class_range[0];
                         const upper = config.weight_class_range[1];
                         const price = config.price;

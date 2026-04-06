@@ -67,7 +67,7 @@ export const HomePage = ({}) => {
         {/* <Testimonials /> */}
 
         {/* Contact/CTA Section */}
-        <section className="py-20 bg-teal-50">
+        {/* <section className="py-20 bg-teal-50">
           <div className="max-w-4xl mx-auto text-center px-4">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
               Ready to Pamper Your Pet?
@@ -83,7 +83,7 @@ export const HomePage = ({}) => {
               Schedule Appointment
             </button>
           </div>
-        </section>
+        </section> */}
       </main>
 
       <Footer />
