@@ -1,6 +1,12 @@
 import React from "react";
 import { Scissors, Droplets, Heart, Sparkles, Brush } from "lucide-react";
 import { useServices } from "../hooks/services";
+import fullServiceImage from "../static/img/full_service.webp";
+import bathImage from "../static/img/bath.webp";
+import basicServiceImage from "../static/img/basic_service.webp";
+import demattingImage from "../static/img/dematting.webp";
+import nailClippingImage from "../static/img/nail_clipping.webp";
+import earCleaningImage from "../static/img/ear_cleaning.webp";
 
 type Service = {
   id: number;
@@ -19,22 +25,14 @@ const iconMap = {
 };
 
 const imageMap = {
-  FULL_GROOMING:
-    "https://images.unsplash.com/photo-1703368786305-4e1dcfcfd0db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBnZXR0aW5nJTIwaGFpcmN1dHxlbnwxfHx8fDE3NzA0MDY0NTd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  BATH_BRUSH:
-    "https://images.unsplash.com/photo-1680374642577-441d91f91ea5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBiYXRoJTIwYnViYmxlc3xlbnwxfHx8fDE3NzA0MDY0NTd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  BASIC_GROOMING:
-    "https://images.unsplash.com/photo-1730403257848-a38a393f1b60?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBkb2clMjBncm9vbWVyfGVufDF8fHx8MTc3MDM5NzU5Nnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  DEMATTING:
-    "https://images.unsplash.com/photo-1769025939291-0603d7b76bb5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBwYXclMjBjYXJlfGVufDF8fHx8MTc3MDQwNjU2NXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  NAIL_TRIMMING:
-    "https://images.unsplash.com/photo-1769025939291-0603d7b76bb5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBwYXclMjBjYXJlfGVufDF8fHx8MTc3MDQwNjU2NXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-
-  EAR_CLEANING:
-    "https://images.unsplash.com/photo-1769025939291-0603d7b76bb5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBwYXclMjBjYXJlfGVufDF8fHx8MTc3MDQwNjU2NXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+  FULL_GROOMING: fullServiceImage,
+  BATH_BRUSH: bathImage,
+  BASIC_GROOMING: basicServiceImage,
+  DEMATTING: demattingImage,
+  NAIL_TRIMMING: nailClippingImage,
+  EAR_CLEANING: earCleaningImage,
 };
-const defaultImage =
-  "https://images.unsplash.com/photo-1703368786305-4e1dcfcfd0db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBnZXR0aW5nJTIwaGFpcmN1dHxlbnwxfHx8fDE3NzA0MDY0NTd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
+const defaultImage = fullServiceImage;
 const staticData = [
   {
     code: "FULL-GROOMING",
@@ -42,8 +40,9 @@ const staticData = [
     description:
       "Bath, blow dry, brush out, haircut, nail trim, and ear cleaning. The full treatment.",
     icon: Scissors,
-    image:
-      "https://images.unsplash.com/photo-1703368786305-4e1dcfcfd0db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBnZXR0aW5nJTIwaGFpcmN1dHxlbnwxfHx8fDE3NzA0MDY0NTd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    image: "../static/img/full_service.webp",
+    // image:
+    //   "https://images.unsplash.com/photo-1703368786305-4e1dcfcfd0db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBnZXR0aW5nJTIwaGFpcmN1dHxlbnwxfHx8fDE3NzA0MDY0NTd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
   },
   {
     code: "BATH",
@@ -93,15 +92,12 @@ const staticData = [
 export const Services = ({}) => {
   const { data: serviceList = [], isLoading, error } = useServices();
 
-  const services = serviceList.map((service) => {
-    const match = staticData.find((s) => s.code === service.code);
-    return {
-      name: service.name,
-      price: `From $${service.base_price}`,
-      description: service.description,
-      code: service.code
-    };
-  });
+  const services = serviceList.map((service) => ({
+    name: service.name,
+    price: `From $${service.base_price}`,
+    description: service.description,
+    code: service.code,
+  }));
 
   return (
     <section id="services" className="py-20 bg-gray-50">
@@ -128,7 +124,7 @@ export const Services = ({}) => {
                 <div className="h-48 overflow-hidden relative">
                   <img
                     src={image}
-                    alt={defaultImage}
+                    alt={service.name}
                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors"></div>

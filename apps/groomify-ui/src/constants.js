@@ -156,6 +156,10 @@ export const BOOKING_STEPS={
 export const DEFAULT_STATUS = 'booked';
 export const LOCALE = "en-US";
 export const CONTACT_INFO = {
-  email: 'rwpet@gmail.com',
-  phone: '780-893-1007'
+  email: 'rwpetgrooming@gmail.com',
+  phone: '780-893-1007',
+  street: '115 Mumbai Drive',
+  city: 'Markham',
+  province: 'ON',
+  postal: 'L3S 0G3'
 }
