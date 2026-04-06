@@ -18,7 +18,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { BOOKING_STEPS } from "@/constants";
-export const ReviewStep = ({ onEdit }) => {
+export const ReviewStep = ({ onEdit = (step) => {} }) => {
   const { SERVICE, PERSONAL, DATE_TIME } = BOOKING_STEPS;
   const handleEdit = (step) => {
     onEdit(step);

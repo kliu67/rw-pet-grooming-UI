@@ -24,7 +24,6 @@ export function Hero({ onBookNow }: HeroProps) {
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <button 
                 onClick={onBookNow}
-                data-testid="open-booking"
                 className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-4 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
               >
                 Book Appointment <ArrowRight className="ml-2 h-5 w-5" />

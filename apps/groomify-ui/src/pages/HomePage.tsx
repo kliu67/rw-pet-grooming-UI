@@ -78,7 +78,6 @@ export const HomePage = ({}) => {
             </p>
             <button
               onClick={() => setIsModalOpen(true)}
-              data-testid="open-booking"
               className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-4 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all"
             >
               Schedule Appointment
