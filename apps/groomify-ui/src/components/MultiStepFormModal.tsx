@@ -260,7 +260,6 @@ export function MultiStepFormModal({
           navigate(`${CONFIRMATION}${appointment?.id}`);
         } else navigate(ERROR);
       } catch (err) {
-        console.log(err);
         navigate(ERROR);
       } finally {
         // onOpenChange(false);

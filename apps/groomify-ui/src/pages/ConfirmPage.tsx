@@ -74,7 +74,6 @@ export const ConfirmPage = ({}) => {
         phone,
       });
     } catch (error) {
-      console.error("PDF download failed", error);
       window.alert("Unable to generate the PDF right now. Please try again.");
     } finally {
       setIsDownloading(false);
