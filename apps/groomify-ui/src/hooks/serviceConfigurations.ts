@@ -1,5 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getServiceConfigurations, getConfigByFKs } from "@/api/serviceConfigurations";
+import { useMutation, useQuery, useQueryClient, useQueries } from "@tanstack/react-query";
+import { getServiceConfigurations, getConfigByFKs, getDistinctConfigPriceByServiceIds } from "@/api/serviceConfigurations";
 import { SERVICE_CONFIGURATIONS_QUERY_KEY } from "@/constants";
 
 export function useServiceConfigurations() {
@@ -15,5 +15,21 @@ export function useConfigByFKs(data) {
     queryKey: [SERVICE_CONFIGURATIONS_QUERY_KEY, serviceId, breedId, weightClassId],
     queryFn: () => getConfigByFKs(serviceId, breedId, weightClassId),
     enabled: !!serviceId && !!breedId && !!weightClassId
+  });
+}
+
+export function useDistinctConfigsByServiceIds({
+  serviceIds = [],
+  enabled = true
+}: {
+  serviceIds?: number[];
+  enabled?: boolean;
+}) {
+  return useQueries({
+    queries: serviceIds.map((serviceId) => ({
+      queryKey: [SERVICE_CONFIGURATIONS_QUERY_KEY, serviceId],
+      queryFn: () => getDistinctConfigPriceByServiceIds(serviceId),
+      enabled: enabled && !!serviceId
+    }))
   });
 }

@@ -11,9 +11,9 @@ export function Hero({ onBookNow }: HeroProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="relative z-10">
-            <div className="inline-block bg-teal-100 text-teal-800 px-4 py-1.5 rounded-full text-sm font-semibold mb-6">
+            {/* <div className="inline-block bg-teal-100 text-teal-800 px-4 py-1.5 rounded-full text-sm font-semibold mb-6">
               Voted #1 Groomer in Town 🏆
-            </div>
+            </div> */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
               Premium Care for Your <span className="text-teal-600">Furry Best Friend</span>
             </h1>
@@ -36,7 +36,7 @@ export function Hero({ onBookNow }: HeroProps) {
               </a>
             </div>
 
-            <div className="flex items-center gap-6 text-sm text-gray-500 font-medium">
+            {/* <div className="flex items-center gap-6 text-sm text-gray-500 font-medium">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-teal-500" />
                 Certified Groomers
@@ -45,7 +45,7 @@ export function Hero({ onBookNow }: HeroProps) {
                 <CheckCircle className="h-5 w-5 text-teal-500" />
                 Organic Shampoos
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div className="relative lg:ml-10">
@@ -55,10 +55,10 @@ export function Hero({ onBookNow }: HeroProps) {
                 alt="Happy fluffy dog" 
                 className="w-full h-[500px] object-cover"
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-8">
+              {/* <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-8">
                 <p className="text-white font-bold text-xl">"They treat my Max like royalty!"</p>
                 <p className="text-gray-200 text-sm">- Sarah T.</p>
-              </div>
+              </div> */}
             </div>
             
             {/* Decorative elements */}

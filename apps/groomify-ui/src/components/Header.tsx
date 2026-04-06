@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { PawPrint, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
@@ -8,6 +9,7 @@ interface HeaderProps {
 
 export function Header({ onBookNow }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <header className="fixed w-full bg-white/90 backdrop-blur-md z-50 shadow-sm">
@@ -15,14 +17,14 @@ export function Header({ onBookNow }: HeaderProps) {
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center">
             <PawPrint className="h-8 w-8 text-teal-600" />
-            <span className="ml-2 text-xl font-bold text-gray-900">FreshPaws</span>
+            <span className="ml-2 text-xl font-bold text-gray-900">{t('Header.name')}</span>
           </div>
           
           <nav className="hidden md:flex space-x-8">
             <a href="#home" className="text-gray-600 hover:text-teal-600 font-medium transition-colors">Home</a>
             <a href="#services" className="text-gray-600 hover:text-teal-600 font-medium transition-colors">Services</a>
-            <a href="#about" className="text-gray-600 hover:text-teal-600 font-medium transition-colors">About</a>
-            <a href="#reviews" className="text-gray-600 hover:text-teal-600 font-medium transition-colors">Reviews</a>
+            {/* <a href="#about" className="text-gray-600 hover:text-teal-600 font-medium transition-colors">About</a> */}
+            {/* <a href="#reviews" className="text-gray-600 hover:text-teal-600 font-medium transition-colors">Reviews</a> */}
           </nav>
 
           <div className="hidden md:flex items-center">

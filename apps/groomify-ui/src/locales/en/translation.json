@@ -114,5 +114,11 @@
   },
   "Price":{
     "total": "Total"
+  },
+  "Header":{
+    "name": "RW Pet Grooming"
+  },
+  "Footer":{
+    "contactInfo": "Contact Info"
   }
 }

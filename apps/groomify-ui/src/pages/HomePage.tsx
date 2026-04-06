@@ -21,7 +21,7 @@ export const HomePage = ({}) => {
         <Services />
 
         {/* About Section - Simple enough to keep inline or extract if it grows */}
-        <section id="about" className="py-20 bg-white">
+        {/* <section id="about" className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
               <div className="relative">
@@ -32,11 +32,11 @@ export const HomePage = ({}) => {
                   className="relative rounded-3xl shadow-xl z-10 w-full h-[400px] object-cover"
                 />
               </div>
-              <div>
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+              <div> */}
+                {/* <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
                   Passionate About Paws
-                </h2>
-                <p className="text-lg text-gray-600 mb-6">
+                </h2> */}
+                {/* <p className="text-lg text-gray-600 mb-6">
                   Founded in 2018, FreshPaws started with a simple mission: to
                   provide a grooming experience that dogs actually enjoy. We
                   believe that grooming shouldn't be a chore or a stressful
@@ -62,12 +62,12 @@ export const HomePage = ({}) => {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
-        <Testimonials />
+        {/* <Testimonials /> */}
 
         {/* Contact/CTA Section */}
-        <section className="py-20 bg-teal-50">
+        {/* <section className="py-20 bg-teal-50">
           <div className="max-w-4xl mx-auto text-center px-4">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
               Ready to Pamper Your Pet?
@@ -83,7 +83,7 @@ export const HomePage = ({}) => {
               Schedule Appointment
             </button>
           </div>
-        </section>
+        </section> */}
       </main>
 
       <Footer />
