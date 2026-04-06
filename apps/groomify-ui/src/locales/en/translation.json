@@ -1,0 +1,118 @@
+{
+  "general": {
+    "next": "Next",
+    "prev": "Prev",
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "search": "Search...",
+    "loading": "Loading...",
+    "edit": "Edit",
+    "update": "Update",
+    "delete": "Delete",
+    "create": "Create",
+    "select": "Select",
+    "remarks": "Remarks",
+    "login": "Login",
+    "logout": "Logout",
+    "name": "Name",
+    "pounds": "lbs"
+  },
+  "bookingModal": {
+    "title": "Complete Your Booking",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "petName": "Pet Name",
+    "service": "Service",
+    "breed": "Breed",
+    "weight": "Weight",
+    "date": "Date",
+    "time": "Time",
+    "message": "Message",
+    "serviceStep": "Service",
+    "personalStep": "Personal",
+    "petStep": "Pet",
+    "dateTimeStep": "Date/Time",
+    "reviewStep": "Review",
+    "startingPrice": "From ${{price}}",
+    "requiredMessage": " indicates required field"
+  },
+  "placeholder": {
+    "firstName": "Enter your first name",
+    "lastName": "Enter your last name",
+    "email": "Enter your email",
+    "phone": "Enter your phone",
+    "petName": "Enter your pet's name",
+    "service": "Select a service",
+    "message": "Leave a message",
+    "breed": "Select your pet's breed",
+    "weight": "Select your pet's weight",
+    "time": "Select a time"
+  },
+  "clients": {
+    "errors": {
+      "firstName": "First name length must be between 0 and \"{{max}}\" characters",
+      "lastName": "Last name length must be between 0 and \"{{max}}\" characters",
+      "phone": "phone length must be between 0 and \"{{max}}\" and consist of numbers and '-' only",
+      "email": "Email length must be between 0 and \"{{max}}\" characters and be in valid format",
+      "description": "Description cannot be longer than 200 characters.",
+      "notEmpty": "\"{{input}}\" field cannot be empty",
+      "loading": "Error loading clients"
+    }
+  },
+  "pets": {
+    "pounds": "lbs",
+    "errors": {
+      "nameLengthViolation": "Pet name length must be between 0 and \"{{max}}\" characters",
+      "notEmpty": "\"{{input}}\" field cannot be empty",
+      "loading": "Error loading pets"
+    }
+  },
+  "appointment":{
+    "errors":{
+      "descriptionLengthViolation": "description cannot be over \"{{max}}\" characters"
+    }
+  },
+  "reviewStep": {
+   "summary": "Booking summary",
+    "priceEstimate": "Price Estimate",
+    "basePrice": "Base Price",
+     "totalAmount": "Total Amount",
+    "weightCharge": "Weight Charge",
+    "customerInfo": "Customer Information"
+  },
+  "confirmStep": {
+    "confirm": "Booking Confirmed!",
+    "thankYou": "Thank you for your reservation",
+    "confirmNumber": "Confirmation Number",
+    "details": "Booking details",
+    "price": "Price",
+    "date": "Date",
+    "time": "Time",
+    "duration": "Duration",
+    "minutes": "minutes",
+    "pet": "Pet",
+    "guest": "Guest Information",
+    "priceEstimate": "Price Estimate",
+    "basePrice": "Base Price",
+    "weightCharge": "Weight Charge",
+    "totalAmount": "Total Amount",
+    "customerInfo": "Customer Information",
+    "download": "Download Confirmation",
+    "bookAnother": "Make another booking",
+    "emailBooking": "Email Confirmation",
+    "reminder": "Need to make changes/cancel? Contact us at {{email}} or call {{phone}}. Changes or cancellations must be made 24 hours in advance."
+  },
+  "errorPage": {
+    "message": "We couldn't complete your booking at this time. This might be due to a temporary issue or the selected time slot may no longer be available.",
+    "contactSupport": "Please try again later or contact us at {{phone}} or {{email}}",
+    "returnHomeLabel": "Return to Home",
+    "errorCode": "Error Code"
+  },
+  "Price":{
+    "total": "Total"
+  }
+}
