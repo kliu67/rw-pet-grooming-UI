@@ -1,5 +1,11 @@
 //
 import { Scissors, Droplets, Heart, Sparkles, Brush } from "lucide-react";
+import fullServiceImage from "./static/img/full_service.webp";
+import bathImage from "./static/img/bath.webp";
+import basicServiceImage from "./static/img/basic_service.webp";
+import demattingImage from "./static/img/dematting.webp";
+import nailClippingImage from "./static/img/nail_clipping.webp";
+import earCleaningImage from "./static/img/ear_cleaning.webp";
 
 export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 export const INTERVAL_MINUTES = 20;
@@ -67,8 +73,7 @@ export const passwordRegex = new RegExp(
   `^(?=.*[A-Za-z])(?=.*\\d)(?=.*[^A-Za-z0-9]).+$`,
 );
 
-
-export const DEFAULT_STYLIST=2;
+export const DEFAULT_STYLIST = 2;
 
 export const staticServiceData = [
   {
@@ -126,40 +131,33 @@ export const staticServiceData = [
 ];
 
 export const serviceImageMap = {
-  FULL_GROOMING:
-    "https://images.unsplash.com/photo-1703368786305-4e1dcfcfd0db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBnZXR0aW5nJTIwaGFpcmN1dHxlbnwxfHx8fDE3NzA0MDY0NTd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  BATH_BRUSH:
-    "https://images.unsplash.com/photo-1680374642577-441d91f91ea5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBiYXRoJTIwYnViYmxlc3xlbnwxfHx8fDE3NzA0MDY0NTd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  BASIC_GROOMING:
-    "https://images.unsplash.com/photo-1730403257848-a38a393f1b60?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBkb2clMjBncm9vbWVyfGVufDF8fHx8MTc3MDM5NzU5Nnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  DEMATTING:
-    "https://images.unsplash.com/photo-1769025939291-0603d7b76bb5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBwYXclMjBjYXJlfGVufDF8fHx8MTc3MDQwNjU2NXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  NAIL_TRIMMING:
-    "https://images.unsplash.com/photo-1769025939291-0603d7b76bb5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBwYXclMjBjYXJlfGVufDF8fHx8MTc3MDQwNjU2NXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-
-  EAR_CLEANING:
-    "https://images.unsplash.com/photo-1769025939291-0603d7b76bb5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBwYXclMjBjYXJlfGVufDF8fHx8MTc3MDQwNjU2NXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+  FULL_GROOMING: fullServiceImage,
+  BATH_BRUSH: bathImage,
+  BASIC_GROOMING: basicServiceImage,
+  DEMATTING: demattingImage,
+  NAIL_TRIMMING: nailClippingImage,
+  EAR_CLEANING: earCleaningImage,
 };
 
 export const defaultImage =
   "https://images.unsplash.com/photo-1703368786305-4e1dcfcfd0db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBnZXR0aW5nJTIwaGFpcmN1dHxlbnwxfHx8fDE3NzA0MDY0NTd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
 
-export const BOOKING_STEPS={
+export const BOOKING_STEPS = {
   SERVICE: 1,
   PET: 2,
   DATE_TIME: 3,
   PERSONAL: 4,
   REVIEW: 5,
-  CONFIRM: 6
-}
+  CONFIRM: 6,
+};
 
-export const DEFAULT_STATUS = 'booked';
+export const DEFAULT_STATUS = "booked";
 export const LOCALE = "en-US";
 export const CONTACT_INFO = {
-  email: 'rwpetgrooming@gmail.com',
-  phone: '780-893-1007',
-  street: '115 Mumbai Drive',
-  city: 'Markham',
-  province: 'ON',
-  postal: 'L3S 0G3'
-}
+  email: "rwpetgrooming@gmail.com",
+  phone: "780-893-1007",
+  street: "115 Mumbai Drive",
+  city: "Markham",
+  province: "ON",
+  postal: "L3S 0G3",
+};
