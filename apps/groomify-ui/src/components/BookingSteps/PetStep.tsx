@@ -127,8 +127,8 @@ export const PetStep = ({
                 onChange={handleSearchChange}
               ></DropdownSearch>
               {breedsData.map((breed) => (
-                <SelectItem key={breed?.id} value={String(breed.id)}>
-                  {breed?.name}
+                <SelectItem key={breed?.id} value={String(breed.id)} disabled={!breed.permitted}>
+                  {`${breed?.name}${!breed.permitted && t('pets.notPermitted')}`}
                 </SelectItem>
               ))}
             </SelectContent>
