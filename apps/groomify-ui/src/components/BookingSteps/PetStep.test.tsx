@@ -40,7 +40,11 @@ vi.mock("../ui/select", () => ({
   SelectTrigger: ({ children }: any) => <>{children}</>,
   SelectValue: ({ placeholder }: any) => <span>{placeholder}</span>,
   SelectContent: ({ children }: any) => <>{children}</>,
-  SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>
+  SelectItem: ({ value, children, disabled }: any) => (
+    <option value={value} disabled={disabled}>
+      {children}
+    </option>
+  )
 }));
 
 describe("PetStep", () => {
@@ -140,6 +144,24 @@ describe("PetStep", () => {
     expect(mockUpdateBookingData).toHaveBeenCalledWith({
       breed: { id: 2, name: "Poodle" }
     });
+  });
+
+  it("renders non-permitted breeds as disabled options", () => {
+    render(
+      <PetStep
+        onValidityChange={vi.fn()}
+        breedsData={[
+          { id: 1, name: "Labrador", permitted: true },
+          { id: 2, name: "Wolfdog", permitted: false }
+        ]}
+      />
+    );
+
+    const wolfdogOption = screen.getByRole("option", {
+      name: /Wolfdogpets\.notPermitted/i
+    });
+
+    expect(wolfdogOption).toBeDisabled();
   });
 
   it("updates weight class and removes startTime on weight select change", () => {

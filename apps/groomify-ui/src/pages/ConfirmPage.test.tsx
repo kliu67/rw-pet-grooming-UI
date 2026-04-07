@@ -99,4 +99,25 @@ describe("ConfirmPage", () => {
     fireEvent.click(downloadButton);
     expect(handleDownloadPdfMock).not.toHaveBeenCalled();
   });
+
+  it("shows email confirmation message only when client email exists", () => {
+    useQueryMock.mockReturnValue({
+      data: {
+        client_email: "jane@example.com",
+      },
+    });
+
+    const { rerender } = render(<ConfirmPage />);
+    expect(screen.getByText("confirmStep.emailSent")).toBeInTheDocument();
+    expect(screen.getByText("jane@example.com")).toBeInTheDocument();
+
+    useQueryMock.mockReturnValue({
+      data: {
+        client_email: "",
+      },
+    });
+    rerender(<ConfirmPage />);
+
+    expect(screen.queryByText("confirmStep.emailSent")).not.toBeInTheDocument();
+  });
 });
