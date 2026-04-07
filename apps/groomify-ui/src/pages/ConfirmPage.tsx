@@ -12,7 +12,7 @@ import {
   Mail,
   Phone,
   PawPrint,
-  Loader
+  Loader,
 } from "lucide-react";
 import { LOCALE, CONTACT_INFO } from "@/constants";
 import { handleDownloadPdf } from "@shared-utils/pdf";
@@ -57,7 +57,7 @@ export const ConfirmPage = ({}) => {
     Number(confirmData?.price_snapshot) -
     Number(confirmData?.service_base_price);
   const totalPrice = confirmData?.price_snapshot;
-  const localeNameString = `${confirmData?.client_first_name || '-'} ${confirmData?.client_last_name || '-'}`;
+  const localeNameString = `${confirmData?.client_first_name || "-"} ${confirmData?.client_last_name || "-"}`;
 
   const onDownloadClick = async () => {
     if (isDownloading) return;
@@ -93,6 +93,9 @@ export const ConfirmPage = ({}) => {
               {t("confirmStep.confirm")}
             </h1>
             <p className="text-gray-600 mb-4">{t("confirmStep.thankYou")}</p>
+            {email && (
+              <p className="text-gray-600 mb-4">{t("confirmStep.emailSent", {email})}</p>
+            )}
             <div className="inline-block bg-gray-100 rounded-lg px-6 py-3">
               <p className="text-sm text-gray-600 mb-1">
                 {t("confirmStep.confirmNumber")}
@@ -101,7 +104,9 @@ export const ConfirmPage = ({}) => {
                 <p className="text-2xl font-semibold text-gray-900">
                   {appointmentNumber}
                 </p>
-              ): <Loader/>}
+              ) : (
+                <Loader />
+              )}
             </div>
           </div>
 
@@ -242,12 +247,12 @@ export const ConfirmPage = ({}) => {
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-6">
-            <button
+          <button
             type="button"
             onClick={onDownloadClick}
             disabled={isDownloading || !confirmData}
             className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
-            >
+          >
             <Download className="w-5 h-5 mr-2" />
             {isDownloading ? "Generating PDF..." : t("confirmStep.download")}
           </button>
