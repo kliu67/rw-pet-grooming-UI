@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { BookingProvider } from "@/context/BookingContext";
+import { BookingProvider, useBooking } from "@/context/BookingContext";
 import { MultiStepFormModal } from "./MultiStepFormModal";
 import { CONFIRMATION, ERROR } from "@/static/paths";
 
@@ -172,9 +172,22 @@ describe("MultiStepFormModal", () => {
     vi.clearAllMocks();
   });
 
-  const renderModal = () =>
+  function BookingStateProbe({
+    onBookingDataChange,
+  }: {
+    onBookingDataChange: (data: any) => void;
+  }) {
+    const { bookingData } = useBooking();
+    useEffect(() => {
+      onBookingDataChange(bookingData);
+    }, [bookingData, onBookingDataChange]);
+    return null;
+  }
+
+  const renderModal = (onBookingDataChange: (data: any) => void = vi.fn()) =>
     render(
       <BookingProvider>
+        <BookingStateProbe onBookingDataChange={onBookingDataChange} />
         <MultiStepFormModal open onOpenChange={vi.fn()} />
       </BookingProvider>,
     );
@@ -225,8 +238,9 @@ describe("MultiStepFormModal", () => {
 
   it("navigates to confirmation when appointment is created", async () => {
     createAppointmentMutateAsyncMock.mockResolvedValue({ id: 40 });
+    const onBookingDataChange = vi.fn();
 
-    renderModal();
+    renderModal(onBookingDataChange);
     await goToReviewStep();
     fireEvent.click(screen.getByRole("button", { name: "Submit" }));
 
@@ -234,18 +248,41 @@ describe("MultiStepFormModal", () => {
       expect(createAppointmentMutateAsyncMock).toHaveBeenCalledTimes(1);
       expect(navigateMock).toHaveBeenCalledWith(`${CONFIRMATION}40`);
     });
+
+    await waitFor(() => {
+      expect(
+        onBookingDataChange.mock.calls.some(
+          ([data]) =>
+            data?.firstName === undefined &&
+            data?.petName === undefined &&
+            data?.service === undefined,
+        ),
+      ).toBe(true);
+    });
   });
 
   it("navigates to error when appointment creation fails", async () => {
     createAppointmentMutateAsyncMock.mockRejectedValue(new Error("boom"));
+    const onBookingDataChange = vi.fn();
 
-    renderModal();
+    renderModal(onBookingDataChange);
     await goToReviewStep();
     fireEvent.click(screen.getByRole("button", { name: "Submit" }));
 
     await waitFor(() => {
       expect(createAppointmentMutateAsyncMock).toHaveBeenCalledTimes(1);
       expect(navigateMock).toHaveBeenCalledWith(ERROR);
+    });
+
+    await waitFor(() => {
+      expect(
+        onBookingDataChange.mock.calls.some(
+          ([data]) =>
+            data?.firstName === undefined &&
+            data?.petName === undefined &&
+            data?.service === undefined,
+        ),
+      ).toBe(true);
     });
   });
 });

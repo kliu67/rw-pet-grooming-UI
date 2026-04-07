@@ -262,7 +262,7 @@ export function MultiStepFormModal({
       } catch (err) {
         navigate(ERROR);
       } finally {
-        // onOpenChange(false);
+        resetBooking();
       }
     }
   };
