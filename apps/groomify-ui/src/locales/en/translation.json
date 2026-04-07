@@ -65,6 +65,7 @@
   },
   "pets": {
     "pounds": "lbs",
+    "notPermitted": "(This breed cannot be serviced)",
     "errors": {
       "nameLengthViolation": "Pet name length must be between 0 and \"{{max}}\" characters",
       "notEmpty": "\"{{input}}\" field cannot be empty",
@@ -104,6 +105,7 @@
     "download": "Download Confirmation",
     "bookAnother": "Make another booking",
     "emailBooking": "Email Confirmation",
+    "emailSent": "A confirmation email has been sent to {{email}}.",
     "reminder": "Need to make changes/cancel? Contact us at {{email}} or call {{phone}}. Changes or cancellations must be made 24 hours in advance."
   },
   "errorPage": {
