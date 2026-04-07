@@ -73,7 +73,7 @@ export const passwordRegex = new RegExp(
   `^(?=.*[A-Za-z])(?=.*\\d)(?=.*[^A-Za-z0-9]).+$`,
 );
 
-export const DEFAULT_STYLIST = process.env.DEFAULT_STYLIST_ID;
+export const DEFAULT_STYLIST = 1;
 
 export const staticServiceData = [
   {
