@@ -104,26 +104,64 @@ vi.mock("./ServiceCard", () => ({
   ),
 }));
 
-vi.mock("./BookingSteps/PetStep", () => ({
-  PetStep: ({ onValidityChange }: any) => {
-    useEffect(() => onValidityChange(true), [onValidityChange]);
-    return <div>pet-step</div>;
-  },
-}));
+vi.mock("./BookingSteps/PetStep", async () => {
+  const { useBooking } = await import("@/context/BookingContext");
+  return {
+    PetStep: ({ onValidityChange }: any) => {
+      const { updateBookingData } = useBooking();
+      useEffect(() => {
+        updateBookingData({
+          petName: "Test Pet",
+          breed: { id: 10, name: "Akita" },
+          weightClass: {
+            id: 2,
+            code: "MEDIUM",
+            label: "Medium",
+            weight_bounds: [21, 40],
+          },
+        });
+        onValidityChange(true);
+      }, []);
+      return <div>pet-step</div>;
+    },
+  };
+});
 
-vi.mock("./BookingSteps/DateTimeStep", () => ({
-  DateTimeStep: ({ onValidityChange }: any) => {
-    useEffect(() => onValidityChange(true), [onValidityChange]);
-    return <div>datetime-step</div>;
-  },
-}));
+vi.mock("./BookingSteps/DateTimeStep", async () => {
+  const { useBooking } = await import("@/context/BookingContext");
+  return {
+    DateTimeStep: ({ onValidityChange }: any) => {
+      const { updateBookingData } = useBooking();
+      useEffect(() => {
+        updateBookingData({
+          startTime: "2026-04-10T17:00:00.000Z",
+          stylist_id: 2,
+        });
+        onValidityChange(true);
+      }, []);
+      return <div>datetime-step</div>;
+    },
+  };
+});
 
-vi.mock("./BookingSteps/PersonalStep", () => ({
-  PersonalStep: ({ onValidityChange }: any) => {
-    useEffect(() => onValidityChange(true), [onValidityChange]);
-    return <div>personal-step</div>;
-  },
-}));
+vi.mock("./BookingSteps/PersonalStep", async () => {
+  const { useBooking } = await import("@/context/BookingContext");
+  return {
+    PersonalStep: ({ onValidityChange }: any) => {
+      const { updateBookingData } = useBooking();
+      useEffect(() => {
+        updateBookingData({
+          firstName: "Jane",
+          lastName: "Doe",
+          phone: "1234567890",
+          email: "jane@example.com",
+        });
+        onValidityChange(true);
+      }, []);
+      return <div>personal-step</div>;
+    },
+  };
+});
 
 vi.mock("./BookingSteps/ReviewStep", () => ({
   ReviewStep: () => <div>review-step</div>,
@@ -143,12 +181,19 @@ describe("MultiStepFormModal", () => {
 
   async function goToReviewStep() {
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Next" })).toBeInTheDocument();
+      expect(screen.getByTestId("service-card-35")).toBeInTheDocument();
     });
+    fireEvent.click(screen.getByTestId("service-card-35"));
 
-    fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    const clickNext = async () => {
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: "Next" })).toBeEnabled();
+      });
+      fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    };
+    await clickNext();
+    await clickNext();
+    await clickNext();
 
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
