@@ -27,8 +27,8 @@ import { useUpcomingTimeOffsByStylistId } from "../hooks/timeOffs";
 import { useConfigByFKs } from "@/hooks/serviceConfigurations";
 import { DEFAULT_STYLIST, serviceImageMap, defaultImage } from "../constants";
 import { CONFIRMATION, ERROR } from "@/static/paths";
-import { ServiceCard } from "./ServiceCard";
 import { SpeciesStep } from "./BookingSteps/SpeciesStep";
+import { ServiceStep } from "./BookingSteps/ServiceStep";
 import { PersonalStep } from "./BookingSteps/PersonalStep";
 import { PetStep } from "./BookingSteps/PetStep";
 import { DateTimeStep } from "./BookingSteps/DateTimeStep";
@@ -353,41 +353,8 @@ export function MultiStepFormModal({
         );
       case SERVICE:
         return (
-          <div className="space-y-4">
-            <div
-              id="services-container"
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-            >
-              {serviceData.length > 0 &&
-                serviceData.filter((service)=>service.service_species===bookingData.petSpecies).map((service, index) => {
-                  const image = serviceImageMap[service?.code] ?? defaultImage;
-                  return (
-                    <ServiceCard
-                      key={service?.id}
-                      service={service}
-                      image={image}
-                      isSelected={
-                        String(bookingData?.service?.id) === String(service?.id)
-                      }
-                      onClick={(field, value) => {
-                        const serviceForm = {
-                          svcId: value?.id,
-                          svcName: value?.name,
-                          svcBasePrice: value?.base_price,
-                          svcCode: value.code,
-                        };
-                        const { startTime, ...rest } = bookingData;
-                        removeStartTime();
-                        updateBookingData({ ...rest, service: service });
-                        handleNext();
-                      }}
-                    />
-                  );
-                })}
-            </div>
-          </div>
+         <ServiceStep serviceData={serviceData}/>
         );
-
       case PET:
         return (
           <PetStep

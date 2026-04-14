@@ -105,7 +105,7 @@ vi.mock("./ServiceCard", () => ({
     <button
       type="button"
       data-testid={`service-card-${service.id}`}
-      onClick={() => onClick("service", service)}
+      onClick={() => onClick()}
     >
       {service.name}
     </button>
@@ -214,23 +214,26 @@ describe("MultiStepFormModal", () => {
       </BookingProvider>,
     );
 
-  async function goToReviewStep() {
+  async function clickNext() {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Next" })).toBeEnabled();
     });
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
+  }
+
+  async function goToReviewStep() {
+    // Step 1 -> Step 2
+    await clickNext();
 
     await waitFor(() => {
       expect(screen.getByTestId("service-card-35")).toBeInTheDocument();
     });
+
+    // Step 2 selection
     fireEvent.click(screen.getByTestId("service-card-35"));
 
-    const clickNext = async () => {
-      await waitFor(() => {
-        expect(screen.getByRole("button", { name: "Next" })).toBeEnabled();
-      });
-      fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    };
+    // Step 2 -> 3, 3 -> 4, 4 -> 5, 5 -> 6 (Review)
+    await clickNext();
     await clickNext();
     await clickNext();
     await clickNext();
