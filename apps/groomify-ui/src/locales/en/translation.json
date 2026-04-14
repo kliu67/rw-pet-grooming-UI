@@ -32,6 +32,7 @@
     "date": "Date",
     "time": "Time",
     "message": "Message",
+    "speciesStep": "Species",
     "serviceStep": "Service",
     "personalStep": "Personal",
     "petStep": "Pet",
@@ -51,6 +52,11 @@
     "breed": "Select your pet's breed",
     "weight": "Select your pet's weight",
     "time": "Select a time"
+  },
+  "speciesStep":{
+      "dog": "Dog",
+    "cat": "Cat",
+    "selectSpecies": "What kind of pet are you booking for?"
   },
   "clients": {
     "errors": {

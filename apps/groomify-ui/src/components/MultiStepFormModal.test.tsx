@@ -20,7 +20,15 @@ vi.mock("react-router", () => ({
 
 vi.mock("../hooks/services", () => ({
   useServices: () => ({
-    data: [{ id: 35, code: "BATH_BRUSH", name: "Bath&Brush", base_price: "40.00" }],
+    data: [
+      {
+        id: 35,
+        code: "BATH_BRUSH",
+        name: "Bath&Brush",
+        base_price: "40.00",
+        service_species: "DOG",
+      },
+    ],
     isLoading: false,
     error: null,
   }),
@@ -167,6 +175,20 @@ vi.mock("./BookingSteps/ReviewStep", () => ({
   ReviewStep: () => <div>review-step</div>,
 }));
 
+vi.mock("./BookingSteps/SpeciesStep", async () => {
+  const { useBooking } = await import("@/context/BookingContext");
+  return {
+    SpeciesStep: ({ onValidityChange }: any) => {
+      const { updateBookingData } = useBooking();
+      useEffect(() => {
+        updateBookingData({ petSpecies: "DOG" });
+        onValidityChange(true);
+      }, []);
+      return <div>species-step</div>;
+    },
+  };
+});
+
 describe("MultiStepFormModal", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -193,6 +215,11 @@ describe("MultiStepFormModal", () => {
     );
 
   async function goToReviewStep() {
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Next" })).toBeEnabled();
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+
     await waitFor(() => {
       expect(screen.getByTestId("service-card-35")).toBeInTheDocument();
     });

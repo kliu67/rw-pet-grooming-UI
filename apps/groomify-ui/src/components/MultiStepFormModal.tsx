@@ -28,6 +28,7 @@ import { useConfigByFKs } from "@/hooks/serviceConfigurations";
 import { DEFAULT_STYLIST, serviceImageMap, defaultImage } from "../constants";
 import { CONFIRMATION, ERROR } from "@/static/paths";
 import { ServiceCard } from "./ServiceCard";
+import { SpeciesStep } from "./BookingSteps/SpeciesStep";
 import { PersonalStep } from "./BookingSteps/PersonalStep";
 import { PetStep } from "./BookingSteps/PetStep";
 import { DateTimeStep } from "./BookingSteps/DateTimeStep";
@@ -59,9 +60,9 @@ interface FormData {
   description: string;
 }
 const { BOOKING_MODAL_FIELD_TWO: BOOKING_MODAL_FIELD } = CLASSNAMES;
-const { SERVICE, PET, DATE_TIME, PERSONAL, REVIEW } = BOOKING_STEPS;
+const { SPECIES, SERVICE, PET, DATE_TIME, PERSONAL, REVIEW } = BOOKING_STEPS;
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 export function MultiStepFormModal({
   open,
@@ -89,6 +90,10 @@ export function MultiStepFormModal({
   };
 
   const steps = [
+    {
+      id: SPECIES,
+      label: t("bookingModal.speciesStep"),
+    },
     {
       id: SERVICE,
       label: t("bookingModal.serviceStep"),
@@ -167,8 +172,10 @@ export function MultiStepFormModal({
     createAppMutation.isPending;
   const validateStep = () => {
     switch (currentStep) {
+      case SPECIES:
+        return bookingData?.petSpecies && stepIsValid;
       case SERVICE:
-        return true;
+        return !!bookingData?.service?.id;
       case PERSONAL:
         return (
           !!bookingData?.firstName &&
@@ -239,8 +246,17 @@ export function MultiStepFormModal({
     if (validateStep()) {
       const { petName, breed, weightClass } = bookingData;
       try {
-        const { firstName, lastName, phone, email, service, startTime, serviceConfig, status } = bookingData;
-                const appointmentForm = {
+        const {
+          firstName,
+          lastName,
+          phone,
+          email,
+          service,
+          startTime,
+          serviceConfig,
+          status,
+        } = bookingData;
+        const appointmentForm = {
           first_name: firstName,
           last_name: lastName,
           phone: phone,
@@ -286,11 +302,11 @@ export function MultiStepFormModal({
     setCurrentStep(step);
   };
 
-  useEffect(() => {
-    if (bookingData.service?.id) {
-      setCurrentStep(2);
-    }
-  }, [bookingData.service?.id]);
+  // useEffect(() => {
+  //   if (bookingData.service?.id) {
+  //     setCurrentStep(PET);
+  //   }
+  // }, [bookingData.service?.id]);
 
   useEffect(() => {
     if (currentStep !== PERSONAL && showPersonalErrors) {
@@ -329,6 +345,12 @@ export function MultiStepFormModal({
 
   const renderStep = () => {
     switch (currentStep) {
+      case SPECIES:
+        return (
+          <SpeciesStep
+            onValidityChange={(isValid) => setStepIsValid(isValid)}
+          />
+        );
       case SERVICE:
         return (
           <div className="space-y-4">
@@ -337,7 +359,7 @@ export function MultiStepFormModal({
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
             >
               {serviceData.length > 0 &&
-                serviceData.map((service, index) => {
+                serviceData.filter((service)=>service.service_species===bookingData.petSpecies).map((service, index) => {
                   const image = serviceImageMap[service?.code] ?? defaultImage;
                   return (
                     <ServiceCard
@@ -444,13 +466,13 @@ export function MultiStepFormModal({
 
         {/* Form Content */}
         <div className="py-4">{renderStep()}</div>
-        {currentStep > 1 && (
+        {currentStep >= 1 && (
           <DialogFooter className="flex-row justify-between sm:justify-between">
-            {currentStep === 1 ? (
+            {currentStep === SPECIES ? (
               <Button
                 type="button"
                 variant="outline"
-                onClick={handleBack}
+                onClick={()=>handleOpenChange(false)}
                 className="active:bg-gray-200 active:border-gray-300 active:text-gray-900 active:scale-95 transition"
               >
                 {t("general.cancel")}
