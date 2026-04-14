@@ -56,9 +56,14 @@ export const Services = ({}) => {
         </div>
 
         {dogServices.length > 0 && (
-          <div id="dog-services" className="border-gray-500">
-            <div>
-              <p>{t("services.dogs")}</p>
+          <div
+            id="dog-services"
+            className="border border-gray-300 rounded-2xl shadow-md p-6 mb-10"
+          >
+            <div className="text-center py-4 mb-6">
+              <p className="text-2xl md:text-3xl font-semibold text-gray-600">
+                {t("services.dogs")}
+              </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {dogServices.length > 0 &&
@@ -112,9 +117,14 @@ export const Services = ({}) => {
           </div>
         )}
         {catServices.length > 0 && (
-          <div id="cat-services" className="border-gray-500">
-            <div>
-              <p>{t("services.cats")}</p>
+          <div
+            id="cat-services"
+            className="border border-gray-300 rounded-2xl shadow-md p-6"
+          >
+            <div className="text-center py-4 mb-6">
+              <p className="text-2xl md:text-3xl font-semibold text-gray-600">
+                {t("services.cats")}
+              </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {catServices.map((service, index) => {
