@@ -53,8 +53,9 @@ describe("PetStep", () => {
     mockRemoveStartTime.mockClear();
     mockBookingData = {
       petName: "",
-      breed: undefined,
-      weightClass: undefined
+      breed: "",
+      weightClass: undefined,
+      petSpecies: "DOG",
     };
   });
 
@@ -70,8 +71,9 @@ describe("PetStep", () => {
   it("shows max-length error for overly long pet name", () => {
     mockBookingData = {
       petName: "a".repeat(MAX_PET_NAME_LENGTH + 1),
-      breed: undefined,
-      weightClass: undefined
+      breed: "",
+      weightClass: undefined,
+      petSpecies: "DOG",
     };
     render(<PetStep onValidityChange={vi.fn()} />);
 
@@ -90,14 +92,10 @@ describe("PetStep", () => {
     expect(mockUpdateBookingData).toHaveBeenCalledWith({ petName: "Buddy" });
   });
 
-  it("renders breed and weight selects when options are provided", () => {
+  it("renders breed input and weight select when species is DOG", () => {
     render(
       <PetStep
         onValidityChange={vi.fn()}
-        breedsData={[
-          { id: "1", name: "Labrador" },
-          { id: "2", name: "Poodle" }
-        ]}
         weightClassesData={[
           { id: "1", label: "Small", weight_bounds: [0, 20] },
           { id: "2", label: "Large", weight_bounds: [21, 80] }
@@ -107,7 +105,7 @@ describe("PetStep", () => {
 
     expect(screen.getByText("bookingModal.breed")).toBeInTheDocument();
     expect(screen.getByText("bookingModal.weight")).toBeInTheDocument();
-    expect(screen.getByText("placeholder.breed")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("placeholder.breed")).toBeInTheDocument();
     expect(screen.getByText("placeholder.weight")).toBeInTheDocument();
   });
 
@@ -115,8 +113,9 @@ describe("PetStep", () => {
     const onValidityChange = vi.fn();
     mockBookingData = {
       petName: "Milo",
-      breed: undefined,
-      weightClass: undefined
+      breed: "",
+      weightClass: undefined,
+      petSpecies: "DOG",
     };
 
     render(<PetStep onValidityChange={onValidityChange} />);
@@ -126,42 +125,35 @@ describe("PetStep", () => {
     });
   });
 
-  it("updates breed when breed select value changes", () => {
-    render(
-      <PetStep
-        onValidityChange={vi.fn()}
-        breedsData={[
-          { id: 1, name: "Labrador" },
-          { id: 2, name: "Poodle" }
-        ]}
-      />
-    );
+  it("updates breed when breed input changes", () => {
+    render(<PetStep onValidityChange={vi.fn()} />);
 
-    fireEvent.change(screen.getByTestId("breed-select"), {
-      target: { value: "2" }
+    fireEvent.change(screen.getByPlaceholderText("placeholder.breed"), {
+      target: { name: "breed", value: "Poodle" }
     });
 
     expect(mockUpdateBookingData).toHaveBeenCalledWith({
-      breed: { id: 2, name: "Poodle" }
+      breed: "Poodle"
     });
   });
 
-  it("renders non-permitted breeds as disabled options", () => {
+  it("hides weight select when species is CAT", () => {
+    mockBookingData = {
+      ...mockBookingData,
+      petSpecies: "CAT",
+    };
+
     render(
       <PetStep
         onValidityChange={vi.fn()}
-        breedsData={[
-          { id: 1, name: "Labrador", permitted: true },
-          { id: 2, name: "Wolfdog", permitted: false }
+        weightClassesData={[
+          { id: 1, label: "Small", weight_bounds: [0, 20] },
+          { id: 2, label: "Large", weight_bounds: [21, 80] }
         ]}
       />
     );
 
-    const wolfdogOption = screen.getByRole("option", {
-      name: /Wolfdogpets\.notPermitted/i
-    });
-
-    expect(wolfdogOption).toBeDisabled();
+    expect(screen.queryByText("bookingModal.weight")).not.toBeInTheDocument();
   });
 
   it("updates weight class and removes startTime on weight select change", () => {

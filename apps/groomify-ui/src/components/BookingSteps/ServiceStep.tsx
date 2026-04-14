@@ -12,7 +12,6 @@ export const ServiceStep = ({ serviceData = [] }) => {
   const handleServiceChange = (service) => {
     const currentServiceId = bookingData?.service?.id;
     const nextServiceId = service?.id;
-
     if (String(currentServiceId) === String(nextServiceId)) {
       return;
     }

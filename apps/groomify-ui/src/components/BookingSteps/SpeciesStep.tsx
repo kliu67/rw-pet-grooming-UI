@@ -36,10 +36,7 @@ export const SpeciesStep = ({ onValidityChange }) => {
           description: "",
           uuid: "",
         },
-        breed: {
-          id: null,
-          name: "",
-        },
+        breed: "",
         weightClass: {
           id: null,
           code: "",
@@ -62,7 +59,6 @@ export const SpeciesStep = ({ onValidityChange }) => {
   return (
     <div className="space-y-4">
       <div>
-
         <p className="font-semibold">{t('speciesStep.selectSpecies')}</p>
       </div>
       <div className="grid grid-cols-2 gap-4 mb-8">

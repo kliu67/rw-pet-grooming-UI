@@ -111,10 +111,7 @@ describe("SpeciesStep", () => {
         description: "",
         uuid: "",
       },
-      breed: {
-        id: null,
-        name: "",
-      },
+      breed: "",
       weightClass: {
         id: null,
         code: "",

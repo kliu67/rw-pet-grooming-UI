@@ -24,8 +24,11 @@ import { useWeightClasses } from "../hooks/weightClasses";
 import { useAvailabiltyByStylistId } from "../hooks/availability";
 import { useUpcomingAppointmentsByStylistId } from "@/hooks/appointments";
 import { useUpcomingTimeOffsByStylistId } from "../hooks/timeOffs";
-import { useConfigByFKs } from "@/hooks/serviceConfigurations";
-import { DEFAULT_STYLIST, serviceImageMap, defaultImage } from "../constants";
+import {
+  useServiceConfigurations,
+  useConfigByFKs,
+} from "@/hooks/serviceConfigurations";
+import { DEFAULT_STYLIST } from "../constants";
 import { CONFIRMATION, ERROR } from "@/static/paths";
 import { SpeciesStep } from "./BookingSteps/SpeciesStep";
 import { ServiceStep } from "./BookingSteps/ServiceStep";
@@ -34,7 +37,11 @@ import { PetStep } from "./BookingSteps/PetStep";
 import { DateTimeStep } from "./BookingSteps/DateTimeStep";
 import { ReviewStep } from "./BookingSteps/ReviewStep";
 import { LoadingSpinnerButton } from "./LoadingSpinner";
-import { BOOKING_STEPS, DEFAULT_STATUS } from "../constants";
+import {
+  BOOKING_STEPS,
+  DEFAULT_STATUS,
+  SPECIES as PET_SPECIES,
+} from "../constants";
 
 interface MultiStepFormModalProps {
   open: boolean;
@@ -61,6 +68,7 @@ interface FormData {
 }
 const { BOOKING_MODAL_FIELD_TWO: BOOKING_MODAL_FIELD } = CLASSNAMES;
 const { SPECIES, SERVICE, PET, DATE_TIME, PERSONAL, REVIEW } = BOOKING_STEPS;
+const { DOG, CAT } = PET_SPECIES;
 
 const TOTAL_STEPS = 6;
 
@@ -158,8 +166,7 @@ export function MultiStepFormModal({
     error: configError,
   } = useConfigByFKs({
     serviceId: bookingData.service?.id,
-    breedId: bookingData.breed?.id,
-    weightClassId: bookingData.weightClass?.id,
+    weightClassId: bookingData.weightClass?.id
   });
 
   const { refetch: lookupClientRefetch, isFetching: isLookingUpClient } =
@@ -170,6 +177,7 @@ export function MultiStepFormModal({
     createClientMutation.isPending ||
     createPetMutation.isPending ||
     createAppMutation.isPending;
+
   const validateStep = () => {
     switch (currentStep) {
       case SPECIES:
@@ -184,32 +192,34 @@ export function MultiStepFormModal({
           stepIsValid
         );
       case PET: {
-        const { breed, weightClass } = bookingData;
-        return (
-          !!bookingData?.petName &&
-          !!breed?.id &&
-          !!weightClass?.id &&
-          stepIsValid
-        );
+        const { petName, breed, weightClass, petSpecies } = bookingData;
+        let petComplete = false;
+        if (petSpecies === DOG) {
+          petComplete = !!petName && !!weightClass?.id;
+        }
+        if (petSpecies == CAT) {
+          petComplete = !!petName;
+        }
+        return petComplete && stepIsValid;
       }
       case DATE_TIME:
         return !!bookingData?.startTime && stepIsValid;
       case REVIEW: {
         const {
+          petSpecies,
           firstName,
           lastName,
           phone,
-          breed,
           weightClass,
           service,
           petName,
           serviceConfig,
         } = bookingData;
         return (
+          petSpecies &&
           firstName &&
           lastName &&
           phone &&
-          breed?.id &&
           weightClass?.id &&
           service?.id &&
           serviceConfig?.id &&
@@ -262,7 +272,7 @@ export function MultiStepFormModal({
           phone: phone,
           email: email,
           pet_name: petName,
-          breed_id: breed?.id,
+          breed: breed,
           weight_class_id: weightClass?.id,
           service_id: service?.id,
           stylist_id: bookingData.stylist_id || DEFAULT_STYLIST,
@@ -309,6 +319,17 @@ export function MultiStepFormModal({
   // }, [bookingData.service?.id]);
 
   useEffect(() => {
+    const {petSpecies} = bookingData;
+    if(petSpecies === CAT){
+      updateBookingData({weightClass: {
+      code: "",
+      id: 1,
+      label: "",
+      weight_bounds: [-1, -1],
+      }})
+    }
+  }, [bookingData.petSpecies])
+  useEffect(() => {
     if (currentStep !== PERSONAL && showPersonalErrors) {
       setShowPersonalErrors(false);
     }
@@ -325,7 +346,6 @@ export function MultiStepFormModal({
   useEffect(() => {
     if (
       !configData?.id ||
-      !configData?.breed_id ||
       !configData?.weight_class_id ||
       !configData?.service_id
     )
@@ -352,9 +372,7 @@ export function MultiStepFormModal({
           />
         );
       case SERVICE:
-        return (
-         <ServiceStep serviceData={serviceData}/>
-        );
+        return <ServiceStep serviceData={serviceData} />;
       case PET:
         return (
           <PetStep
@@ -439,7 +457,7 @@ export function MultiStepFormModal({
               <Button
                 type="button"
                 variant="outline"
-                onClick={()=>handleOpenChange(false)}
+                onClick={() => handleOpenChange(false)}
                 className="active:bg-gray-200 active:border-gray-300 active:text-gray-900 active:scale-95 transition"
               >
                 {t("general.cancel")}

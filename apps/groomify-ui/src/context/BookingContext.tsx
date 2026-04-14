@@ -23,10 +23,7 @@ export interface BookingData {
     label: string;
     weight_bounds: [number, number];
   };
-  breed: {
-    id: number;
-    name: string;
-  };
+  breed: string;
   serviceConfig: {
     id: number;
     buffer_minutes: number;
@@ -71,10 +68,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       label: "",
       weight_bounds: [-1, -1],
     },
-    breed: {
-      id: null,
-      name: "",
-    },
+    breed: "",
     serviceConfig:{
       id: null,
       duration_minutes: null,

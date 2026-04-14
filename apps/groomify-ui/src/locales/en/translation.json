@@ -74,6 +74,7 @@
     "notPermitted": "(This breed cannot be serviced)",
     "errors": {
       "nameLengthViolation": "Pet name length must be between 0 and \"{{max}}\" characters",
+      "breedLengthViolation": "Pet breed length must be between 0 and \"{{max}}\" characters",
       "notEmpty": "\"{{input}}\" field cannot be empty",
       "loading": "Error loading pets"
     }

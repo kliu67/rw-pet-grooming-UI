@@ -32,6 +32,7 @@ export const MAX_CLIENT_DESC_LENGTH = 200;
 
 //pets
 export const MAX_PET_NAME_LENGTH = 60;
+export const MAX_BREED_LENGTH = 60;
 export const PETS_QUERY_KEY = "pets";
 
 //weight classes
