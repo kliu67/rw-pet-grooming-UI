@@ -254,10 +254,11 @@ describe("MultiStepFormModal", () => {
       expect(createAppointmentMutateAsyncMock).toHaveBeenCalledTimes(1);
       expect(createAppointmentMutateAsyncMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          first_name: expect.any(String),
-          last_name: expect.any(String),
+          first_name: "Jane",
+          last_name: "Doe",
+          pet_name: "Test Pet",
           service_id: 35,
-          breed_id: 10,
+          breed: expect.objectContaining({ id: 10 }),
           weight_class_id: 2,
           stylist_id: 2,
         }),

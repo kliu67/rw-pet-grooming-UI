@@ -53,6 +53,10 @@
     "weight": "Select your pet's weight",
     "time": "Select a time"
   },
+  "services":{
+    "dogs": "Dog Services",
+    "cats": "Cat Services"
+  },
   "speciesStep":{
       "dog": "Dog",
     "cat": "Cat",

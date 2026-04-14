@@ -56,10 +56,6 @@ export function Hero({ onBookNow }: HeroProps) {
                 alt="Happy fluffy dog" 
                 className="w-full h-[500px] object-cover"
               />
-              {/* <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-8">
-                <p className="text-white font-bold text-xl">"They treat my Max like royalty!"</p>
-                <p className="text-gray-200 text-sm">- Sarah T.</p>
-              </div> */}
             </div>
             
             {/* Decorative elements */}
