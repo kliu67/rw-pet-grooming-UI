@@ -6,6 +6,9 @@ import basicServiceImage from "./static/img/basic_service.webp";
 import demattingImage from "./static/img/dematting.webp";
 import nailClippingImage from "./static/img/nail_clipping.webp";
 import earCleaningImage from "./static/img/ear_cleaning.webp";
+import catBathImage from "./static/img/cat_bath.webp";
+import catBathLongImage from "./static/img/cat_bath_long.webp";
+import catHairTrimmingImage from "./static/img/cat_hair_trimming.webp";
 
 export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 export const INTERVAL_MINUTES = 20;
@@ -138,6 +141,9 @@ export const serviceImageMap = {
   DEMATTING: demattingImage,
   NAIL_TRIMMING: nailClippingImage,
   EAR_CLEANING: earCleaningImage,
+  CAT_BATH: catBathImage,
+  CAT_BATH_LONG: catBathLongImage,
+  CAT_HAIR_TRIMMING: catHairTrimmingImage
 };
 
 export const defaultImage =
