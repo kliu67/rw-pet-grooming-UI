@@ -1,0 +1,565 @@
+import { useMemo } from "react";
+
+type UnknownRecord = Record<string, any>;
+
+type TimeRange = {
+  startMinutes: number;
+  endMinutes: number;
+};
+
+type OpenRange = {
+  start: string;
+  end: string;
+};
+
+type TimeSlot = {
+  start: Date;
+  end: Date;
+  startStrAMPM: string;
+  endStrAMPM: string;
+  bookable: boolean;
+};
+
+type UseOpenTimeRangesParams = {
+  availabilityData?: unknown;
+  timeOffsData?: unknown;
+  appointments?: unknown;
+  date?: Date;
+};
+
+type DayRelation = "same_day" | "previous_day" | null;
+
+function toArray(data: unknown): UnknownRecord[] {
+  if (Array.isArray(data)) return data as UnknownRecord[];
+  if (data && typeof data === "object") {
+    const record = data as UnknownRecord;
+    if (Array.isArray(record.data)) return record.data as UnknownRecord[];
+    if (Array.isArray(record.items)) return record.items as UnknownRecord[];
+    if (Array.isArray(record.results)) return record.results as UnknownRecord[];
+  }
+  return [];
+}
+
+function asNumber(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return null;
+}
+
+function parseTimeToMinutes(value: unknown): number | null {
+  if (typeof value !== "string") return null;
+  const input = value.trim();
+  const match = input.match(
+    /^(?:(\d{1,2}):(\d{2})(?::\d{2}(?:\.\d+)?)?|(?:\d{4}-\d{2}-\d{2}[T\s])(\d{1,2}):(\d{2})(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)$/,
+  );
+  if (!match) return null;
+
+  const hours = Number(match[1] ?? match[3]);
+  const minutes = Number(match[2] ?? match[4]);
+
+  if (!Number.isInteger(hours) || !Number.isInteger(minutes)) return null;
+  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return null;
+
+  return hours * 60 + minutes;
+}
+
+function getMinutesFromRecord(
+  record: UnknownRecord,
+  keys: string[],
+): number | null {
+  for (const key of keys) {
+    const raw = record[key];
+    const fromString = parseTimeToMinutes(raw);
+    if (fromString !== null) return fromString;
+
+    const fromNumber = asNumber(raw);
+    if (fromNumber !== null && fromNumber >= 0 && fromNumber <= 24 * 60) {
+      return fromNumber;
+    }
+  }
+
+  return null;
+}
+
+function getDateOnly(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function parseDateLike(value: unknown): Date | null {
+  if (!value) return null;
+  if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
+  if (typeof value === "string" || typeof value === "number") {
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+  }
+  return null;
+}
+
+function addDays(date: Date, days: number) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function getDateTimeFromRecord(record: UnknownRecord, keys: string[]) {
+  for (const key of keys) {
+    const parsed = parseDateLike(record[key]);
+    if (parsed) return parsed;
+  }
+  return null;
+}
+
+function getDateRelation(
+  record: UnknownRecord,
+  selectedDate: Date,
+): DayRelation {
+  const selectedDay = getDateOnly(selectedDate);
+  const previousDay = addDays(selectedDay, -1);
+  const explicitDate =
+    getDateTimeFromRecord(record, [
+      "date",
+      "start_date",
+      "work_date",
+      "available_date",
+      "day",
+    ]) ??
+    getDateTimeFromRecord(record, [
+      "start_datetime",
+      "startDateTime",
+      "start_at",
+      "from_datetime",
+    ]);
+
+  if (explicitDate) {
+    const dateOnly = getDateOnly(explicitDate);
+    if (dateOnly.getTime() === selectedDay.getTime()) return "same_day";
+    if (dateOnly.getTime() === previousDay.getTime()) return "previous_day";
+    return null;
+  }
+
+  const selectedDow = selectedDay.getDay();
+  const previousDow = previousDay.getDay();
+  const weekdayValue =
+    asNumber(record.day_of_week) ??
+    asNumber(record.weekday) ??
+    asNumber(record.dayOfWeek) ??
+    asNumber(record.dow);
+
+  if (weekdayValue === null) return null;
+  if (weekdayValue === selectedDow) return "same_day";
+  if (weekdayValue === previousDow) return "previous_day";
+
+  return null;
+}
+
+function toRange(record: UnknownRecord): TimeRange | null {
+  const startMinutes = getMinutesFromRecord(record, [
+    "start_datetime",
+    "start_time",
+    "start",
+    "from",
+    "from_time",
+    "startTime",
+  ]);
+  const endMinutes = getMinutesFromRecord(record, [
+    "end_datetime",
+    "end_time",
+    "end",
+    "to",
+    "to_time",
+    "endTime",
+  ]);
+
+  if (startMinutes === null || endMinutes === null) return null;
+  if (endMinutes === startMinutes) return null;
+
+  return { startMinutes, endMinutes };
+}
+
+function getDateTimeRangesForSelectedDay(
+  record: UnknownRecord,
+  selectedDate: Date,
+): TimeRange[] | null {
+  const startAt = getDateTimeFromRecord(record, [
+    "start_datetime",
+    "startDateTime",
+    "start_at",
+    "from_datetime",
+    "startTime",
+  ]);
+  const endAt = getDateTimeFromRecord(record, [
+    "end_datetime",
+    "endDateTime",
+    "end_at",
+    "to_datetime",
+    "endTime",
+  ]);
+
+  if (!startAt || !endAt) return null;
+  if (endAt.getTime() <= startAt.getTime()) return [];
+
+  const dayStart = getDateOnly(selectedDate);
+  const dayEnd = addDays(dayStart, 1);
+  const overlapStart = Math.max(startAt.getTime(), dayStart.getTime());
+  const overlapEnd = Math.min(endAt.getTime(), dayEnd.getTime());
+
+  if (overlapEnd <= overlapStart) return [];
+
+  const startDate = new Date(overlapStart);
+  const endDate = new Date(overlapEnd);
+  const startMinutes = startDate.getHours() * 60 + startDate.getMinutes();
+  let endMinutes = endDate.getHours() * 60 + endDate.getMinutes();
+
+  // Keep end-of-day intervals as 24:00 for clean rendering and subtraction math.
+  if (overlapEnd === dayEnd.getTime()) {
+    endMinutes = 24 * 60;
+  }
+
+  if (endMinutes <= startMinutes) return [];
+
+  return [{ startMinutes, endMinutes }];
+}
+
+function toRangesForSelectedDay(
+  record: UnknownRecord,
+  selectedDate: Date,
+): TimeRange[] {
+  const fromDateTimes = getDateTimeRangesForSelectedDay(record, selectedDate);
+  if (fromDateTimes) return fromDateTimes;
+
+  const relation = getDateRelation(record, selectedDate);
+  if (!relation) return [];
+
+  const baseRange = toRange(record);
+  if (!baseRange) return [];
+
+  if (baseRange.endMinutes > baseRange.startMinutes) {
+    return relation === "same_day" ? [baseRange] : [];
+  }
+
+  // Overnight range, e.g. 22:00 -> 02:00.
+  if (relation === "same_day") {
+    return [{ startMinutes: baseRange.startMinutes, endMinutes: 24 * 60 }];
+  }
+
+  return [{ startMinutes: 0, endMinutes: baseRange.endMinutes }];
+}
+
+function subtractRanges(open: TimeRange[], blocked: TimeRange[]): TimeRange[] {
+  if (!blocked.length) return open;
+
+  return open.flatMap((slot) => {
+    let segments: TimeRange[] = [slot];
+
+    for (const off of blocked) {
+      const next: TimeRange[] = [];
+
+      for (const seg of segments) {
+        const overlapStart = Math.max(seg.startMinutes, off.startMinutes);
+        const overlapEnd = Math.min(seg.endMinutes, off.endMinutes);
+
+        if (overlapStart >= overlapEnd) {
+          next.push(seg);
+          continue;
+        }
+
+        if (seg.startMinutes < overlapStart) {
+          next.push({
+            startMinutes: seg.startMinutes,
+            endMinutes: overlapStart,
+          });
+        }
+
+        if (overlapEnd < seg.endMinutes) {
+          next.push({ startMinutes: overlapEnd, endMinutes: seg.endMinutes });
+        }
+      }
+
+      segments = next;
+      if (!segments.length) break;
+    }
+
+    return segments;
+  });
+}
+
+export function addRanges(base: TimeRange[], added: TimeRange[]): TimeRange[] {
+  const allRanges = [...base, ...added]
+    .filter((range) => range.endMinutes > range.startMinutes)
+    .sort((a, b) => a.startMinutes - b.startMinutes);
+
+  if (!allRanges.length) return [];
+
+  const merged: TimeRange[] = [{ ...allRanges[0] }];
+
+  for (let i = 1; i < allRanges.length; i += 1) {
+    const current = allRanges[i];
+    const last = merged[merged.length - 1];
+
+    if (current.startMinutes <= last.endMinutes) {
+      last.endMinutes = Math.max(last.endMinutes, current.endMinutes);
+      continue;
+    }
+
+    merged.push({ ...current });
+  }
+
+  return merged;
+}
+
+function minutesToTimeString(minutes: number) {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+function toAMPMString(date: Date) {
+  const hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const period = hours >= 12 ? "PM" : "AM";
+  const normalizedHours = hours % 12 || 12;
+  return `${normalizedHours}:${minutes}${period}`;
+}
+
+function rangesOverlap(a: TimeRange, b: TimeRange) {
+  return a.startMinutes < b.endMinutes && b.startMinutes < a.endMinutes;
+}
+
+export function useOpenTimeRanges({
+  availabilityData,
+  timeOffsData,
+  appointments,
+  date,
+}: UseOpenTimeRangesParams) {
+  return useMemo(() => {
+    return getOpenTimeRanges({
+      availabilityData,
+      timeOffsData,
+      appointments,
+      date,
+    });
+  }, [availabilityData, date, appointments, timeOffsData]);
+}
+
+export function getOpenTimeRanges({
+  availabilityData,
+  timeOffsData,
+  appointments = [],
+  date,
+}: UseOpenTimeRangesParams): OpenRange[] {
+  if (!date) return [];
+
+  const availabilityRanges = toArray(availabilityData).flatMap((item) =>
+    toRangesForSelectedDay(item, date),
+  );
+
+  const blockedRanges = toArray(timeOffsData).flatMap((item) =>
+    toRangesForSelectedDay(item, date),
+  );
+
+  const bookedRanges = toArray(appointments).flatMap((app) =>
+    toRangesForSelectedDay(app, date),
+  );
+
+  return subtractRanges(
+    subtractRanges(availabilityRanges, blockedRanges),
+    bookedRanges,
+  )
+    .sort((a, b) => a.startMinutes - b.startMinutes)
+    .map((range) => ({
+      start: minutesToTimeString(range.startMinutes),
+      end: minutesToTimeString(range.endMinutes),
+    }));
+}
+
+export function getBlockedTimeRanges({
+  availabilityData,
+  timeOffsData,
+  date,
+}: UseOpenTimeRangesParams): OpenRange[] {
+  if (!date) return [];
+
+  const availabilityRanges = toArray(availabilityData).flatMap((item) =>
+    toRangesForSelectedDay(item, date),
+  );
+
+  const blockedRanges = toArray(timeOffsData).flatMap((item) =>
+    toRangesForSelectedDay(item, date),
+  );
+
+  return subtractRanges(availabilityRanges, blockedRanges)
+    .sort((a, b) => a.startMinutes - b.startMinutes)
+    .map((range) => ({
+      start: minutesToTimeString(range.startMinutes),
+      end: minutesToTimeString(range.endMinutes),
+    }));
+}
+
+export function getTimeSlotsForDate({
+  availabilityData,
+  timeOffsData,
+  appointments = [],
+  date,
+  slotMinutes,
+  appointmentDurationMinutes,
+  now = new Date(),
+}: UseOpenTimeRangesParams & {
+  slotMinutes: number;
+  appointmentDurationMinutes?: number;
+  now?: Date;
+}): TimeSlot[] {
+  if (!date || !Number.isFinite(slotMinutes) || slotMinutes <= 0) return [];
+  const durationMinutes = Number(appointmentDurationMinutes) || slotMinutes;
+
+  const availabilityRanges = toArray(availabilityData)
+    .flatMap((item) => toRangesForSelectedDay(item, date))
+    .sort((a, b) => a.startMinutes - b.startMinutes);
+
+  const blockedRanges = toArray(timeOffsData).flatMap((item) =>
+    toRangesForSelectedDay(item, date),
+  );
+
+  const bookedRanges = toArray(appointments).flatMap((item) =>
+    toRangesForSelectedDay(item, date),
+  );
+
+  const unavailableRanges = [...blockedRanges, ...bookedRanges];
+  const minBookableAt = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+  const dayStart = getDateOnly(date);
+
+  const slots: TimeSlot[] = [];
+
+  for (const range of availabilityRanges) {
+    for (
+      let cursor = range.startMinutes;
+      cursor + slotMinutes <= range.endMinutes;
+      cursor += slotMinutes
+    ) {
+      const slotRange: TimeRange = {
+        startMinutes: cursor,
+        endMinutes: cursor + slotMinutes,
+      };
+      const appointmentRange: TimeRange = {
+        startMinutes: cursor,
+        endMinutes: cursor + durationMinutes,
+      };
+
+      const slotStart = new Date(dayStart);
+      slotStart.setHours(0, slotRange.startMinutes, 0, 0);
+      const slotEnd = new Date(dayStart.getTime() + slotRange.endMinutes * 60 * 1000);
+      const slotIsFutureEnough = slotStart.getTime() > minBookableAt.getTime();
+      const fitsAvailability = appointmentRange.endMinutes <= range.endMinutes;
+      const hasOverlap = unavailableRanges.some((r) => rangesOverlap(appointmentRange, r));
+
+      slots.push({
+        start: new Date(slotStart),
+        end: slotEnd,
+        startStrAMPM: toAMPMString(slotStart),
+        endStrAMPM: toAMPMString(slotEnd),
+        bookable: slotIsFutureEnough && fitsAvailability && !hasOverlap,
+      });
+    }
+  }
+
+  return slots;
+}
+
+export function useTimeSlotsForDate({
+  availabilityData,
+  timeOffsData,
+  appointments = [],
+  date,
+  slotMinutes,
+  appointmentDurationMinutes,
+  now,
+}: UseOpenTimeRangesParams & {
+  slotMinutes: number;
+  appointmentDurationMinutes?: number;
+  now?: Date;
+}): TimeSlot[] {
+  return useMemo(
+    () =>
+      getTimeSlotsForDate({
+        availabilityData,
+        timeOffsData,
+        appointments,
+        date,
+        slotMinutes,
+        appointmentDurationMinutes,
+        now,
+      }),
+    [
+      availabilityData,
+      timeOffsData,
+      appointments,
+      date,
+      slotMinutes,
+      appointmentDurationMinutes,
+      now,
+    ],
+  );
+}
+
+export function useAvailableTimeRanges({
+  availabilityData,
+  date,
+}: UseOpenTimeRangesParams): OpenRange[] {
+  if (!date) return [];
+
+  return useMemo(() => {
+    const availabilityRanges = toArray(availabilityData)
+      .flatMap((item) => toRangesForSelectedDay(item, date))
+      .sort((a, b) => a.startMinutes - b.startMinutes)
+      .map((range) => ({
+        start: minutesToTimeString(range.startMinutes),
+        end: minutesToTimeString(range.endMinutes),
+      }));
+
+    return availabilityRanges;
+  }, [availabilityData, date]);
+}
+
+export function useClosedTimeRanges({
+  timeOffsData,
+  appointments,
+  date,
+}: UseOpenTimeRangesParams) {
+  return useMemo(() => {
+    return getClosedTimeRanges({
+      timeOffsData,
+      appointments,
+      date,
+    });
+  }, [date, appointments, timeOffsData]);
+}
+
+ function getClosedTimeRanges({
+  availabilityData,
+  timeOffsData,
+  appointments = [],
+  date,
+}: UseOpenTimeRangesParams): OpenRange[] {
+  if (!date) return [];
+
+  const availabilityRanges = toArray(availabilityData).flatMap((item) =>
+    toRangesForSelectedDay(item, date),
+  );
+
+  const blockedRanges = toArray(timeOffsData).flatMap((item) =>
+    toRangesForSelectedDay(item, date),
+  );
+
+  const bookedRanges = toArray(appointments).flatMap((app) =>
+    toRangesForSelectedDay(app, date),
+  );
+
+  return addRanges(blockedRanges, bookedRanges)
+    .sort((a, b) => a.startMinutes - b.startMinutes)
+    .map((range) => ({
+      start: minutesToTimeString(range.startMinutes),
+      end: minutesToTimeString(range.endMinutes),
+    }));
+}
