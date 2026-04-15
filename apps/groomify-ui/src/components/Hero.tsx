@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight, CheckCircle } from 'lucide-react';
+import heroImage from '../static/img/hero.webp';
 
 interface HeroProps {
   onBookNow: () => void;
@@ -51,14 +52,10 @@ export function Hero({ onBookNow }: HeroProps) {
           <div className="relative lg:ml-10">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl transform lg:rotate-2 hover:rotate-0 transition-all duration-500">
               <img 
-                src="https://images.unsplash.com/photo-1696255489143-aead853684f6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYXBweSUyMGNsZWFuJTIwZmx1ZmZ5JTIwZG9nfGVufDF8fHx8MTc3MDQwNjQ1N3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral" 
+                src={heroImage}
                 alt="Happy fluffy dog" 
                 className="w-full h-[500px] object-cover"
               />
-              {/* <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-8">
-                <p className="text-white font-bold text-xl">"They treat my Max like royalty!"</p>
-                <p className="text-gray-200 text-sm">- Sarah T.</p>
-              </div> */}
             </div>
             
             {/* Decorative elements */}

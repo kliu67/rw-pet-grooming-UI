@@ -6,6 +6,9 @@ import basicServiceImage from "./static/img/basic_service.webp";
 import demattingImage from "./static/img/dematting.webp";
 import nailClippingImage from "./static/img/nail_clipping.webp";
 import earCleaningImage from "./static/img/ear_cleaning.webp";
+import catBathImage from "./static/img/cat_bath.webp";
+import catBathLongImage from "./static/img/cat_bath_long.webp";
+import catHairTrimmingImage from "./static/img/cat_hair_trimming.webp";
 
 export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 export const INTERVAL_MINUTES = 20;
@@ -32,6 +35,7 @@ export const MAX_CLIENT_DESC_LENGTH = 200;
 
 //pets
 export const MAX_PET_NAME_LENGTH = 60;
+export const MAX_BREED_LENGTH = 60;
 export const PETS_QUERY_KEY = "pets";
 
 //weight classes
@@ -137,18 +141,40 @@ export const serviceImageMap = {
   DEMATTING: demattingImage,
   NAIL_TRIMMING: nailClippingImage,
   EAR_CLEANING: earCleaningImage,
+  CAT_BATH: catBathImage,
+  CAT_BATH_LONG: catBathLongImage,
+  CAT_HAIR_TRIMMING: catHairTrimmingImage
 };
+
+export const iconMap = {
+  FULL_GROOMING: Scissors,
+  BATH_BRUSH: Droplets,
+  BASIC_GROOMING: Heart,
+  DEMATTING: Brush,
+  NAIL_TRIMMING: Scissors,
+  EAR_CLEANING: Sparkles,
+  CAT_BATH: Droplets,
+  CAT_BATH_LONG: Droplets,
+  CAT_HAIR_TRIMMING: Scissors,
+};
+
 
 export const defaultImage =
   "https://images.unsplash.com/photo-1703368786305-4e1dcfcfd0db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBnZXR0aW5nJTIwaGFpcmN1dHxlbnwxfHx8fDE3NzA0MDY0NTd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
 
 export const BOOKING_STEPS = {
-  SERVICE: 1,
-  PET: 2,
-  DATE_TIME: 3,
-  PERSONAL: 4,
-  REVIEW: 5,
-  CONFIRM: 6,
+  SPECIES: 1,
+  SERVICE: 2,
+  PET: 3,
+  DATE_TIME: 4,
+  PERSONAL: 5,
+  REVIEW: 6,
+  CONFIRM: 7,
+};
+
+export const SPECIES = {
+  DOG: 'DOG',
+  CAT: 'CAT'
 };
 
 export const DEFAULT_STATUS = "booked";

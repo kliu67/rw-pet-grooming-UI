@@ -24,16 +24,24 @@ import { useWeightClasses } from "../hooks/weightClasses";
 import { useAvailabiltyByStylistId } from "../hooks/availability";
 import { useUpcomingAppointmentsByStylistId } from "@/hooks/appointments";
 import { useUpcomingTimeOffsByStylistId } from "../hooks/timeOffs";
-import { useConfigByFKs } from "@/hooks/serviceConfigurations";
-import { DEFAULT_STYLIST, serviceImageMap, defaultImage } from "../constants";
+import {
+  useServiceConfigurations,
+  useConfigByFKs,
+} from "@/hooks/serviceConfigurations";
+import { DEFAULT_STYLIST } from "../constants";
 import { CONFIRMATION, ERROR } from "@/static/paths";
-import { ServiceCard } from "./ServiceCard";
+import { SpeciesStep } from "./BookingSteps/SpeciesStep";
+import { ServiceStep } from "./BookingSteps/ServiceStep";
 import { PersonalStep } from "./BookingSteps/PersonalStep";
 import { PetStep } from "./BookingSteps/PetStep";
 import { DateTimeStep } from "./BookingSteps/DateTimeStep";
 import { ReviewStep } from "./BookingSteps/ReviewStep";
 import { LoadingSpinnerButton } from "./LoadingSpinner";
-import { BOOKING_STEPS, DEFAULT_STATUS } from "../constants";
+import {
+  BOOKING_STEPS,
+  DEFAULT_STATUS,
+  SPECIES as PET_SPECIES,
+} from "../constants";
 
 interface MultiStepFormModalProps {
   open: boolean;
@@ -59,9 +67,10 @@ interface FormData {
   description: string;
 }
 const { BOOKING_MODAL_FIELD_TWO: BOOKING_MODAL_FIELD } = CLASSNAMES;
-const { SERVICE, PET, DATE_TIME, PERSONAL, REVIEW } = BOOKING_STEPS;
+const { SPECIES, SERVICE, PET, DATE_TIME, PERSONAL, REVIEW } = BOOKING_STEPS;
+const { DOG, CAT } = PET_SPECIES;
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 export function MultiStepFormModal({
   open,
@@ -89,6 +98,10 @@ export function MultiStepFormModal({
   };
 
   const steps = [
+    {
+      id: SPECIES,
+      label: t("bookingModal.speciesStep"),
+    },
     {
       id: SERVICE,
       label: t("bookingModal.serviceStep"),
@@ -153,8 +166,7 @@ export function MultiStepFormModal({
     error: configError,
   } = useConfigByFKs({
     serviceId: bookingData.service?.id,
-    breedId: bookingData.breed?.id,
-    weightClassId: bookingData.weightClass?.id,
+    weightClassId: bookingData.weightClass?.id
   });
 
   const { refetch: lookupClientRefetch, isFetching: isLookingUpClient } =
@@ -165,10 +177,13 @@ export function MultiStepFormModal({
     createClientMutation.isPending ||
     createPetMutation.isPending ||
     createAppMutation.isPending;
+
   const validateStep = () => {
     switch (currentStep) {
+      case SPECIES:
+        return bookingData?.petSpecies && stepIsValid;
       case SERVICE:
-        return true;
+        return !!bookingData?.service?.id;
       case PERSONAL:
         return (
           !!bookingData?.firstName &&
@@ -177,32 +192,34 @@ export function MultiStepFormModal({
           stepIsValid
         );
       case PET: {
-        const { breed, weightClass } = bookingData;
-        return (
-          !!bookingData?.petName &&
-          !!breed?.id &&
-          !!weightClass?.id &&
-          stepIsValid
-        );
+        const { petName, breed, weightClass, petSpecies } = bookingData;
+        let petComplete = false;
+        if (petSpecies === DOG) {
+          petComplete = !!petName && !!weightClass?.id;
+        }
+        if (petSpecies == CAT) {
+          petComplete = !!petName;
+        }
+        return petComplete && stepIsValid;
       }
       case DATE_TIME:
         return !!bookingData?.startTime && stepIsValid;
       case REVIEW: {
         const {
+          petSpecies,
           firstName,
           lastName,
           phone,
-          breed,
           weightClass,
           service,
           petName,
           serviceConfig,
         } = bookingData;
         return (
+          petSpecies &&
           firstName &&
           lastName &&
           phone &&
-          breed?.id &&
           weightClass?.id &&
           service?.id &&
           serviceConfig?.id &&
@@ -239,14 +256,23 @@ export function MultiStepFormModal({
     if (validateStep()) {
       const { petName, breed, weightClass } = bookingData;
       try {
-        const { firstName, lastName, phone, email, service, startTime, serviceConfig, status } = bookingData;
-                const appointmentForm = {
+        const {
+          firstName,
+          lastName,
+          phone,
+          email,
+          service,
+          startTime,
+          serviceConfig,
+          status,
+        } = bookingData;
+        const appointmentForm = {
           first_name: firstName,
           last_name: lastName,
           phone: phone,
           email: email,
           pet_name: petName,
-          breed_id: breed?.id,
+          breed: breed,
           weight_class_id: weightClass?.id,
           service_id: service?.id,
           stylist_id: bookingData.stylist_id || DEFAULT_STYLIST,
@@ -286,12 +312,23 @@ export function MultiStepFormModal({
     setCurrentStep(step);
   };
 
-  useEffect(() => {
-    if (bookingData.service?.id) {
-      setCurrentStep(2);
-    }
-  }, [bookingData.service?.id]);
+  // useEffect(() => {
+  //   if (bookingData.service?.id) {
+  //     setCurrentStep(PET);
+  //   }
+  // }, [bookingData.service?.id]);
 
+  useEffect(() => {
+    const {petSpecies} = bookingData;
+    if(petSpecies === CAT){
+      updateBookingData({weightClass: {
+      code: "",
+      id: 1,
+      label: "",
+      weight_bounds: [-1, -1],
+      }})
+    }
+  }, [bookingData.petSpecies])
   useEffect(() => {
     if (currentStep !== PERSONAL && showPersonalErrors) {
       setShowPersonalErrors(false);
@@ -309,7 +346,6 @@ export function MultiStepFormModal({
   useEffect(() => {
     if (
       !configData?.id ||
-      !configData?.breed_id ||
       !configData?.weight_class_id ||
       !configData?.service_id
     )
@@ -329,43 +365,14 @@ export function MultiStepFormModal({
 
   const renderStep = () => {
     switch (currentStep) {
-      case SERVICE:
+      case SPECIES:
         return (
-          <div className="space-y-4">
-            <div
-              id="services-container"
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-            >
-              {serviceData.length > 0 &&
-                serviceData.map((service, index) => {
-                  const image = serviceImageMap[service?.code] ?? defaultImage;
-                  return (
-                    <ServiceCard
-                      key={service?.id}
-                      service={service}
-                      image={image}
-                      isSelected={
-                        String(bookingData?.service?.id) === String(service?.id)
-                      }
-                      onClick={(field, value) => {
-                        const serviceForm = {
-                          svcId: value?.id,
-                          svcName: value?.name,
-                          svcBasePrice: value?.base_price,
-                          svcCode: value.code,
-                        };
-                        const { startTime, ...rest } = bookingData;
-                        removeStartTime();
-                        updateBookingData({ ...rest, service: service });
-                        handleNext();
-                      }}
-                    />
-                  );
-                })}
-            </div>
-          </div>
+          <SpeciesStep
+            onValidityChange={(isValid) => setStepIsValid(isValid)}
+          />
         );
-
+      case SERVICE:
+        return <ServiceStep serviceData={serviceData} />;
       case PET:
         return (
           <PetStep
@@ -444,13 +451,13 @@ export function MultiStepFormModal({
 
         {/* Form Content */}
         <div className="py-4">{renderStep()}</div>
-        {currentStep > 1 && (
+        {currentStep >= 1 && (
           <DialogFooter className="flex-row justify-between sm:justify-between">
-            {currentStep === 1 ? (
+            {currentStep === SPECIES ? (
               <Button
                 type="button"
                 variant="outline"
-                onClick={handleBack}
+                onClick={() => handleOpenChange(false)}
                 className="active:bg-gray-200 active:border-gray-300 active:text-gray-900 active:scale-95 transition"
               >
                 {t("general.cancel")}

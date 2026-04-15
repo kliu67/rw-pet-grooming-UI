@@ -10,11 +10,11 @@ export function useServiceConfigurations() {
 }
 
 export function useConfigByFKs(data) {
-  const{ serviceId, breedId, weightClassId } = data;
+  const{ serviceId, weightClassId } = data;
   return useQuery({
-    queryKey: [SERVICE_CONFIGURATIONS_QUERY_KEY, serviceId, breedId, weightClassId],
-    queryFn: () => getConfigByFKs(serviceId, breedId, weightClassId),
-    enabled: !!serviceId && !!breedId && !!weightClassId
+    queryKey: [SERVICE_CONFIGURATIONS_QUERY_KEY, serviceId, weightClassId],
+    queryFn: () => getConfigByFKs(serviceId, weightClassId),
+    enabled: !!serviceId && !!weightClassId
   });
 }
 

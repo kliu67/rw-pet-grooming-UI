@@ -20,7 +20,15 @@ vi.mock("react-router", () => ({
 
 vi.mock("../hooks/services", () => ({
   useServices: () => ({
-    data: [{ id: 35, code: "BATH_BRUSH", name: "Bath&Brush", base_price: "40.00" }],
+    data: [
+      {
+        id: 35,
+        code: "BATH_BRUSH",
+        name: "Bath&Brush",
+        base_price: "40.00",
+        service_species: "DOG",
+      },
+    ],
     isLoading: false,
     error: null,
   }),
@@ -97,7 +105,7 @@ vi.mock("./ServiceCard", () => ({
     <button
       type="button"
       data-testid={`service-card-${service.id}`}
-      onClick={() => onClick("service", service)}
+      onClick={() => onClick()}
     >
       {service.name}
     </button>
@@ -167,6 +175,20 @@ vi.mock("./BookingSteps/ReviewStep", () => ({
   ReviewStep: () => <div>review-step</div>,
 }));
 
+vi.mock("./BookingSteps/SpeciesStep", async () => {
+  const { useBooking } = await import("@/context/BookingContext");
+  return {
+    SpeciesStep: ({ onValidityChange }: any) => {
+      const { updateBookingData } = useBooking();
+      useEffect(() => {
+        updateBookingData({ petSpecies: "DOG" });
+        onValidityChange(true);
+      }, []);
+      return <div>species-step</div>;
+    },
+  };
+});
+
 describe("MultiStepFormModal", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -192,18 +214,26 @@ describe("MultiStepFormModal", () => {
       </BookingProvider>,
     );
 
+  async function clickNext() {
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Next" })).toBeEnabled();
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+  }
+
   async function goToReviewStep() {
+    // Step 1 -> Step 2
+    await clickNext();
+
     await waitFor(() => {
       expect(screen.getByTestId("service-card-35")).toBeInTheDocument();
     });
+
+    // Step 2 selection
     fireEvent.click(screen.getByTestId("service-card-35"));
 
-    const clickNext = async () => {
-      await waitFor(() => {
-        expect(screen.getByRole("button", { name: "Next" })).toBeEnabled();
-      });
-      fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    };
+    // Step 2 -> 3, 3 -> 4, 4 -> 5, 5 -> 6 (Review)
+    await clickNext();
     await clickNext();
     await clickNext();
     await clickNext();
@@ -224,10 +254,11 @@ describe("MultiStepFormModal", () => {
       expect(createAppointmentMutateAsyncMock).toHaveBeenCalledTimes(1);
       expect(createAppointmentMutateAsyncMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          first_name: expect.any(String),
-          last_name: expect.any(String),
+          first_name: "Jane",
+          last_name: "Doe",
+          pet_name: "Test Pet",
           service_id: 35,
-          breed_id: 10,
+          breed: expect.objectContaining({ id: 10 }),
           weight_class_id: 2,
           stylist_id: 2,
         }),

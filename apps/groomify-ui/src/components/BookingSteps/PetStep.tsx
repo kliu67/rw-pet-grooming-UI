@@ -12,11 +12,10 @@ import {
   SelectValue,
 } from "../ui/select";
 import { CLASSNAMES } from "../../styles/classNames";
-import { MAX_PET_NAME_LENGTH } from "../../constants";
-import { DropdownSearch } from "../DropdownSearch";
+import { MAX_PET_NAME_LENGTH, MAX_BREED_LENGTH, SPECIES } from "../../constants";
 const { BOOKING_MODAL_FIELD_TWO } = CLASSNAMES;
+const { DOG, CAT } = SPECIES;
 export const PetStep = ({
-  breedsData = [],
   weightClassesData = [],
   onValidityChange,
   showErrors = false,
@@ -25,9 +24,8 @@ export const PetStep = ({
   const [errors, setErrors] = useState({
     petName: "",
   });
-  const [searchTerm, setSearchTerm] = useState("");
   const { bookingData, updateBookingData, removeStartTime } = useBooking();
-  const { petName, breed, weightClass } = bookingData;
+  const { petName, breed, weightClass, petSpecies } = bookingData;
 
   const { t } = useTranslation();
 
@@ -41,10 +39,19 @@ export const PetStep = ({
         });
       }
     }
+     if (field === "breed") {
+      if (value.length > MAX_PET_NAME_LENGTH) {
+        return t("pets.errors.breedLengthViolation", {
+          max: MAX_BREED_LENGTH,
+        });
+      }
+    }
     return "";
   };
 
-  const stepIsValid = validateFields("petName", bookingData.petName) === "";
+  const stepIsValid = 
+  validateFields("petName", bookingData.petName) === "" &&
+  validateFields("breed", bookingData.breed) === "";
 
   const updateFieldError = (name, value) => {
     const errorMsg = validateFields(name, value);
@@ -70,10 +77,6 @@ export const PetStep = ({
     updateFieldError(name, value);
   };
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
   useEffect(() => {
     onValidityChange(stepIsValid);
   }, [stepIsValid, onValidityChange]);
@@ -83,12 +86,14 @@ export const PetStep = ({
     setTouched((prev) => ({
       ...prev,
       petName: true,
+      breed: true,
     }));
     setErrors((prev) => ({
       ...prev,
       petName: validateFields("petName", bookingData.petName),
+      breed: validateField("breed", bookingData.breed)
     }));
-  }, [showErrors, bookingData.petName]);
+  }, [showErrors, bookingData.petName, bookingData.breed]);
 
   return (
     <div className="space-y-4">
@@ -106,10 +111,10 @@ export const PetStep = ({
           onBlur={handleBlur}
         />
       </div>
-      {breedsData.length > 0 && (
+      { 
         <div className={BOOKING_MODAL_FIELD_TWO}>
           <Label htmlFor="breed">{t("bookingModal.breed")}</Label>
-          <Select
+          {/* <Select
             name="breed"
             value={breed?.id != null ? String(breed.id) : undefined}
             onValueChange={(value) => {
@@ -132,10 +137,18 @@ export const PetStep = ({
                 </SelectItem>
               ))}
             </SelectContent>
-          </Select>
+          </Select> */}
+             <Input
+          id="pet-breed"
+          name="breed"
+          placeholder={t("placeholder.breed")}
+          value={breed}
+          onChange={handleChange}
+          onBlur={handleBlur}
+        />
         </div>
-      )}
-      {weightClassesData.length > 0 && (
+      }
+      {petSpecies === DOG && weightClassesData.length > 0 && (
         <div className={BOOKING_MODAL_FIELD_TWO}>
           <Label htmlFor="weight-class">{t("bookingModal.weight")}</Label>
           <Select

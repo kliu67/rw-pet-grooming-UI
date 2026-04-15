@@ -16,16 +16,14 @@ export interface BookingData {
   email: string;
   phone: string;
   petName: string;
+  petSpecies: string;
   weightClass: {
     id: number;
     code: string;
     label: string;
     weight_bounds: [number, number];
   };
-  breed: {
-    id: number;
-    name: string;
-  };
+  breed: string;
   serviceConfig: {
     id: number;
     buffer_minutes: number;
@@ -48,46 +46,14 @@ interface BookingContextType {
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
 
 export function BookingProvider({ children }: { children: ReactNode }) {
-  // const [bookingData, setBookingData] = useState<BookingData>({
-  //   firstName: "test",
-  //   lastName: "client1",
-  //   phone: "1234567890",
-  //   email: "derekkailiu@gmail.com",
-  //   petName: "testpet1",
-  //   service: {
-  //     base_price: "40.00",
-  //     code: "BATH_BRUSH",
-  //     description: "description",
-  //     id: 35,
-  //     name: "Bath&Brush",
-  //     uuid: "0855aa36-21b7-48ce-8625-252767cafe47",
-  //   },
-  //   weightClass: {
-  //     code: "MEDIUM",
-  //     id: 2,
-  //     label: "medium",
-  //     weight_bounds: [21, 40],
-  //   },
-  //   breed: {
-  //     id: 10,
-  //     name: "Akita",
-  //   },
-  //   serviceConfig:{
-  //     id: 190,
-  //     duration_minutes: 90,
-  //     buffer_minutes: 20,
-  //     price: "50.00",
-  //   },
-  //   stylist_id: DEFAULT_STYLIST,
-  //   startTime: "2026-03-26T17:00:00.000Z",
-  //   status: DEFAULT_STATUS,
-  // });
+  
     const [bookingData, setBookingData] = useState<BookingData>({
     firstName: "",
     lastName: "",
     phone: "",
     email: "",
     petName: "",
+    petSpecies: "",
     service: {
       base_price: "",
       code: "",
@@ -102,10 +68,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       label: "",
       weight_bounds: [-1, -1],
     },
-    breed: {
-      id: null,
-      name: "",
-    },
+    breed: "",
     serviceConfig:{
       id: null,
       duration_minutes: null,

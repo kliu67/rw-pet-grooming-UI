@@ -32,6 +32,7 @@
     "date": "Date",
     "time": "Time",
     "message": "Message",
+    "speciesStep": "Species",
     "serviceStep": "Service",
     "personalStep": "Personal",
     "petStep": "Pet",
@@ -52,6 +53,15 @@
     "weight": "Select your pet's weight",
     "time": "Select a time"
   },
+  "services":{
+    "dogs": "Dog Services",
+    "cats": "Cat Services"
+  },
+  "speciesStep":{
+      "dog": "Dog",
+    "cat": "Cat",
+    "selectSpecies": "What kind of pet are you booking for?"
+  },
   "clients": {
     "errors": {
       "firstName": "First name length must be between 0 and \"{{max}}\" characters",
@@ -68,6 +78,7 @@
     "notPermitted": "(This breed cannot be serviced)",
     "errors": {
       "nameLengthViolation": "Pet name length must be between 0 and \"{{max}}\" characters",
+      "breedLengthViolation": "Pet breed length must be between 0 and \"{{max}}\" characters",
       "notEmpty": "\"{{input}}\" field cannot be empty",
       "loading": "Error loading pets"
     }

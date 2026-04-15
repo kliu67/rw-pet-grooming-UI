@@ -4,12 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useServices } from "../hooks/services";
 import { mapWeightClassLabel } from "@shared-utils";
 import { useDistinctConfigsByServiceIds } from "@/hooks/serviceConfigurations";
-import fullServiceImage from "../static/img/full_service.webp";
-import bathImage from "../static/img/bath.webp";
-import basicServiceImage from "../static/img/basic_service.webp";
-import demattingImage from "../static/img/dematting.webp";
-import nailClippingImage from "../static/img/nail_clipping.webp";
-import earCleaningImage from "../static/img/ear_cleaning.webp";
+import { serviceImageMap, iconMap, defaultImage, SPECIES } from "../constants";
 
 type Service = {
   id: number;
@@ -18,24 +13,8 @@ type Service = {
   description: string;
   uuid: string;
 };
-const iconMap = {
-  FULL_GROOMING: Scissors,
-  BATH_BRUSH: Droplets,
-  BASIC_GROOMING: Heart,
-  DEMATTING: Brush,
-  NAIL_TRIMMING: Scissors,
-  EAR_CLEANING: Sparkles,
-};
 
-const imageMap = {
-  FULL_GROOMING: fullServiceImage,
-  BATH_BRUSH: bathImage,
-  BASIC_GROOMING: basicServiceImage,
-  DEMATTING: demattingImage,
-  NAIL_TRIMMING: nailClippingImage,
-  EAR_CLEANING: earCleaningImage,
-};
-const defaultImage = fullServiceImage;
+const { DOG, CAT } = SPECIES;
 
 export const Services = ({}) => {
   const { t } = useTranslation();
@@ -56,8 +35,12 @@ export const Services = ({}) => {
     price: `From $${service.base_price}`,
     description: service.description,
     code: service.code,
+    species: service.service_species,
     configs: configsData.filter((config) => config?.service_id === service?.id),
   }));
+
+  const dogServices = services.filter((s) => s.species === DOG);
+  const catServices = services.filter((s) => s.species === CAT);
 
   return (
     <section id="services" className="py-20 bg-gray-50">
@@ -72,52 +55,127 @@ export const Services = ({}) => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {services.map((service, index) => {
-            const Icon = iconMap[service?.code] ?? Scissors;
-            const image = imageMap[service?.code] ?? defaultImage;
-            return (
-              <div
-                key={index}
-                className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group"
-              >
-                <div className="h-48 overflow-hidden relative">
-                  <img
-                    src={image}
-                    alt={service.name}
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors"></div>
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    {/* <span className="bg-gray-100 text-gray-800 text-sm font-semibold px-2.5 py-0.5 rounded">
+        {dogServices.length > 0 && (
+          <div
+            id="dog-services"
+            className="border border-gray-300 rounded-2xl shadow-md p-6 mb-10"
+          >
+            <div className="text-center py-4 mb-6">
+              <p className="text-2xl md:text-3xl font-semibold text-gray-600">
+                {t("services.dogs")}
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {dogServices.length > 0 &&
+                dogServices.map((service, index) => {
+                  const Icon = iconMap[service?.code] ?? Scissors;
+                  const image = serviceImageMap[service?.code] ?? defaultImage;
+                  return (
+                    <div
+                      key={index}
+                      className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group"
+                    >
+                      <div className="h-48 overflow-hidden relative">
+                        <img
+                          src={image}
+                          alt={service.name}
+                          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors"></div>
+                      </div>
+                      <div className="p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          {/* <span className="bg-gray-100 text-gray-800 text-sm font-semibold px-2.5 py-0.5 rounded">
                       {service.price}
                     </span> */}
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
-                      {service.name}
-                    </h3>
-                    <div className="p-2 bg-teal-100 rounded-lg text-teal-600">
-                      <Icon className="h-6 w-6" />
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">
+                            {service.name}
+                          </h3>
+                          <div className="p-2 bg-teal-100 rounded-lg text-teal-600">
+                            <Icon className="h-6 w-6" />
+                          </div>
+                        </div>
+                        <p className="text-gray-600 text-sm leading-relaxed">
+                          {service?.configs.length > 0 &&
+                            service?.configs.map((config) => {
+                              const label = mapWeightClassLabel(
+                                config.weight_class_label,
+                              );
+                              const lower = config.weight_class_range[0];
+                              const upper = config.weight_class_range[1];
+                              const price = config.price;
+                              const str = `${label} (${lower}${t("general.pounds")} - ${upper}${t("general.pounds")}) - $${price}`;
+                              return <p>{str}</p>;
+                            })}
+                          {/* {service.description} */}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        )}
+        {catServices.length > 0 && (
+          <div
+            id="cat-services"
+            className="border border-gray-300 rounded-2xl shadow-md p-6"
+          >
+            <div className="text-center py-4 mb-6">
+              <p className="text-2xl md:text-3xl font-semibold text-gray-600">
+                {t("services.cats")}
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {catServices.map((service, index) => {
+                const Icon = iconMap[service?.code] ?? Scissors;
+                const image = serviceImageMap[service?.code] ?? defaultImage;
+                return (
+                  <div
+                    key={index}
+                    className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group"
+                  >
+                    <div className="h-48 overflow-hidden relative">
+                      <img
+                        src={image}
+                        alt={service.name}
+                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors"></div>
+                    </div>
+                    <div className="p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        {/* <span className="bg-gray-100 text-gray-800 text-sm font-semibold px-2.5 py-0.5 rounded">
+                      {service.price}
+                    </span> */}
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                          {service.name}
+                        </h3>
+                        <div className="p-2 bg-teal-100 rounded-lg text-teal-600">
+                          <Icon className="h-6 w-6" />
+                        </div>
+                      </div>
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        {service?.configs.length > 0 &&
+                          service?.configs.map((config) => {
+                            const label = mapWeightClassLabel(
+                              config.weight_class_label,
+                            );
+                            const lower = config.weight_class_range[0];
+                            const upper = config.weight_class_range[1];
+                            const price = config.price;
+                            const str = `${label} (${lower}${t("general.pounds")} - ${upper}${t("general.pounds")}) - $${price}`;
+                            return <p>{str}</p>;
+                          })}
+                        {/* {service.description} */}
+                      </p>
                     </div>
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {service?.configs.length > 0 &&
-                      service?.configs.map((config) => {
-                        const label = mapWeightClassLabel(config.weight_class_label);
-                        const lower = config.weight_class_range[0];
-                        const upper = config.weight_class_range[1];
-                        const price = config.price;
-                        const str = `${label} (${lower}${t("general.pounds")} - ${upper}${t("general.pounds")}) - $${price}`;
-                        return <p>{str}</p>;
-                      })}
-                    {/* {service.description} */}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
