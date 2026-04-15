@@ -28,13 +28,13 @@ export function Header({ onBookNow }: HeaderProps) {
               href="#home"
               className="text-gray-600 hover:text-teal-600 font-medium transition-colors"
             >
-              Home
+              {t('header.home')}
             </a>
             <a
               href="#services"
               className="text-gray-600 hover:text-teal-600 font-medium transition-colors"
             >
-              Services
+              {t('header.services')}
             </a>
             {/* <a href="#about" className="text-gray-600 hover:text-teal-600 font-medium transition-colors">About</a> */}
             {/* <a href="#reviews" className="text-gray-600 hover:text-teal-600 font-medium transition-colors">Reviews</a> */}
@@ -46,7 +46,7 @@ export function Header({ onBookNow }: HeaderProps) {
               onClick={onBookNow}
               className="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-full font-medium transition-all transform hover:scale-105 shadow-md"
             >
-              Book Appointment
+              {t('header.bookAppointment')}
             </button>
           </div>
 
@@ -75,16 +75,18 @@ export function Header({ onBookNow }: HeaderProps) {
               className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 w-full text-center"
               onClick={() => setIsMenuOpen(false)}
             >
-              Home
+                            {t('header.home')}
+
             </a>
             <a
               href="#services"
               className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 w-full text-center"
               onClick={() => setIsMenuOpen(false)}
             >
-              Services
+                            {t('header.services')}
+
             </a>
-            <a
+            {/* <a
               href="#about"
               className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 w-full text-center"
               onClick={() => setIsMenuOpen(false)}
@@ -97,7 +99,7 @@ export function Header({ onBookNow }: HeaderProps) {
               onClick={() => setIsMenuOpen(false)}
             >
               Reviews
-            </a>
+            </a> */}
             <button
               onClick={() => {
                 setIsMenuOpen(false);
@@ -105,7 +107,7 @@ export function Header({ onBookNow }: HeaderProps) {
               }}
               className="mt-4 w-[90%] bg-teal-600 text-white px-5 py-3 rounded-lg font-medium"
             >
-              Book Appointment
+              {t('header.bookAppointment')}
             </button>
           </div>
         </div>

@@ -19,6 +19,42 @@
     "name": "Name",
     "pounds": "lbs"
   },
+   "header":{
+    "home": "Home",
+    "services": "Services",
+    "bookAppointment": "Book Appointment"
+  },
+  "hero":{
+    "title1": "Premium Care for Your ",
+    "title2": "Furry Best Friend",
+    "description": "Get premium-quality grooming at budget-friendly prices. We prioritize your pet’s safety and comfort while delivering a stylish, fresh look every time.",
+    "bookAppointment": "Book Appointment",
+    "viewServices": "View Services"
+  },
+  "services":{
+    "title": "Our Grooming Services",
+    "dog": {
+      "title": "Dog Services",
+      "basicGrooming": "Basic Grooming",
+      "fullGrooming": "Full Grooming",
+      "earCleaning": "Ear Cleaning",
+      "dematting": "Dematting",
+      "bath": "Bath & Brush",
+      "nailTrimming": "Nail Trimming"
+    },
+    "cat": {
+      "title": "Cat Services",
+      "bath": "Bath & Brush",
+      "bathLong": "Bath & Brush - Long Hair",
+      "hairTrimming": "Hair Trimming"
+    }
+  },
+  "footer":{
+    "rights": "RW Pet Grooming. All rights reserved.",
+    "quickLinks": "Quick Links",
+    "home": "Home",
+    "services": "Services"
+  },
   "bookingModal": {
     "title": "Complete Your Booking",
     "firstName": "First Name",
@@ -52,10 +88,6 @@
     "breed": "Select your pet's breed",
     "weight": "Select your pet's weight",
     "time": "Select a time"
-  },
-  "services":{
-    "dogs": "Dog Services",
-    "cats": "Cat Services"
   },
   "speciesStep":{
       "dog": "Dog",
