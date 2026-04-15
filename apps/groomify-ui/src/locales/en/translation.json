@@ -18,7 +18,7 @@
     "logout": "Logout",
     "name": "Name",
     "pounds": "lbs",
-    "submit": "Submit"
+    "submit": "Book"
   },
    "header":{
     "home": "Home",
@@ -163,6 +163,7 @@
     "reminder": "Need to make changes/cancel? Contact us at {{email}} or call {{phone}}. Changes or cancellations must be made 24 hours in advance."
   },
   "errorPage": {
+    "title": "Booking Error",
     "message": "We couldn't complete your booking at this time. This might be due to a temporary issue or the selected time slot may no longer be available.",
     "contactSupport": "Please try again later or contact us at {{phone}} or {{email}}",
     "returnHomeLabel": "Return to Home",
