@@ -6,6 +6,7 @@ import React, {
   useRef,
 } from "react";
 import { useTranslation } from "react-i18next";
+import { enCA, zhCN } from "date-fns/locale";
 import { INTERVAL_MINUTES } from "@/constants";
 import { Label } from "./ui/label";
 import { Calendar } from "./ui/calendar";
@@ -39,7 +40,8 @@ export const DateTimePicker = ({
   const timePickerRef = useRef(null);
   const prevDateKeyRef = useRef(null);
   const isTimeDisabled = !isObjectNotEmpty(configData);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const calendarLocale = i18n.resolvedLanguage === "zh-CN" ? zhCN : enCA;
   const appointmentDurationMinutes = useMemo(() => {
     const duration = Number(configData?.duration_minutes) || 0;
     const buffer = Number(configData?.buffer_minutes) || 0;
@@ -209,6 +211,7 @@ export const DateTimePicker = ({
         >
           <Label htmlFor="date">{t("bookingModal.date")}</Label>
           <Calendar
+            locale={calendarLocale}
             mode="single"
             selected={date}
             onSelect={handleDateSelect}
@@ -264,7 +267,10 @@ export const DateTimePicker = ({
                     onSelect(e);
                   }}
                 >
-                  {`${time.startStrAMPM}`}
+                  { time?.isStartAMOrPM==='AM' ? 
+                    t('dateTime.timeStringAM',{time: time?.startStrNormal}) :
+                    t('dateTime.timeStringPM',{time: time?.startStrNormal})
+                  }
                 </button>
               </div>
             ))}

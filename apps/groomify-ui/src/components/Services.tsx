@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useServices } from "../hooks/services";
 import { mapWeightClassLabel } from "@shared-utils";
 import { useDistinctConfigsByServiceIds } from "@/hooks/serviceConfigurations";
-import { serviceImageMap, iconMap, defaultImage, SPECIES } from "../constants";
+import { serviceImageMap, serviceTextMap, iconMap, defaultImage, SPECIES } from "../constants";
 
 type Service = {
   id: number;
@@ -47,12 +47,12 @@ export const Services = ({}) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Our Grooming Services
+            {t('services.title')}
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          {/* <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             We use premium, organic products suited for your pet's specific coat
             type. Prices vary based on size and coat condition.
-          </p>
+          </p> */}
         </div>
 
         {dogServices.length > 0 && (
@@ -62,7 +62,7 @@ export const Services = ({}) => {
           >
             <div className="text-center py-4 mb-6">
               <p className="text-2xl md:text-3xl font-semibold text-gray-600">
-                {t("services.dogs")}
+                {t("services.dog.title")}
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -89,7 +89,10 @@ export const Services = ({}) => {
                       {service.price}
                     </span> */}
                           <h3 className="text-xl font-bold text-gray-900 mb-2">
-                            {service.name}
+                            {/* {service.name} */}
+                            {
+                              t(serviceTextMap[service.code]?.name)
+                            }
                           </h3>
                           <div className="p-2 bg-teal-100 rounded-lg text-teal-600">
                             <Icon className="h-6 w-6" />
@@ -123,7 +126,7 @@ export const Services = ({}) => {
           >
             <div className="text-center py-4 mb-6">
               <p className="text-2xl md:text-3xl font-semibold text-gray-600">
-                {t("services.cats")}
+                {t("services.cat.title")}
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -149,7 +152,7 @@ export const Services = ({}) => {
                       {service.price}
                     </span> */}
                         <h3 className="text-xl font-bold text-gray-900 mb-2">
-                          {service.name}
+                            {t(serviceTextMap[service.code]?.name)}
                         </h3>
                         <div className="p-2 bg-teal-100 rounded-lg text-teal-600">
                           <Icon className="h-6 w-6" />

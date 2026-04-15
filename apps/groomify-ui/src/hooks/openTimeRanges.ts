@@ -16,6 +16,8 @@ type TimeSlot = {
   start: Date;
   end: Date;
   startStrAMPM: string;
+  startStrNormal: string;
+  isStartAMOrPM: string;
   endStrAMPM: string;
   bookable: boolean;
 };
@@ -324,6 +326,17 @@ function toAMPMString(date: Date) {
   return `${normalizedHours}:${minutes}${period}`;
 }
 
+function toNormalizedTime(date: Date){
+   const hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const normalizedHours = hours % 12 || 12;
+  return `${normalizedHours}:${minutes}`;
+}
+
+function getAMOrPM(date: Date) {
+  return date.getHours() >= 12? "PM": "AM";
+}
+
 function rangesOverlap(a: TimeRange, b: TimeRange) {
   return a.startMinutes < b.endMinutes && b.startMinutes < a.endMinutes;
 }
@@ -458,6 +471,8 @@ export function getTimeSlotsForDate({
         start: new Date(slotStart),
         end: slotEnd,
         startStrAMPM: toAMPMString(slotStart),
+        isStartAMOrPM: getAMOrPM(slotStart),
+        startStrNormal: toNormalizedTime(slotStart),
         endStrAMPM: toAMPMString(slotEnd),
         bookable: slotIsFutureEnough && fitsAvailability && !hasOverlap,
       });

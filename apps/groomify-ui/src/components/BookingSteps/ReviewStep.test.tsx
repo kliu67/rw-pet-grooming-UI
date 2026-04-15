@@ -12,6 +12,17 @@ vi.mock("@/context/BookingContext", () => ({
   }),
 }));
 
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: {
+      resolvedLanguage: "en",
+      changeLanguage: vi.fn(),
+    },
+  }),
+  Trans: ({ i18nKey }: { i18nKey?: string }) => i18nKey ?? null,
+}));
+
 describe("ReviewStep", () => {
   beforeEach(() => {
     mockBookingData = {
@@ -37,13 +48,14 @@ describe("ReviewStep", () => {
   it("renders summary sections when required booking data exists", () => {
     render(<ReviewStep />);
 
-    expect(screen.getByText("Booking Summary")).toBeInTheDocument();
-    expect(screen.getByText("Service Details")).toBeInTheDocument();
-    expect(screen.getByText("Date & Time")).toBeInTheDocument();
+    expect(screen.getByText("reviewStep.summary")).toBeInTheDocument();
+    expect(screen.getByText("reviewStep.serviceDetails")).toBeInTheDocument();
+    expect(screen.getByText("reviewStep.dateTime")).toBeInTheDocument();
     expect(screen.getByText("reviewStep.customerInfo")).toBeInTheDocument();
     expect(screen.getByText("reviewStep.priceEstimate")).toBeInTheDocument();
     expect(screen.getByText("Bath&Brush")).toBeInTheDocument();
     expect(screen.getByText("Lou")).toBeInTheDocument();
+    expect(screen.getByText("reviewStep.disclaimer")).toBeInTheDocument();
   });
 
   it("returns null when required booking data is missing", () => {
@@ -64,13 +76,18 @@ describe("ReviewStep", () => {
     const onEdit = vi.fn();
     render(<ReviewStep onEdit={onEdit} />);
 
-    fireEvent.click(screen.getAllByText("Edit")[0]); // service
+    const editButtons = screen.getAllByRole("button").filter((button) => {
+      const label = button.textContent?.trim();
+      return label === "general.edit" || label === "Edit";
+    });
+
+    fireEvent.click(editButtons[0]); // service
     expect(onEdit).toHaveBeenCalledWith(BOOKING_STEPS.SERVICE);
 
-    fireEvent.click(screen.getAllByText("Edit")[1]); // date/time
+    fireEvent.click(editButtons[1]); // date/time
     expect(onEdit).toHaveBeenCalledWith(BOOKING_STEPS.DATE_TIME);
 
-    fireEvent.click(screen.getAllByText("Edit")[2]); // personal
+    fireEvent.click(editButtons[2]); // personal
     expect(onEdit).toHaveBeenCalledWith(BOOKING_STEPS.PERSONAL);
   });
 });
