@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import i18n from "@/i18n";
 interface Language {
   code: string;
   name: string;
@@ -8,7 +8,7 @@ interface Language {
 
 const languages: Language[] = [
   { code: "en", name: "English", flag: "🇨🇦" },
-  { code: "zh", name: "中文", flag: "🇨🇳" },
+  { code: "zh-CN", name: "中文", flag: "🇨🇳" },
 ];
 
 interface LanguageSwitcherProps {
@@ -20,9 +20,16 @@ export const LanguageSwitcher = ({
   compact = false,
   tiny = false,
 }: LanguageSwitcherProps) => {
+  const activeCode = i18n.resolvedLanguage === "zh-CN" ? "zh-CN" : "en";
   const [selectedLanguage, setSelectedLanguage] = useState<Language>(
-    languages[0],
+    languages.find((lang) => lang.code === activeCode) ?? languages[0],
   );
+
+  const handleChange = (language: Language) => {
+    setSelectedLanguage(language);
+    void i18n.changeLanguage(language.code);
+    localStorage.setItem("lang", language.code);
+  };
 
   return (
     <div
@@ -48,7 +55,7 @@ export const LanguageSwitcher = ({
       {languages.map((language) => (
         <button
           key={language.code}
-          onClick={() => setSelectedLanguage(language)}
+          onClick={() => handleChange(language)}
           className={`relative z-10 inline-flex items-center justify-center cursor-pointer transition-colors ${
             tiny
               ? "gap-1 px-1.5 py-1 min-w-[58px]"
