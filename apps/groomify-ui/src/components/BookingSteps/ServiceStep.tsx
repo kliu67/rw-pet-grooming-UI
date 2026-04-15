@@ -31,7 +31,7 @@ export const ServiceStep = ({ serviceData = [] }) => {
     <div className="space-y-4">
       <div
         id="services-container"
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
       >
         {filteredServices.length > 0
           ? filteredServices

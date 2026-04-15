@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useServices } from "../hooks/services";
 import { mapWeightClassLabel } from "@shared-utils";
 import { useDistinctConfigsByServiceIds } from "@/hooks/serviceConfigurations";
-import { serviceImageMap, serviceNameMap, iconMap, defaultImage, SPECIES } from "../constants";
+import { serviceImageMap, serviceTextMap, iconMap, defaultImage, SPECIES } from "../constants";
 
 type Service = {
   id: number;
@@ -91,7 +91,7 @@ export const Services = ({}) => {
                           <h3 className="text-xl font-bold text-gray-900 mb-2">
                             {/* {service.name} */}
                             {
-                              t(serviceNameMap[service.code])
+                              t(serviceTextMap[service.code]?.name)
                             }
                           </h3>
                           <div className="p-2 bg-teal-100 rounded-lg text-teal-600">
@@ -152,7 +152,7 @@ export const Services = ({}) => {
                       {service.price}
                     </span> */}
                         <h3 className="text-xl font-bold text-gray-900 mb-2">
-                            {t(serviceNameMap[service.code])}
+                            {t(serviceTextMap[service.code]?.name)}
                         </h3>
                         <div className="p-2 bg-teal-100 rounded-lg text-teal-600">
                           <Icon className="h-6 w-6" />
