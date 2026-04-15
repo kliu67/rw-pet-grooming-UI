@@ -11,6 +11,10 @@ const createAppointmentMutateAsyncMock = vi.fn();
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string) => key,
+    i18n: {
+      resolvedLanguage: "en",
+      changeLanguage: vi.fn(),
+    },
   }),
 }));
 
@@ -239,7 +243,9 @@ describe("MultiStepFormModal", () => {
     await clickNext();
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "general.submit" }),
+      ).toBeInTheDocument();
     });
   }
 
@@ -248,7 +254,7 @@ describe("MultiStepFormModal", () => {
 
     renderModal();
     await goToReviewStep();
-    fireEvent.click(screen.getByRole("button", { name: "Submit" }));
+    fireEvent.click(screen.getByRole("button", { name: "general.submit" }));
 
     await waitFor(() => {
       expect(createAppointmentMutateAsyncMock).toHaveBeenCalledTimes(1);
@@ -273,7 +279,7 @@ describe("MultiStepFormModal", () => {
 
     renderModal(onBookingDataChange);
     await goToReviewStep();
-    fireEvent.click(screen.getByRole("button", { name: "Submit" }));
+    fireEvent.click(screen.getByRole("button", { name: "general.submit" }));
 
     await waitFor(() => {
       expect(createAppointmentMutateAsyncMock).toHaveBeenCalledTimes(1);
@@ -298,7 +304,7 @@ describe("MultiStepFormModal", () => {
 
     renderModal(onBookingDataChange);
     await goToReviewStep();
-    fireEvent.click(screen.getByRole("button", { name: "Submit" }));
+    fireEvent.click(screen.getByRole("button", { name: "general.submit" }));
 
     await waitFor(() => {
       expect(createAppointmentMutateAsyncMock).toHaveBeenCalledTimes(1);
