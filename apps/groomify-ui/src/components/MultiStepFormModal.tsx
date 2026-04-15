@@ -458,7 +458,7 @@ export function MultiStepFormModal({
                 type="button"
                 variant="outline"
                 onClick={() => handleOpenChange(false)}
-                className="active:bg-gray-200 active:border-gray-300 active:text-gray-900 active:scale-95 transition"
+                className="w-1/2 active:bg-gray-200 active:border-gray-300 active:text-gray-900 active:scale-95 transition"
               >
                 {t("general.cancel")}
               </Button>
@@ -467,7 +467,7 @@ export function MultiStepFormModal({
                 type="button"
                 variant="outline"
                 onClick={handleBack}
-                className="active:bg-gray-200 active:border-gray-300 active:text-gray-900 active:scale-95 transition"
+                className="w-1/2 active:bg-gray-200 active:border-gray-300 active:text-gray-900 active:scale-95 transition"
               >
                 {t("general.back")}
               </Button>
@@ -476,7 +476,7 @@ export function MultiStepFormModal({
               <Button
                 type="button"
                 onClick={handleNext}
-                className="active:bg-emerald-600 active:border-emerald-600 active:text-white active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-1/2 active:bg-emerald-600 active:border-emerald-600 active:text-white active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
                 disabled={!validateStep() || isSubmitting}
               >
                 {t('general.next')}
@@ -486,7 +486,7 @@ export function MultiStepFormModal({
                 <Button
                   type="button"
                   onClick={handleSubmit}
-                  className="active:bg-emerald-600 active:border-emerald-600 active:text-white active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-1/2 active:bg-emerald-600 active:border-emerald-600 active:text-white active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
                   disabled={!validateStep() || isSubmitting}
                 >
                   {isSubmitting ? <LoadingSpinnerButton size="sm" /> : t('general.submit')}
