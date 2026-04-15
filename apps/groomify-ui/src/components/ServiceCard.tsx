@@ -1,5 +1,6 @@
 import { defaultImage } from "../constants";
 import { useTranslation } from "react-i18next";
+import { serviceNameMap } from "../constants";
 export const ServiceCard = ({
   image = "",
   Icon = "",
@@ -42,7 +43,7 @@ export const ServiceCard = ({
             {t("bookingModal.startingPrice", { price: base_price })}
           </span>
         </div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">{name}</h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">{t(serviceNameMap[service.code])}</h3>
         <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
       </div>
     </div>

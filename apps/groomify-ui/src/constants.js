@@ -158,6 +158,18 @@ export const iconMap = {
   CAT_HAIR_TRIMMING: Scissors,
 };
 
+export const serviceNameMap = {
+  FULL_GROOMING: 'services.dog.fullGrooming',
+  BASIC_GROOMING: 'services.dog.basicGrooming',
+  BATH_BRUSH: 'services.dog.bath',
+  DEMATTING: 'services.dog.dematting',
+  EAR_CLEANING: 'services.dog.earCleaning',
+  NAIL_TRIMMING: 'services.dog.nailTrimming',
+  CAT_HAIR_TRIMMING: 'services.cat.hairTrimming',
+  CAT_BATH: 'services.cat.bath',
+  CAT_BATH_LONG: 'services.cat.bathLong',
+};
+
 export const defaultImage =
   "https://images.unsplash.com/photo-1703368786305-4e1dcfcfd0db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBnZXR0aW5nJTIwaGFpcmN1dHxlbnwxfHx8fDE3NzA0MDY0NTd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
 

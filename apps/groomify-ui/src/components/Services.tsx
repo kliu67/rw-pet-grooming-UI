@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useServices } from "../hooks/services";
 import { mapWeightClassLabel } from "@shared-utils";
 import { useDistinctConfigsByServiceIds } from "@/hooks/serviceConfigurations";
-import { serviceImageMap, iconMap, defaultImage, SPECIES } from "../constants";
+import { serviceImageMap, serviceNameMap, iconMap, defaultImage, SPECIES } from "../constants";
 
 type Service = {
   id: number;
@@ -12,18 +12,6 @@ type Service = {
   base_price: string;
   description: string;
   uuid: string;
-};
-
-const serviceNameMap = {
-  FULL_GROOMING: 'services.dog.fullGrooming',
-  BASIC_GROOMING: 'services.dog.basicGrooming',
-  BATH_BRUSH: 'services.dog.bath',
-  DEMATTING: 'services.dog.dematting',
-  EAR_CLEANING: 'services.dog.earCleaning',
-  NAIL_TRIMMING: 'services.dog.nailTrimming',
-  CAT_HAIR_TRIMMING: 'services.cat.hairTrimming',
-  CAT_BATH: 'services.cat.bath',
-  CAT_BATH_LONG: 'services.cat.bathLong',
 };
 
 const { DOG, CAT } = SPECIES;

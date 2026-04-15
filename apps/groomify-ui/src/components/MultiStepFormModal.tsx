@@ -416,7 +416,7 @@ export function MultiStepFormModal({
         <DialogHeader>
           <DialogTitle>{t("bookingModal.title")}</DialogTitle>
           <DialogDescription>
-            Step {currentStep} of {TOTAL_STEPS}
+            {t('bookingModal.step', {current: currentStep, total: TOTAL_STEPS})}
           </DialogDescription>
         </DialogHeader>
 
@@ -479,7 +479,7 @@ export function MultiStepFormModal({
                 className="active:bg-emerald-600 active:border-emerald-600 active:text-white active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
                 disabled={!validateStep() || isSubmitting}
               >
-                Next
+                {t('general.next')}
               </Button>
             ) : (
               <>
@@ -489,7 +489,7 @@ export function MultiStepFormModal({
                   className="active:bg-emerald-600 active:border-emerald-600 active:text-white active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
                   disabled={!validateStep() || isSubmitting}
                 >
-                  {isSubmitting ? <LoadingSpinnerButton size="sm" /> : "Submit"}
+                  {isSubmitting ? <LoadingSpinnerButton size="sm" /> : t('general.submit')}
                 </Button>
               </>
             )}

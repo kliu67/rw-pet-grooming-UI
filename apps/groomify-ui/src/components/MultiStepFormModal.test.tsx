@@ -216,9 +216,9 @@ describe("MultiStepFormModal", () => {
 
   async function clickNext() {
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Next" })).toBeEnabled();
+      expect(screen.getByRole("button", { name: "general.next" })).toBeEnabled();
     });
-    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(screen.getByRole("button", { name: "general.next" }));
   }
 
   async function goToReviewStep() {

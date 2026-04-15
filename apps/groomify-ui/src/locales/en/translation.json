@@ -17,7 +17,8 @@
     "login": "Login",
     "logout": "Logout",
     "name": "Name",
-    "pounds": "lbs"
+    "pounds": "lbs",
+    "submit": "Submit"
   },
    "header":{
     "home": "Home",
@@ -75,7 +76,8 @@
     "dateTimeStep": "Date/Time",
     "reviewStep": "Review",
     "startingPrice": "From ${{price}}",
-    "requiredMessage": " indicates required field"
+    "requiredMessage": " indicates required field",
+    "step": "Step {{current}} of {{total}}"
   },
   "placeholder": {
     "firstName": "Enter your first name",
@@ -105,6 +107,10 @@
       "loading": "Error loading clients"
     }
   },
+   "dateTime": {
+    "timeStringAM": "{{time}} AM",
+    "timeStringPM": "{{time}} PM" 
+  },
   "pets": {
     "pounds": "lbs",
     "notPermitted": "(This breed cannot be serviced)",
@@ -126,7 +132,12 @@
     "basePrice": "Base Price",
      "totalAmount": "Total Amount",
     "weightCharge": "Weight Charge",
-    "customerInfo": "Customer Information"
+    "customerInfo": "Customer Information",
+    "serviceDetails": "Service Details",
+    "dateTime": "Date & Time",
+    "message": "Message",
+    "disclaimer": "By confirming this booking, you agree to our <termsOfService>Terms of Service </termsOfService> and <cancellation>Cancellation Policy</cancellation>.",
+    "minutes": "minutes"
   },
   "confirmStep": {
     "confirm": "Booking Confirmed!",
