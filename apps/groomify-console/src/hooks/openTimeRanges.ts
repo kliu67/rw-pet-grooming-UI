@@ -324,3 +324,9 @@ export function getBlockedTimeRanges({
       end: minutesToTimeString(range.endMinutes),
     }));
 }
+
+export const get24HrMinString = (date: Date) => {
+  const hr = String(date.getHours()).padStart(2, "0");
+  const min = String(date.getMinutes()).padStart(2, "0");
+  return `${hr}:${min}`;
+};
