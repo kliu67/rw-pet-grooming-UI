@@ -5,6 +5,7 @@ import { BookingProvider } from "./context/BookingContext.js";
 import App from "./App";
 import "./index.css";
 import "./i18n";
+import { initGA } from "./lib/analytics";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -15,6 +16,8 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+initGA();
 
 createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
