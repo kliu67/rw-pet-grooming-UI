@@ -28,6 +28,10 @@ const inputs = {
     displayName: "Breed",
     placeholder: "Select breed"
   },
+  species: {
+    displayName: "Species",
+    placeholder: "Select species"
+  },
   weightClass: {
     displayName: "Weight Class",
     placeholder: "Select weight class"
@@ -60,8 +64,11 @@ describe("PetModal", () => {
     fireEvent.change(screen.getByPlaceholderText("Pet name"), {
       target: { value: "  Buddy  " }
     });
+    fireEvent.click(screen.getByRole("radio", { name: "Dog" }));
     fireEvent.click(screen.getByText("Doe, Jane"));
-    fireEvent.click(screen.getByText("Poodle"));
+    fireEvent.change(screen.getByPlaceholderText("Select breed"), {
+      target: { value: "Poodle" }
+    });
     fireEvent.click(screen.getByText("Small"));
     fireEvent.click(screen.getByText("general.create"));
 
@@ -70,6 +77,7 @@ describe("PetModal", () => {
         name: "Buddy",
         owner: 1,
         breed: 10,
+        species: "dog",
         weight_class_id: 100
       });
     });
@@ -86,6 +94,7 @@ describe("PetModal", () => {
           name: "Buddy",
           owner: clientData[0],
           breed: breedData[0],
+          species: "dog",
           weightClass: weightClassData[0]
         }}
       />
@@ -109,6 +118,7 @@ describe("PetModal", () => {
           name: "Buddy",
           owner: clientData[0],
           breed: breedData[0],
+          species: "dog",
           weightClass: weightClassData[0]
         }}
       />
@@ -149,8 +159,11 @@ describe("PetModal", () => {
     fireEvent.change(screen.getByPlaceholderText("Pet name"), {
       target: { value: "Buddy" }
     });
+    fireEvent.click(screen.getByRole("radio", { name: "Dog" }));
     fireEvent.click(screen.getByText("Doe, Jane"));
-    fireEvent.click(screen.getByText("Poodle"));
+    fireEvent.change(screen.getByPlaceholderText("Select breed"), {
+      target: { value: "Poodle" }
+    });
     fireEvent.click(screen.getByText("Small"));
     fireEvent.click(screen.getByText("general.create"));
 
@@ -158,5 +171,20 @@ describe("PetModal", () => {
       expect(screen.getByText("Request failed")).toBeInTheDocument();
     });
     expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("disables create submit until species is selected", () => {
+    render(<PetModal {...baseProps} />);
+
+    fireEvent.change(screen.getByPlaceholderText("Pet name"), {
+      target: { value: "Buddy" }
+    });
+    fireEvent.click(screen.getByText("Doe, Jane"));
+    fireEvent.change(screen.getByPlaceholderText("Select breed"), {
+      target: { value: "Poodle" }
+    });
+    fireEvent.click(screen.getByText("Small"));
+
+    expect(screen.getByText("general.create")).toBeDisabled();
   });
 });
