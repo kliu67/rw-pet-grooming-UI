@@ -249,6 +249,38 @@ describe("AppointmentModal", () => {
     ).toBeInTheDocument();
   });
 
+  it("uses matching service configuration even when breed does not match", async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+
+    render(
+      <AppointmentModal
+        {...baseProps}
+        onSubmit={onSubmit}
+        configs={[
+          {
+            id: 99,
+            breed_id: 999,
+            service_id: 1,
+            weight_class_id: 9,
+            duration_minutes: 60
+          }
+        ]}
+      />
+    );
+
+    selectRequiredFields();
+    fireEvent.click(screen.getByRole("button", { name: "09:00AM - 10:00AM" }));
+    fireEvent.click(screen.getByText("general.create"));
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          service_configuration_id: 99
+        })
+      );
+    });
+  });
+
   it("submits changed status in edit mode", async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined);
     const onClose = vi.fn();

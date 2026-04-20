@@ -1,5 +1,5 @@
 import React from "react";
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 
 import { useTranslation } from "react-i18next";
@@ -64,12 +64,15 @@ export default function PetModal({
       client.last_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredBreeds = breedData.filter((breed) =>
-    breed.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
   const filteredWeightClasses = weightClassData.filter((wc) =>
     wc.label?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const matchedBreed = useMemo(() => {
+    const breedName = form.breed?.trim()?.toLowerCase();
+    if (!breedName) return undefined;
+    return breedData.find((breed) => breed.name.toLowerCase() === breedName);
+  }, [breedData, form.breed]);
 
   const validateFields = (field, value) => {
     if (isDirty) {
@@ -117,7 +120,8 @@ export default function PetModal({
     return (
       (petData?.name || "").trim() !== current.name.trim() ||
       (petData?.owner?.id || "") !== current.owner.id ||
-      (petData?.breed?.id || "") !== current.breed.id ||
+      (petData?.breed?.id || "") !== matchedBreed?.id ||
+      (petData?.species || "") !== (current.species || "") ||
       ((petData?.weightClass?.id || "") !== current.weightClass?.id &&
         !!current.weightClass?.id)
     );
@@ -129,6 +133,9 @@ export default function PetModal({
     form.name &&
     form.owner &&
     form.breed &&
+    form.species &&
+    matchedBreed &&
+    form.weightClass &&
     ((mode === "edit" && hasChanges(form)) || mode === "create");
 
   // ---------- Reset form when editing another row ----------
@@ -136,13 +143,15 @@ export default function PetModal({
     setForm({
       name: petData?.name || "",
       owner: petData?.owner || "",
-      breed: petData?.breed || "",
+      breed: petData?.breed?.name || "",
+      species: petData?.species || "",
       weightClass: petData?.weightClass || ""
     });
     setErrors({
       name: "",
       owner: "",
       breed: "",
+      species: "",
       weightClass: ""
     });
 
@@ -167,8 +176,11 @@ export default function PetModal({
             if (petData?.owner?.id !== form?.owner?.id) {
               delta.owner = form.owner.id;
             }
-            if (petData?.breed?.id !== form?.breed?.id) {
-              delta.breed = form.breed.id;
+            if (petData?.breed?.id !== matchedBreed?.id) {
+              delta.breed = matchedBreed?.id;
+            }
+            if (petData?.species !== form?.species) {
+              delta.species = form.species;
             }
             if (petData?.weightClass?.id !== form.weightClass?.id) {
               delta.weight_class_id = form.weightClass.id;
@@ -192,7 +204,7 @@ export default function PetModal({
           )}
           <input
             name="name"
-            value={form.name}
+            value={form.name ?? ""}
             onChange={handleChange}
             onBlur={handleBlur}
             placeholder={inputs.name.placeholder}
@@ -200,6 +212,35 @@ export default function PetModal({
             autoFocus
             required
           />
+          <fieldset className="mb-3">
+            <legend className="mb-2">
+              {inputs.species?.displayName || "Species"}
+            </legend>
+            <div className="flex items-center gap-4">
+              <label className="inline-flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="species"
+                  value="dog"
+                  checked={form.species === "dog"}
+                  onChange={handleChange}
+                  required
+                />
+                Dog
+              </label>
+              <label className="inline-flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="species"
+                  value="cat"
+                  checked={form.species === "cat"}
+                  onChange={handleChange}
+                  required
+                />
+                Cat
+              </label>
+            </div>
+          </fieldset>
           <div className="mt-4 mb-4">
             <DropdownMenu id="owner">
               <DropdownMenuTrigger asChild>
@@ -233,39 +274,23 @@ export default function PetModal({
             </DropdownMenu>
           </div>
 
-          <div className="mt-4 mb-4">
-            <DropdownMenu id="breed">
-              <DropdownMenuTrigger asChild>
-                <button className="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-                  {form.breed ? form.breed.name : inputs.breed.placeholder}{" "}
-                  <span aria-hidden="true">&#9662;</span>
-                </button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="end">
-                <DropdownSearch
-                  searchTerm={searchTerm}
-                  onChange={handleSearchChange}
-                ></DropdownSearch>
-                {filteredBreeds.map((breed) => (
-                  <Fragment key={breed.id}>
-                    <DropdownMenuItem
-                      onSelect={() => {
-                        setForm((prev) => ({
-                          ...prev,
-                          breed: breed
-                        }));
-                      }}
-                    >
-                      {breed.name}
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </Fragment>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
+          <label htmlFor="breed">{inputs.breed.displayName}</label>
+          <input
+            id="breed"
+            name="breed"
+            value={form.breed ?? ""}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            placeholder={inputs.breed.placeholder}
+            list="breed-options"
+            className="w-full border rounded-lg px-3 py-2 mb-3"
+            required
+          />
+          <datalist id="breed-options">
+            {breedData.map((breed) => (
+              <option key={breed.id} value={breed.name} />
+            ))}
+          </datalist>
           <div className="mt-4 mb-4">
             <DropdownMenu id="weightClass">
               <DropdownMenuTrigger asChild>

@@ -12,8 +12,8 @@ export async function createAppointment(data) {
 }
 
 export async function updateAppointment(id, data) {
-   return await apiFetch(`/api/appointments/${id}`, {
-    method: "PUT",
+   return await apiFetch(`/api/appointments/${id}/update`, {
+    method: "PATCH",
     body: JSON.stringify(data)
   })
 }
