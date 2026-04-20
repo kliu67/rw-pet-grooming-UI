@@ -175,7 +175,7 @@ export function WeeklySchedule({
                           e.stopPropagation();
                           onAppointmentClick(apt);
                         }}
-                        className={`absolute left-1 right-1 rounded p-2 text-left text-sm ${
+                        className={`absolute left-1 right-1 z-20 rounded p-2 text-left text-sm ${
                           apt.color || "bg-blue-100 text-blue-700"
                         } hover:opacity-80 transition-opacity overflow-hidden`}
                         style={{

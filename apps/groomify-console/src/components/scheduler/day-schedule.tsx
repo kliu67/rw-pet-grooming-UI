@@ -166,7 +166,7 @@ export function DaySchedule({
                         e.stopPropagation();
                         onAppointmentClick(apt);
                       }}
-                      className={`absolute left-2 right-2 rounded-lg p-3 text-left ${
+                      className={`absolute left-2 right-2 z-20 rounded-lg p-3 text-left ${
                         apt.color || "bg-blue-100 text-blue-700"
                       } hover:opacity-80 transition-opacity shadow-sm border border-black/10`}
                       style={{

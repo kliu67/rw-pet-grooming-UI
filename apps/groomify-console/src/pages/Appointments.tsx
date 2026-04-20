@@ -25,7 +25,14 @@ import { EmptyState } from "@/components/emptyState";
 import { Calendar } from "../components/scheduler/calendar";
 import { WeeklySchedule } from "../components/scheduler/weekly-schedule";
 import { DaySchedule } from "../components/scheduler/day-schedule";
-import { AppointmentDialog } from "../components/scheduler/appointment-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../components/ui/dialog";
 import { Button } from "../components/ui/button";
 import {
   Calendar as CalendarIcon,
@@ -39,6 +46,21 @@ import {
   Menu,
   Sun,
 } from "lucide-react";
+
+interface Appointment {
+  id: string | number;
+  title: string;
+  date: Date;
+  startTime: string;
+  endTime: string;
+  description?: string;
+  color?: string;
+  status?: string;
+  clientName?: string;
+  petName?: string;
+  stylistName?: string;
+  sourceAppointment?: Record<string, unknown>;
+}
 
 const columnHelper = createColumnHelper();
 
@@ -104,11 +126,10 @@ export const Appointments = () => {
     // },
   ]);
 
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<
     Appointment | undefined
   >();
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
 
   //queries
 
@@ -458,35 +479,29 @@ export const Appointments = () => {
       endTime: get24HrMinString(endDate),
       description: a.service?.name,
       color: "bg-blue-100 text-blue-700",
+      status: a.status,
+      clientName: [a.client?.first_name, a.client?.last_name]
+        .filter(Boolean)
+        .join(" "),
+      petName: a.pet?.name,
+      stylistName: [a.stylist?.first_name, a.stylist?.last_name]
+        .filter(Boolean)
+        .join(" "),
+      sourceAppointment: a,
     };
   });
 
-  const handleDayClick = (date: Date) => {
-    setSelectedDate(date);
+  const handleDayClick = (_date: Date) => {
     setSelectedAppointment(undefined);
-    setDialogOpen(true);
   };
 
-  const handleTimeSlotClick = (date: Date, time: string) => {
-    const [hours, minutes] = time.split(":").map(Number);
-    const dateWithTime = new Date(date);
-    dateWithTime.setHours(hours, minutes, 0, 0);
-
-    setSelectedDate(dateWithTime);
+  const handleTimeSlotClick = (_date: Date, _time: string) => {
     setSelectedAppointment(undefined);
-    setDialogOpen(true);
   };
 
   const handleAppointmentClick = (appointment: Appointment) => {
     setSelectedAppointment(appointment);
-    setSelectedDate(undefined);
-    setDialogOpen(true);
-  };
-
-  const handleNewAppointment = () => {
-    setSelectedDate(new Date());
-    setSelectedAppointment(undefined);
-    setDialogOpen(true);
+    setDetailsOpen(true);
   };
 
   return isAuthenticated ? (
@@ -646,6 +661,83 @@ export const Appointments = () => {
                   stylists={stylistsData}
                 />
               )}
+      <Dialog
+        open={detailsOpen}
+        onOpenChange={(open) => {
+          setDetailsOpen(open);
+          if (!open) {
+            setSelectedAppointment(undefined);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{selectedAppointment?.title || "Appointment Details"}</DialogTitle>
+            <DialogDescription>
+              {selectedAppointment
+                ? new Date(selectedAppointment.date).toLocaleDateString()
+                : ""}
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedAppointment && (
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-500">Time</span>
+                <span className="font-medium">
+                  {selectedAppointment.startTime} - {selectedAppointment.endTime}
+                </span>
+              </div>
+              {selectedAppointment.clientName && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">Client</span>
+                  <span className="font-medium">{selectedAppointment.clientName}</span>
+                </div>
+              )}
+              {selectedAppointment.petName && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">Pet</span>
+                  <span className="font-medium">{selectedAppointment.petName}</span>
+                </div>
+              )}
+              {selectedAppointment.stylistName && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">Stylist</span>
+                  <span className="font-medium">{selectedAppointment.stylistName}</span>
+                </div>
+              )}
+              {selectedAppointment.status && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">Status</span>
+                  <StatusBadge status={selectedAppointment.status} />
+                </div>
+              )}
+              {selectedAppointment.description && (
+                <div className="rounded-md border p-3 bg-gray-50">
+                  <p className="text-gray-600">{selectedAppointment.description}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter>
+            {selectedAppointment?.sourceAppointment && (
+              <Button
+                type="button"
+                onClick={() => {
+                  setDetailsOpen(false);
+                  handleAction("edit", selectedAppointment.sourceAppointment);
+                }}
+              >
+                Update Appointment
+              </Button>
+            )}
+            <Button type="button" variant="outline" onClick={() => setDetailsOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   ) : (
     <EmptyState />

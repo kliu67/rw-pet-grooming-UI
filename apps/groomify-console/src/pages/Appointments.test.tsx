@@ -114,6 +114,27 @@ vi.mock("@/context/AuthContext", () => ({
   useAuth: () => authState
 }));
 
+vi.mock("../components/scheduler/calendar", () => ({
+  Calendar: ({ appointments, onAppointmentClick }: any) => (
+    <div>
+      <button
+        type="button"
+        onClick={() => onAppointmentClick?.(appointments?.[0])}
+      >
+        Open scheduler appointment
+      </button>
+    </div>
+  )
+}));
+
+vi.mock("../components/scheduler/weekly-schedule", () => ({
+  WeeklySchedule: () => <div>Weekly Schedule</div>
+}));
+
+vi.mock("../components/scheduler/day-schedule", () => ({
+  DaySchedule: () => <div>Day Schedule</div>
+}));
+
 const appointmentRecords = [
   {
     id: 1,
@@ -205,6 +226,10 @@ beforeEach(() => {
 });
 
 describe("Appointments", () => {
+  const switchToTableView = () => {
+    fireEvent.click(screen.getByRole("button", { name: "Table View" }));
+  };
+
   it("renders loading state while data is loading", () => {
     appointmentsHookState = { data: [], isLoading: true, error: null };
 
@@ -215,6 +240,7 @@ describe("Appointments", () => {
 
   it("renders appointment rows and filters by search term", () => {
     render(<Appointments />);
+    switchToTableView();
 
     expect(screen.getByTestId("row-1")).toHaveTextContent("Jane Doe");
     expect(screen.getByTestId("row-2")).toHaveTextContent("Taylor Jones");
@@ -231,7 +257,7 @@ describe("Appointments", () => {
   it("opens the create modal when add is clicked", () => {
     render(<Appointments />);
 
-    fireEvent.click(screen.getByText("appointments.add"));
+    fireEvent.click(screen.getByText("New Appointment"));
 
     expect(screen.getByTestId("appointment-modal")).toHaveTextContent("create");
     expect(screen.getByTestId("appointment-modal")).toHaveTextContent("new");
@@ -239,6 +265,7 @@ describe("Appointments", () => {
 
   it("opens the edit modal for a row action", () => {
     render(<Appointments />);
+    switchToTableView();
 
     fireEvent.click(screen.getAllByText("Edit")[0]);
 
@@ -248,6 +275,7 @@ describe("Appointments", () => {
 
   it("opens the delete confirmation modal for a row action", async () => {
     render(<Appointments />);
+    switchToTableView();
 
     fireEvent.click(screen.getAllByText("Delete")[0]);
 
@@ -287,7 +315,7 @@ describe("Appointments", () => {
   it("submits a new appointment from the modal", async () => {
     render(<Appointments />);
 
-    fireEvent.click(screen.getByText("appointments.add"));
+    fireEvent.click(screen.getByText("New Appointment"));
     fireEvent.click(screen.getByText("submit modal"));
 
     await waitFor(() => {
@@ -297,6 +325,7 @@ describe("Appointments", () => {
 
   it("submits an edited appointment from the modal", async () => {
     render(<Appointments />);
+    switchToTableView();
 
     fireEvent.click(screen.getAllByText("Edit")[0]);
     fireEvent.click(screen.getByText("submit modal"));
@@ -311,6 +340,7 @@ describe("Appointments", () => {
 
   it("invokes the delete mutation on confirm", async () => {
     render(<Appointments />);
+    switchToTableView();
 
     fireEvent.click(screen.getAllByText("Delete")[0]);
 
@@ -324,5 +354,29 @@ describe("Appointments", () => {
 
     expect(deleteMutateAsyncMock).toHaveBeenCalledWith(1);
     expect(closeModalMock).toHaveBeenCalled();
+  });
+
+  it("opens appointment details modal when scheduler appointment is clicked", async () => {
+    render(<Appointments />);
+
+    fireEvent.click(screen.getByText("Open scheduler appointment"));
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Bath" })).toBeInTheDocument();
+    });
+    expect(screen.getByText("Update Appointment")).toBeInTheDocument();
+    expect(screen.getByText("Jane Doe")).toBeInTheDocument();
+  });
+
+  it("opens edit appointment modal from details dialog update button", async () => {
+    render(<Appointments />);
+
+    fireEvent.click(screen.getByText("Open scheduler appointment"));
+    fireEvent.click(screen.getByText("Update Appointment"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("appointment-modal")).toHaveTextContent("edit");
+    });
+    expect(screen.getByTestId("appointment-modal")).toHaveTextContent("1");
   });
 });
