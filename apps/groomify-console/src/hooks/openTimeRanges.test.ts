@@ -3,6 +3,7 @@ import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import {
   getBlockedTimeRanges,
+  get24HrMinString,
   getOpenTimeRanges,
   useOpenTimeRanges
 } from "./openTimeRanges";
@@ -72,5 +73,11 @@ describe("openTimeRanges", () => {
     );
 
     expect(result.current).toEqual([{ start: "09:00", end: "11:00" }]);
+  });
+
+  it("formats 24-hour time with zero-padded hours and minutes", () => {
+    expect(get24HrMinString(new Date("2026-03-15T09:05:00"))).toBe("09:05");
+    expect(get24HrMinString(new Date("2026-03-15T10:15:00"))).toBe("10:15");
+    expect(get24HrMinString(new Date("2026-03-15T18:45:00"))).toBe("18:45");
   });
 });

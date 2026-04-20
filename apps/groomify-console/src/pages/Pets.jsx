@@ -8,7 +8,6 @@ import { Table as PetTable } from "@/components/Table";
 import { MODAL_TYPES } from "@/components/modals/modalRegistry";
 import { usePets, useCreatePet, useUpdatePet, useDeletePet } from "@/hooks/pets";
 import { useClients } from "@/hooks/clients";
-import { useBreeds } from "@/hooks/breeds";
 import { useWeightClasses } from "@/hooks/weightClasses"
 import { RowActionsMenu } from "@/components/RowActionDropdown";
 import { useAuth } from "@/context/AuthContext";
@@ -41,11 +40,6 @@ export const Pets = () => {
     error: weightClassesError
   } = useWeightClasses();
 
-  const {
-    data: breedsData = [],
-    isLoading: breedsIsLoading,
-    error: breedsError
-  } = useBreeds();
 
   const {
     data: clientsData = [],
@@ -53,8 +47,8 @@ export const Pets = () => {
     error: clientsError
   } = useClients();
 
-  const isLoading = petsIsLoading || weightClassesIsLoading || breedsIsLoading || clientsIsLoading;
-  const isError = petsError || weightClassesError || breedsError || clientsError
+  const isLoading = petsIsLoading || weightClassesIsLoading || clientsIsLoading;
+  const isError = petsError || weightClassesError || clientsError
 
   const petInputs = React.useMemo(
     () => ({
@@ -95,7 +89,6 @@ export const Pets = () => {
 
   const pets = petsData.map((pet) => {
     const owner = clientsData.find((client) => client.id === pet.owner);
-    const breed = breedsData.find((breed) => breed.id === pet.breed);
     const weightClass = weightClassesData.find(
       (wc) => wc.id === pet.weight_class_id
     );
@@ -107,8 +100,8 @@ export const Pets = () => {
       owner: owner,
       ownerDisplayName: (owner && `${owner.last_name}, ${owner.first_name}`) ||
         t("general.notFound"),
-      breed: breed,
-      breedDisplayName: breed?.name || t("general.notFound"),
+      breed: pet.breed,
+      breedDisplayName: pet.breed,
       weightClass: weightClass,
       weightClassDisplayName: weightClass?.label || t("general.notFound"),
       uuid: pet.uuid,
@@ -274,7 +267,6 @@ export const Pets = () => {
             isLoading={isSubmitting}
             weightClassData={weightClassesData}
             clientData={clientsData}
-            breedData={breedsData}
           />
         )}
       </div>

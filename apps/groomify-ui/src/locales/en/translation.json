@@ -17,7 +17,71 @@
     "login": "Login",
     "logout": "Logout",
     "name": "Name",
-    "pounds": "lbs"
+    "pounds": "lbs",
+    "submit": "Book"
+  },
+  "header": {
+    "home": "Home",
+    "services": "Services",
+    "bookAppointment": "Book Appointment"
+  },
+  "hero": {
+    "title1": "Premium Care for Your ",
+    "title2": "Furry Best Friend",
+    "description": "Get premium-quality grooming at budget-friendly prices. We prioritize your pet’s safety and comfort while delivering a stylish, fresh look every time.",
+    "bookAppointment": "Book Appointment",
+    "viewServices": "View Services"
+  },
+  "services": {
+    "title": "Our Grooming Services",
+    "dog": {
+      "title": "Dog Services",
+      "basicGrooming": { 
+        "name": "Basic Grooming",
+        "desc": "Includes: nail clipping, ear cleaning, paw trimming, private part trimming, shampoo/conditioning and drying."
+       },
+      "fullGrooming": { 
+        "name": "Full Grooming",
+        "desc": "Everything provided in basic grooming PLUS hair trimming and styling."
+      },
+      "earCleaning": {
+        "name": "Ear Cleaning",
+        "desc": "Remove wax and debris, help prevent infections and odor, and keep your dog’s ears healthy and comfortable." 
+      },
+      "dematting": {
+        "name": "Dematting",
+        "desc": "Remove mats and knots. Keeps your dog’s coat smooth, healthy, and easy to maintain."
+      },
+      "bath": {
+        "name": "Bath & Brush",
+        "desc": "Gentle bath and thorough brush-out to clean your dog’s coat, remove loose fur, and leave them soft, fresh, and comfortable."
+      },
+      "nailTrimming": {
+        "name": "Nail Trimming",
+        "desc": "Quick nail trimming and filing, preventing overgrowth, splitting, and discomfort."
+      }
+    },
+    "cat": {
+      "title": "Cat Services",
+      "bath": {
+        "name": "Bath & Brush",
+        "desc": "Calm bath and brush-out for your cat to remove dirt and loose fur, reduce shedding, and keep the coat soft and healthy."
+      },
+      "bathLong": {
+        "name": "Bath & Brush - Long Hair",
+        "desc": "Calm bath and brush-out for your cat to remove dirt and loose fur, reduce shedding, and keep the coat soft and healthy."
+      },
+      "hairTrimming": {
+        "name": "Hair Trimming",
+        "desc": "Precise, gentle trim to tidy your cat’s coat, reduce matting, and keep them comfortable."
+      }
+    }
+  },
+  "footer": {
+    "rights": "RW Pet Grooming. All rights reserved.",
+    "quickLinks": "Quick Links",
+    "home": "Home",
+    "services": "Services"
   },
   "bookingModal": {
     "title": "Complete Your Booking",
@@ -39,7 +103,8 @@
     "dateTimeStep": "Date/Time",
     "reviewStep": "Review",
     "startingPrice": "From ${{price}}",
-    "requiredMessage": " indicates required field"
+    "requiredMessage": " indicates required field",
+    "step": "Step {{current}} of {{total}}"
   },
   "placeholder": {
     "firstName": "Enter your first name",
@@ -53,12 +118,8 @@
     "weight": "Select your pet's weight",
     "time": "Select a time"
   },
-  "services":{
-    "dogs": "Dog Services",
-    "cats": "Cat Services"
-  },
-  "speciesStep":{
-      "dog": "Dog",
+  "speciesStep": {
+    "dog": "Dog",
     "cat": "Cat",
     "selectSpecies": "What kind of pet are you booking for?"
   },
@@ -73,6 +134,10 @@
       "loading": "Error loading clients"
     }
   },
+  "dateTime": {
+    "timeStringAM": "{{time}} AM",
+    "timeStringPM": "{{time}} PM"
+  },
   "pets": {
     "pounds": "lbs",
     "notPermitted": "(This breed cannot be serviced)",
@@ -83,18 +148,23 @@
       "loading": "Error loading pets"
     }
   },
-  "appointment":{
-    "errors":{
+  "appointment": {
+    "errors": {
       "descriptionLengthViolation": "description cannot be over \"{{max}}\" characters"
     }
   },
   "reviewStep": {
-   "summary": "Booking summary",
+    "summary": "Booking summary",
     "priceEstimate": "Price Estimate",
     "basePrice": "Base Price",
-     "totalAmount": "Total Amount",
+    "totalAmount": "Total Amount",
     "weightCharge": "Weight Charge",
-    "customerInfo": "Customer Information"
+    "customerInfo": "Customer Information",
+    "serviceDetails": "Service Details",
+    "dateTime": "Date & Time",
+    "message": "Message",
+    "disclaimer": "By confirming this booking, you agree to our <termsOfService>Terms of Service </termsOfService> and <cancellation>Cancellation Policy</cancellation>.",
+    "minutes": "minutes"
   },
   "confirmStep": {
     "confirm": "Booking Confirmed!",
@@ -120,18 +190,19 @@
     "reminder": "Need to make changes/cancel? Contact us at {{email}} or call {{phone}}. Changes or cancellations must be made 24 hours in advance."
   },
   "errorPage": {
+    "title": "Booking Error",
     "message": "We couldn't complete your booking at this time. This might be due to a temporary issue or the selected time slot may no longer be available.",
     "contactSupport": "Please try again later or contact us at {{phone}} or {{email}}",
     "returnHomeLabel": "Return to Home",
     "errorCode": "Error Code"
   },
-  "Price":{
+  "Price": {
     "total": "Total"
   },
-  "Header":{
+  "Header": {
     "name": "RW Pet Grooming"
   },
-  "Footer":{
+  "Footer": {
     "contactInfo": "Contact Info"
   }
 }

@@ -1,0 +1,210 @@
+{
+  "general": {
+    "next": "下一步",
+    "submit": "预约",
+    "prev": "上一步",
+    "back": "返回",
+    "save": "保存",
+    "cancel": "取消",
+    "close": "关闭",
+    "search": "搜索...",
+    "loading": "加载中...",
+    "edit": "编辑",
+    "update": "更新",
+    "delete": "删除",
+    "create": "创建",
+    "select": "选择",
+    "remarks": "备注",
+    "login": "登录",
+    "logout": "退出登录",
+    "name": "姓名",
+    "pounds": "磅"
+  },
+  "header": {
+    "home": "首页",
+    "services": "服务",
+    "bookAppointment": "立即预约"
+  },
+  "hero": {
+    "title1": "为您的宠物提供",
+    "title2": "高品质护理",
+    "description": "以亲民价格享受高品质宠物美容服务。保证宠物的安全与舒适，同时打造清爽有型的造型效果。",
+    "bookAppointment": "立即预约",
+    "viewServices": "查看服务"
+  },
+  "bookingModal": {
+    "title": "完成您的预约",
+    "firstName": "名",
+    "lastName": "姓",
+    "email": "电子邮箱",
+    "phone": "电话",
+    "petName": "宠物名称",
+    "service": "服务",
+    "breed": "品种",
+    "weight": "体重",
+    "date": "日期",
+    "time": "时间",
+    "message": "留言",
+    "speciesStep": "宠物种类",
+    "serviceStep": "服务",
+    "personalStep": "个人信息",
+    "petStep": "宠物信息",
+    "dateTimeStep": "日期/时间",
+    "reviewStep": "确认信息",
+    "startingPrice": "最低 ${{price}}",
+    "requiredMessage": " 为必填项",
+    "step": "第 {{current}} 步，共 {{total}} 步"
+  },
+  "placeholder": {
+    "firstName": "请输入您的名",
+    "lastName": "请输入您的姓",
+    "email": "请输入您的邮箱",
+    "phone": "请输入您的电话",
+    "petName": "请输入宠物名称",
+    "service": "请选择服务",
+    "message": "请输入留言",
+    "breed": "请选择宠物品种",
+    "weight": "请选择宠物体重",
+    "time": "请选择时间"
+  },
+  "services": {
+    "title": "我们的美容服务",
+    "dog": {
+      "title": "狗狗服务",
+      "basicGrooming": {
+        "name": "基础美容",
+        "desc": "包含：修剪指甲、耳部清洁、脚底毛修整、私密处修剪、洗护与吹干。"
+      },
+      "fullGrooming": {
+        "name": "全套美容",
+        "desc": "含基础美容全部项目，另加毛发修剪与造型。"
+      },
+      "earCleaning": {
+        "name": "耳部清洁",
+        "desc": "清理耳垢与杂质，帮助预防感染和异味，让狗狗耳朵更健康舒适。"
+      },
+      "dematting": {
+        "name": "开结梳理",
+        "desc": "去除打结与毛团，保持被毛顺滑健康，后续更易打理。"
+      },
+      "bath": {
+        "name": "洗澡与梳毛",
+        "desc": "温和洗浴并彻底梳理，清洁被毛、去除浮毛，让狗狗干净清爽更舒适。"
+      },
+      "nailTrimming": {
+        "name": "修剪指甲",
+        "desc": "快速修剪并打磨指甲，减少过长、开裂与不适。"
+      }
+    },
+    "cat": {
+      "title": "猫咪服务",
+      "bath": {
+        "name": "洗澡与梳毛",
+        "desc": "在低压力环境下为猫咪洗护梳理，去除污垢与浮毛，减少掉毛并保持毛发柔顺健康。"
+      },
+      "bathLong": {
+        "name": "洗澡与梳毛 - 长毛",
+        "desc": "针对长毛猫的低压力洗护梳理，去除污垢与浮毛，减少打结和掉毛，保持毛发柔顺。"
+      },
+      "hairTrimming": {
+        "name": "毛发修剪",
+        "desc": "细致温和地修整毛发，减少打结，让猫咪更舒适、外观更整洁。"
+      }
+    },
+    "dogs": "狗狗服务",
+    "cats": "猫咪服务"
+  },
+  "footer": {
+    "rights": "RW 宠物美容。保留所有权利。",
+    "quickLinks": "快速链接",
+    "home": "首页",
+    "services": "服务"
+  },
+  "speciesStep": {
+    "dog": "狗",
+    "cat": "猫",
+    "selectSpecies": "您要为哪种宠物预约？"
+  },
+  "clients": {
+    "errors": {
+      "firstName": "名字长度必须在 0 到 \"{{max}}\" 个字符之间",
+      "lastName": "姓氏长度必须在 0 到 \"{{max}}\" 个字符之间",
+      "phone": "电话号码长度必须在 0 到 \"{{max}}\" 之间，且仅可包含数字和 '-'",
+      "email": "邮箱长度必须在 0 到 \"{{max}}\" 个字符之间，且格式必须有效",
+      "description": "描述不能超过 200 个字符。",
+      "notEmpty": "\"{{input}}\" 字段不能为空",
+      "loading": "加载客户信息时出错"
+    }
+  },
+  "dateTime": {
+    "timeStringAM": "上午 {{time}}",
+    "timeStringPM": "下午 {{time}}" 
+  },
+  "pets": {
+    "pounds": "磅",
+    "notPermitted": "（该品种暂不提供服务）",
+    "errors": {
+      "nameLengthViolation": "宠物名称长度必须在 0 到 \"{{max}}\" 个字符之间",
+      "breedLengthViolation": "宠物品种长度必须在 0 到 \"{{max}}\" 个字符之间",
+      "notEmpty": "\"{{input}}\" 字段不能为空",
+      "loading": "加载宠物信息时出错"
+    }
+  },
+  "appointment": {
+    "errors": {
+      "descriptionLengthViolation": "描述不能超过 \"{{max}}\" 个字符"
+    }
+  },
+  "reviewStep": {
+    "summary": "预约小结",
+    "priceEstimate": "价格预估",
+    "basePrice": "基础价格",
+    "totalAmount": "总计",
+    "weightCharge": "体重附加费",
+    "customerInfo": "客户信息",
+    "serviceDetails": "服务详情",
+    "dateTime": "日期与时间",
+    "message": "留言",
+    "disclaimer": "确认此预约即表示您同意我们的<termsOfService>服务条款</termsOfService>和<cancellation>取消政策</cancellation>。",
+    "minutes": "分钟"
+  },
+  "confirmStep": {
+    "confirm": "预约已确认！",
+    "thankYou": "感谢您的预约",
+    "confirmNumber": "确认编号",
+    "details": "预约详情",
+    "price": "价格",
+    "date": "日期",
+    "time": "时间",
+    "duration": "时长",
+    "minutes": "分钟",
+    "pet": "宠物",
+    "guest": "客户信息",
+    "priceEstimate": "价格预估",
+    "basePrice": "基础价格",
+    "weightCharge": "体重附加费",
+    "totalAmount": "总金额",
+    "customerInfo": "客户信息",
+    "download": "下载确认单",
+    "bookAnother": "再预约一次",
+    "emailBooking": "发送确认邮件",
+    "emailSent": "确认邮件已发送至 {{email}}。",
+    "reminder": "如需修改或取消，请联系 {{email}} 或致电 {{phone}}。变更或取消需提前 24 小时。"
+  },
+  "errorPage": {
+    "title": "预约未完成",
+    "message": "我们目前无法完成您的预约。这可能是临时问题，或所选时间段已不可用。",
+    "contactSupport": "请稍后重试，或通过 {{phone}} 或 {{email}} 联系我们",
+    "returnHomeLabel": "返回首页",
+    "errorCode": "错误代码"
+  },
+  "Price": {
+    "total": "总计"
+  },
+  "Header": {
+    "name": "RW 宠物美容"
+  },
+  "Footer": {
+    "contactInfo": "联系方式"
+  }
+}

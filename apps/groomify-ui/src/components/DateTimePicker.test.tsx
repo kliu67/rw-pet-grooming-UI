@@ -9,6 +9,10 @@ const mockGetTimeSlotsForDate = vi.fn();
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string) => key,
+    i18n: {
+      resolvedLanguage: "en",
+      changeLanguage: vi.fn(),
+    },
   }),
 }));
 
@@ -53,6 +57,8 @@ describe("DateTimePicker", () => {
             start: new Date("2026-03-11T10:00:00.000Z"),
             end: new Date("2026-03-11T10:20:00.000Z"),
             startStrAMPM: "10:00AM",
+            startStrNormal: "10:00",
+            isStartAMOrPM: "AM",
             endStrAMPM: "10:20AM",
             bookable: true,
           },
@@ -63,6 +69,8 @@ describe("DateTimePicker", () => {
           start: new Date("2026-03-10T09:00:00.000Z"),
           end: new Date("2026-03-10T09:20:00.000Z"),
           startStrAMPM: "9:00AM",
+          startStrNormal: "9:00",
+          isStartAMOrPM: "AM",
           endStrAMPM: "9:20AM",
           bookable: true,
         },
@@ -85,10 +93,11 @@ describe("DateTimePicker", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("9:00AM").closest("[data-selected]")).toHaveAttribute(
-        "data-selected",
-        "true",
-      );
+      expect(
+        screen
+          .getByRole("button", { name: "dateTime.timeStringAM" })
+          .closest("[data-selected]"),
+      ).toHaveAttribute("data-selected", "true");
     });
   });
 
@@ -109,10 +118,11 @@ describe("DateTimePicker", () => {
     fireEvent.click(screen.getByTestId("calendar-select-date"));
 
     await waitFor(() => {
-      expect(screen.getByText("10:00AM").closest("[data-selected]")).toHaveAttribute(
-        "data-selected",
-        "false",
-      );
+      expect(
+        screen
+          .getByRole("button", { name: "dateTime.timeStringAM" })
+          .closest("[data-selected]"),
+      ).toHaveAttribute("data-selected", "false");
     });
   });
 
@@ -131,7 +141,7 @@ describe("DateTimePicker", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "9:00AM" }));
+    fireEvent.click(screen.getByRole("button", { name: "dateTime.timeStringAM" }));
 
     expect(onSelect).toHaveBeenCalledTimes(1);
     expect(onSelect.mock.calls[0][0].target.value).toBe("2026-03-10T09:00:00.000Z");

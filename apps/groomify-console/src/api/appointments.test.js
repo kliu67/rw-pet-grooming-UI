@@ -56,8 +56,8 @@ describe("appointments api", () => {
     apiFetch.mockResolvedValue(payload);
 
     await expect(updateAppointment(4, data)).resolves.toEqual(payload);
-    expect(apiFetch).toHaveBeenCalledWith("/api/appointments/4", {
-      method: "PUT",
+    expect(apiFetch).toHaveBeenCalledWith("/api/appointments/4/update", {
+      method: "PATCH",
       body: JSON.stringify(data)
     });
   });

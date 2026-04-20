@@ -142,3 +142,6 @@ vite.config.ts.timestamp-*
 .wrangler
 .dev.vars*
 !.dev.vars.example
+
+# Keep app locale JSON files tracked even if global ignores include *.json
+!apps/groomify-ui/src/locales/**/*.json

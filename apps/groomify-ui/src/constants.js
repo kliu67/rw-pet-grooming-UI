@@ -143,7 +143,7 @@ export const serviceImageMap = {
   EAR_CLEANING: earCleaningImage,
   CAT_BATH: catBathImage,
   CAT_BATH_LONG: catBathLongImage,
-  CAT_HAIR_TRIMMING: catHairTrimmingImage
+  CAT_HAIR_TRIMMING: catHairTrimmingImage,
 };
 
 export const iconMap = {
@@ -158,6 +158,44 @@ export const iconMap = {
   CAT_HAIR_TRIMMING: Scissors,
 };
 
+export const serviceTextMap = {
+  FULL_GROOMING: {
+    name: "services.dog.fullGrooming.name",
+    desc: "services.dog.fullGrooming.desc",
+  },
+  BASIC_GROOMING: {
+    name: "services.dog.basicGrooming.name",
+    desc: "services.dog.basicGrooming.desc",
+  },
+  BATH_BRUSH: {
+    name: "services.dog.bath.name",
+    desc: "services.dog.bath.desc"
+  },
+  DEMATTING: {
+    name: "services.dog.dematting.name",
+    desc: "services.dog.dematting.desc"
+    },
+  EAR_CLEANING: {
+    name: "services.dog.earCleaning.name",
+    desc: "services.dog.earCleaning.desc"
+  },
+  NAIL_TRIMMING: {
+    name: "services.dog.nailTrimming.name",
+    desc: "services.dog.nailTrimming.desc"
+  },
+  CAT_HAIR_TRIMMING: {
+    name: "services.cat.hairTrimming.name",
+    desc: "services.cat.hairTrimming.desc"
+  },
+  CAT_BATH: {
+    name: "services.cat.bath.name",
+    desc: "services.cat.bath.desc"
+  },
+  CAT_BATH_LONG: {
+    name: "services.cat.bathLong.name",
+    desc: "services.cat.bathLong.name"
+  }
+};
 
 export const defaultImage =
   "https://images.unsplash.com/photo-1703368786305-4e1dcfcfd0db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBnZXR0aW5nJTIwaGFpcmN1dHxlbnwxfHx8fDE3NzA0MDY0NTd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral";
@@ -173,8 +211,8 @@ export const BOOKING_STEPS = {
 };
 
 export const SPECIES = {
-  DOG: 'DOG',
-  CAT: 'CAT'
+  DOG: "DOG",
+  CAT: "CAT",
 };
 
 export const DEFAULT_STATUS = "booked";

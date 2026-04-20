@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation, Trans } from "react-i18next";
 import { useBooking } from "@/context/BookingContext";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -67,7 +67,7 @@ export const ReviewStep = ({ onEdit = (step) => {} }) => {
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <h2 className="text-xl font-semibold">Booking Summary</h2>
+            <h2 className="text-xl font-semibold">{t('reviewStep.summary')}</h2>
           </div>
         </div>
 
@@ -77,7 +77,7 @@ export const ReviewStep = ({ onEdit = (step) => {} }) => {
             <div className="mb-4 flex items-center justify-between">
               <h3 className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-indigo-600" />
-                Service Details
+                {t('reviewStep.serviceDetails')}
               </h3>
               <Button
                 variant="ghost"
@@ -88,7 +88,7 @@ export const ReviewStep = ({ onEdit = (step) => {} }) => {
                 className="text-indigo-600 hover:text-indigo-700"
               >
                 <Edit2 className="mr-1 h-3 w-3" />
-                Edit
+                {t('general.edit')}
               </Button>
             </div>
             <div className="space-y-3">
@@ -113,7 +113,7 @@ export const ReviewStep = ({ onEdit = (step) => {} }) => {
             <div className="mb-4 flex items-center justify-between">
               <h3 className="flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-indigo-600" />
-                Date & Time
+                {t('reviewStep.dateTime')}
               </h3>
               <Button
                 variant="ghost"
@@ -124,7 +124,7 @@ export const ReviewStep = ({ onEdit = (step) => {} }) => {
                 className="text-indigo-600 hover:text-indigo-700"
               >
                 <Edit2 className="mr-1 h-3 w-3" />
-                Edit
+                {t('general.edit')}
               </Button>
             </div>
             <div className="space-y-2">
@@ -136,7 +136,7 @@ export const ReviewStep = ({ onEdit = (step) => {} }) => {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <Clock className="h-4 w-4" />
-                  <span>{`${serviceConfig.duration_minutes} minutes`}</span>
+                  <span>{`${serviceConfig.duration_minutes} ${t('reviewStep.minutes')}`}</span>
                 </div>
               </div>
 
@@ -145,7 +145,7 @@ export const ReviewStep = ({ onEdit = (step) => {} }) => {
                   <Separator />
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <MessageSquare className="h-4 w-4" />{" "}
-                    <p className="text-sm text-gray-600">Message</p>
+                    <p className="text-sm text-gray-600">{t('reviewStep.message')}</p>
                     <span>{description}</span>
                   </div>
                 </>
@@ -219,7 +219,16 @@ export const ReviewStep = ({ onEdit = (step) => {} }) => {
 
           {/* Terms & Conditions */}
           <div className="rounded-lg border border-gray-200 bg-white p-4">
-            <p className="text-xs text-gray-600">
+            <Trans i18nKey="reviewStep.disclaimer"
+            components={{
+              termsOfService: 
+              <button className="text-indigo-600 hover:underline">
+              </button>,
+              cancellation:
+                <button className="text-indigo-600 hover:underline">
+              </button>
+            }} />
+            {/* <p className="text-xs text-gray-600">
               By confirming this booking, you agree to our{" "}
               <button className="text-indigo-600 hover:underline">
                 Terms of Service
@@ -229,8 +238,8 @@ export const ReviewStep = ({ onEdit = (step) => {} }) => {
                 Cancellation Policy
               </button>
               .
-              {/* You will receive a confirmation email at {bookingData.personalInfo.email}. */}
-            </p>
+              You will receive a confirmation email at {bookingData.personalInfo.email}.
+            </p> */}
           </div>
         </div>
       </Card>

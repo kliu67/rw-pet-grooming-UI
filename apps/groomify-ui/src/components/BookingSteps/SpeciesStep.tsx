@@ -12,6 +12,8 @@ export const SpeciesStep = ({ onValidityChange }) => {
   const { DOG, CAT } = SPECIES;
   const species = bookingData?.petSpecies || "";
   const stepIsValid = !!species;
+  const cardBaseClasses =
+    "group relative overflow-hidden p-7 rounded-2xl border-2 transition-all duration-300 shadow-sm hover:shadow-xl";
 
   useEffect(() => {
     onValidityChange(stepIsValid);
@@ -65,16 +67,19 @@ export const SpeciesStep = ({ onValidityChange }) => {
         <button
           type="button"
           onClick={() => handleSpeciesChange(DOG)}
-          className={`group relative p-8 rounded-xl border-2 shadow-md hover:shadow-xl transition-all duration-300 ${
+          className={`${cardBaseClasses} ${
             species === DOG
-              ? "border-emerald-500 bg-emerald-50 shadow-lg"
-              : "border-gray-200 hover:border-emerald-300 bg-white"
+              ? "border-emerald-500 bg-gradient-to-br from-emerald-100 via-emerald-50 to-teal-100 ring-2 ring-emerald-200"
+              : "border-gray-300 bg-gradient-to-br from-gray-100 via-gray-50 to-emerald-50/50 hover:border-emerald-300 hover:bg-gradient-to-br hover:from-gray-100 hover:to-emerald-100/50"
           }`}
         >
+          <div className="absolute -top-12 -right-12 h-28 w-28 rounded-full bg-emerald-200/30 blur-2xl transition-opacity group-hover:opacity-100 opacity-70" />
           <div className="flex flex-col items-center gap-4">
             <div
-              className={`p-4 rounded-full transition-all duration-300 group-hover:scale-110 ${
-                species === DOG ? "bg-emerald-100" : "bg-gray-100"
+              className={`p-4 rounded-full transition-all duration-300 group-hover:scale-110 border ${
+                species === DOG
+                  ? "bg-emerald-100 border-emerald-200 shadow-sm"
+                  : "bg-gray-100 border-gray-200"
               }`}
             >
               <Dog
@@ -91,9 +96,9 @@ export const SpeciesStep = ({ onValidityChange }) => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 exit={{ scale: 0 }}
-                className="absolute top-3 right-3 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center"
+                className="absolute top-3 right-3 w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center shadow-md"
               >
-                <div className="w-2 h-2 bg-white rounded-full" />
+                <div className="w-2.5 h-2.5 bg-white rounded-full" />
               </motion.div>
             )}
           </AnimatePresence>
@@ -102,16 +107,19 @@ export const SpeciesStep = ({ onValidityChange }) => {
         <button
           type="button"
           onClick={() => handleSpeciesChange(CAT)}
-          className={`group relative p-8 rounded-xl border-2 shadow-md hover:shadow-xl transition-all duration-300 ${
+          className={`${cardBaseClasses} ${
             species === CAT
-              ? "border-emerald-500 bg-emerald-50 shadow-lg"
-              : "border-gray-200 hover:border-emerald-300 bg-white"
+              ? "border-emerald-500 bg-gradient-to-br from-emerald-100 via-emerald-50 to-teal-100 ring-2 ring-emerald-200"
+              : "border-gray-300 bg-gradient-to-br from-gray-100 via-gray-50 to-emerald-50/50 hover:border-emerald-300 hover:bg-gradient-to-br hover:from-gray-100 hover:to-emerald-100/50"
           }`}
         >
+          <div className="absolute -top-12 -right-12 h-28 w-28 rounded-full bg-emerald-200/30 blur-2xl transition-opacity group-hover:opacity-100 opacity-70" />
           <div className="flex flex-col items-center gap-4">
             <div
-              className={`p-4 rounded-full transition-all duration-300 group-hover:scale-110 ${
-                species === CAT ? "bg-emerald-100" : "bg-gray-100"
+              className={`p-4 rounded-full transition-all duration-300 group-hover:scale-110 border ${
+                species === CAT
+                  ? "bg-emerald-100 border-emerald-200 shadow-sm"
+                  : "bg-gray-100 border-gray-200"
               }`}
             >
               <Cat
@@ -128,9 +136,9 @@ export const SpeciesStep = ({ onValidityChange }) => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 exit={{ scale: 0 }}
-                className="absolute top-3 right-3 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center"
+                className="absolute top-3 right-3 w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center shadow-md"
               >
-                <div className="w-2 h-2 bg-white rounded-full" />
+                <div className="w-2.5 h-2.5 bg-white rounded-full" />
               </motion.div>
             )}
           </AnimatePresence>

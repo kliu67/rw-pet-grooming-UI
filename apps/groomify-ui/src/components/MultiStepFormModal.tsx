@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useBooking } from "@/context/BookingContext";
 import { useNavigate } from "react-router";
 import {
@@ -42,6 +42,7 @@ import {
   DEFAULT_STATUS,
   SPECIES as PET_SPECIES,
 } from "../constants";
+import { trackEvent } from "@/lib/analytics";
 
 interface MultiStepFormModalProps {
   open: boolean;
@@ -81,6 +82,7 @@ export function MultiStepFormModal({
   const [showPersonalErrors, setShowPersonalErrors] = useState(false);
   const [showPetErrors, setShowPetErrors] = useState(false);
   const [showDateTimeErrors, setShowDateTimeErrors] = useState(false);
+  const hasTrackedStartRef = useRef(false);
   const { bookingData, updateBookingData, resetBooking, removeStartTime } =
     useBooking();
 
@@ -242,6 +244,37 @@ export function MultiStepFormModal({
       setShowPersonalErrors(true);
     }
     if (validateStep() && currentStep < TOTAL_STEPS) {
+      if (currentStep === SPECIES) {
+        trackEvent("species_selected", {
+          pet_species: bookingData?.petSpecies,
+        });
+      }
+      if (currentStep === SERVICE) {
+        trackEvent("service_selected", {
+          service_id: bookingData?.service?.id,
+          service_code: bookingData?.service?.code,
+          pet_species: bookingData?.petSpecies,
+        });
+      }
+      if (currentStep === PET) {
+        trackEvent("pet_details_completed", {
+          pet_species: bookingData?.petSpecies,
+          has_breed: Boolean(bookingData?.breed?.id),
+          has_weight_class: Boolean(bookingData?.weightClass?.id),
+        });
+      }
+      if (currentStep === DATE_TIME) {
+        trackEvent("datetime_selected", {
+          stylist_id: bookingData?.stylist_id || DEFAULT_STYLIST,
+          has_start_time: Boolean(bookingData?.startTime),
+        });
+      }
+      if (currentStep === PERSONAL) {
+        trackEvent("personal_info_completed", {
+          has_email: Boolean(bookingData?.email),
+          has_phone: Boolean(bookingData?.phone),
+        });
+      }
       setCurrentStep((prev) => prev + 1);
     }
   };
@@ -254,6 +287,10 @@ export function MultiStepFormModal({
 
   const handleSubmit = async () => {
     if (validateStep()) {
+      trackEvent("booking_submitted", {
+        service_id: bookingData?.service?.id,
+        pet_species: bookingData?.petSpecies,
+      });
       const { petName, breed, weightClass } = bookingData;
       try {
         const {
@@ -283,9 +320,19 @@ export function MultiStepFormModal({
         const appointment =
           await createAppMutation.mutateAsync(appointmentForm);
         if (appointment) {
+          trackEvent("booking_success", {
+            appointment_id: appointment?.id,
+            service_id: bookingData?.service?.id,
+          });
           navigate(`${CONFIRMATION}${appointment?.id}`);
-        } else navigate(ERROR);
+        } else {
+          trackEvent("booking_error", { reason: "empty_appointment_response" });
+          navigate(ERROR);
+        }
       } catch (err) {
+        trackEvent("booking_error", {
+          reason: "create_appointment_failed",
+        });
         navigate(ERROR);
       } finally {
         resetBooking();
@@ -329,6 +376,16 @@ export function MultiStepFormModal({
       }})
     }
   }, [bookingData.petSpecies])
+  useEffect(() => {
+    if (open && !hasTrackedStartRef.current) {
+      trackEvent("booking_started", { entry_point: "booking_modal" });
+      hasTrackedStartRef.current = true;
+    }
+    if (!open) {
+      hasTrackedStartRef.current = false;
+    }
+  }, [open]);
+
   useEffect(() => {
     if (currentStep !== PERSONAL && showPersonalErrors) {
       setShowPersonalErrors(false);
@@ -416,7 +473,7 @@ export function MultiStepFormModal({
         <DialogHeader>
           <DialogTitle>{t("bookingModal.title")}</DialogTitle>
           <DialogDescription>
-            Step {currentStep} of {TOTAL_STEPS}
+            {t('bookingModal.step', {current: currentStep, total: TOTAL_STEPS})}
           </DialogDescription>
         </DialogHeader>
 
@@ -458,7 +515,7 @@ export function MultiStepFormModal({
                 type="button"
                 variant="outline"
                 onClick={() => handleOpenChange(false)}
-                className="active:bg-gray-200 active:border-gray-300 active:text-gray-900 active:scale-95 transition"
+                className="w-1/2 active:bg-gray-200 active:border-gray-300 active:text-gray-900 active:scale-95 transition"
               >
                 {t("general.cancel")}
               </Button>
@@ -467,7 +524,7 @@ export function MultiStepFormModal({
                 type="button"
                 variant="outline"
                 onClick={handleBack}
-                className="active:bg-gray-200 active:border-gray-300 active:text-gray-900 active:scale-95 transition"
+                className="w-1/2 active:bg-gray-200 active:border-gray-300 active:text-gray-900 active:scale-95 transition"
               >
                 {t("general.back")}
               </Button>
@@ -476,20 +533,20 @@ export function MultiStepFormModal({
               <Button
                 type="button"
                 onClick={handleNext}
-                className="active:bg-emerald-600 active:border-emerald-600 active:text-white active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-1/2 active:bg-emerald-600 active:border-emerald-600 active:text-white active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
                 disabled={!validateStep() || isSubmitting}
               >
-                Next
+                {t('general.next')}
               </Button>
             ) : (
               <>
                 <Button
                   type="button"
                   onClick={handleSubmit}
-                  className="active:bg-emerald-600 active:border-emerald-600 active:text-white active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-1/2 active:bg-emerald-600 active:border-emerald-600 active:text-white active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
                   disabled={!validateStep() || isSubmitting}
                 >
-                  {isSubmitting ? <LoadingSpinnerButton size="sm" /> : "Submit"}
+                  {isSubmitting ? <LoadingSpinnerButton size="sm" /> : t('general.submit')}
                 </Button>
               </>
             )}
