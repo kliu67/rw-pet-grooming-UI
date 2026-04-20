@@ -326,7 +326,6 @@ export default function AppointmentModal({
     if (service && pet) {
       const matchedConfig = configs.find(
         (c) =>
-          c.breed_id === pet.breed &&
           c.service_id === service.id &&
           c.weight_class_id === pet.weight_class_id
       );
