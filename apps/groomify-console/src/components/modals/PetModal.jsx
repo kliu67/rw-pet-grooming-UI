@@ -68,6 +68,12 @@ export default function PetModal({
     wc.label?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const matchedBreed = useMemo(() => {
+    const breedName = form.breed?.trim()?.toLowerCase();
+    if (!breedName) return undefined;
+    return breedData.find((breed) => breed.name.toLowerCase() === breedName);
+  }, [breedData, form.breed]);
+
   const validateFields = (field, value) => {
     if (isDirty) {
       if (field === "name") {
@@ -114,7 +120,7 @@ export default function PetModal({
     return (
       (petData?.name || "").trim() !== current.name.trim() ||
       (petData?.owner?.id || "") !== current.owner.id ||
-      (petData?.breed || "").trim() !== current.breed.trim() ||
+      (petData?.breed?.id || "") !== matchedBreed?.id ||
       (petData?.species || "") !== (current.species || "") ||
       ((petData?.weightClass?.id || "") !== current.weightClass?.id &&
         !!current.weightClass?.id)
@@ -128,6 +134,7 @@ export default function PetModal({
     form.owner &&
     form.breed &&
     form.species &&
+    matchedBreed &&
     form.weightClass &&
     ((mode === "edit" && hasChanges(form)) || mode === "create");
 
@@ -136,7 +143,7 @@ export default function PetModal({
     setForm({
       name: petData?.name || "",
       owner: petData?.owner || "",
-      breed: petData?.breed || "",
+      breed: petData?.breed?.name || "",
       species: petData?.species || "",
       weightClass: petData?.weightClass || ""
     });
@@ -169,8 +176,8 @@ export default function PetModal({
             if (petData?.owner?.id !== form?.owner?.id) {
               delta.owner = form.owner.id;
             }
-            if (petData?.breed !== form?.breed?.trim()) {
-              delta.breed = form?.breed.trim();
+            if (petData?.breed?.id !== matchedBreed?.id) {
+              delta.breed = matchedBreed?.id;
             }
             if (petData?.species !== form?.species) {
               delta.species = form.species;
@@ -279,6 +286,11 @@ export default function PetModal({
             className="w-full border rounded-lg px-3 py-2 mb-3"
             required
           />
+          <datalist id="breed-options">
+            {breedData.map((breed) => (
+              <option key={breed.id} value={breed.name} />
+            ))}
+          </datalist>
           <div className="mt-4 mb-4">
             <DropdownMenu id="weightClass">
               <DropdownMenuTrigger asChild>
