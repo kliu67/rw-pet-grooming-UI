@@ -3,8 +3,8 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "build": "npm --prefix apps/groomify-console ci && npm --prefix apps/groomify-console run build",
-    "build:console": "npm --prefix apps/groomify-console ci && npm --prefix apps/groomify-console run build",
+    "build": "node scripts/build-console.mjs",
+    "build:console": "node scripts/build-console.mjs",
     "build:ui": "npm --prefix apps/groomify-ui ci && npm --prefix apps/groomify-ui run build"
   }
 }
