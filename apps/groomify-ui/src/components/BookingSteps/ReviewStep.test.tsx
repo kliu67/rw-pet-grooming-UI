@@ -55,7 +55,8 @@ describe("ReviewStep", () => {
     expect(screen.getByText("reviewStep.priceEstimate")).toBeInTheDocument();
     expect(screen.getByText("Bath&Brush")).toBeInTheDocument();
     expect(screen.getByText("Lou")).toBeInTheDocument();
-    expect(screen.getByText("reviewStep.disclaimer")).toBeInTheDocument();
+    expect(screen.getByText("reviewStep.priceDisclaimer")).toBeInTheDocument();
+    expect(screen.getByText("reviewStep.refusalOfServiceDisclaimer")).toBeInTheDocument();
   });
 
   it("returns null when required booking data is missing", () => {
