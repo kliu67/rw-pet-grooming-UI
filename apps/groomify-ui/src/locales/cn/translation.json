@@ -110,9 +110,7 @@
         "name": "毛发修剪",
         "desc": "细致温和地修整毛发，减少打结，让猫咪更舒适、外观更整洁。"
       }
-    },
-    "dogs": "狗狗服务",
-    "cats": "猫咪服务"
+    }
   },
   "footer": {
     "rights": "RW 宠物美容。保留所有权利。",
@@ -165,7 +163,9 @@
     "serviceDetails": "服务详情",
     "dateTime": "日期与时间",
     "message": "留言",
-    "disclaimer": "确认此预约即表示您同意我们的<termsOfService>服务条款</termsOfService>和<cancellation>取消政策</cancellation>。",
+    "disclaimer": "免责声明",
+    "priceDisclaimer": "所有价格均为估算，可能会根据宠物的体型和状况进行调整。",
+    "refusalOfServiceDisclaimer": "为确保安全，如果宠物表现出攻击性或不配合行为，我们保留拒绝服务的权利。",
     "minutes": "分钟"
   },
   "confirmStep": {

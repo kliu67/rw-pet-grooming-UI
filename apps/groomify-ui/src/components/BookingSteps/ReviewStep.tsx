@@ -216,9 +216,15 @@ export const ReviewStep = ({ onEdit = (step) => {} }) => {
               </div>
             </div>
           </div>
-
-          {/* Terms & Conditions */}
+          {/* Note */}
           <div className="rounded-lg border border-gray-200 bg-white p-4">
+            {t('reviewStep.priceDisclaimer')}
+          </div>
+          <div className="rounded-lg border border-gray-200 bg-white p-4">
+            {t('reviewStep.refusalOfServiceDisclaimer')}
+          </div>
+          {/* Terms & Conditions */}
+          {/* <div className="rounded-lg border border-gray-200 bg-white p-4">
             <Trans i18nKey="reviewStep.disclaimer"
             components={{
               termsOfService: 
@@ -228,7 +234,7 @@ export const ReviewStep = ({ onEdit = (step) => {} }) => {
                 <button className="text-indigo-600 hover:underline">
               </button>
             }} />
-            {/* <p className="text-xs text-gray-600">
+            <p className="text-xs text-gray-600">
               By confirming this booking, you agree to our{" "}
               <button className="text-indigo-600 hover:underline">
                 Terms of Service
@@ -239,8 +245,8 @@ export const ReviewStep = ({ onEdit = (step) => {} }) => {
               </button>
               .
               You will receive a confirmation email at {bookingData.personalInfo.email}.
-            </p> */}
-          </div>
+            </p>
+          </div> */}
         </div>
       </Card>
     </div>

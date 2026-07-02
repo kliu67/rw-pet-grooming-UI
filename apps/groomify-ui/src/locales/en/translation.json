@@ -163,7 +163,9 @@
     "serviceDetails": "Service Details",
     "dateTime": "Date & Time",
     "message": "Message",
-    "disclaimer": "By confirming this booking, you agree to our <termsOfService>Terms of Service </termsOfService> and <cancellation>Cancellation Policy</cancellation>.",
+    "disclaimer": "Disclaimer",
+    "priceDisclaimer": "All prices are estimates and are subject to changes depending on the size and the condition of the animal.",
+    "refusalOfServiceDisclaimer": "To ensure safety, We reserve the right to refuse service if the animal shows aggressive or uncooperative behaviour.",
     "minutes": "minutes"
   },
   "confirmStep": {
