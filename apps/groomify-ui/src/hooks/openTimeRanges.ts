@@ -29,6 +29,12 @@ type UseOpenTimeRangesParams = {
   date?: Date;
 };
 
+type TimeSlotsForDateParams = UseOpenTimeRangesParams & {
+  slotMinutes: number;
+  appointmentDurationMinutes?: number;
+  now?: Date;
+};
+
 type DayRelation = "same_day" | "previous_day" | null;
 
 function toArray(data: unknown): UnknownRecord[] {
@@ -419,11 +425,7 @@ export function getTimeSlotsForDate({
   slotMinutes,
   appointmentDurationMinutes,
   now = new Date(),
-}: UseOpenTimeRangesParams & {
-  slotMinutes: number;
-  appointmentDurationMinutes?: number;
-  now?: Date;
-}): TimeSlot[] {
+}: TimeSlotsForDateParams): TimeSlot[] {
   if (!date || !Number.isFinite(slotMinutes) || slotMinutes <= 0) return [];
   const durationMinutes = Number(appointmentDurationMinutes) || slotMinutes;
 
@@ -482,19 +484,17 @@ export function getTimeSlotsForDate({
   return slots;
 }
 
-export function useTimeSlotsForDate({
-  availabilityData,
-  timeOffsData,
-  appointments = [],
-  date,
-  slotMinutes,
-  appointmentDurationMinutes,
-  now,
-}: UseOpenTimeRangesParams & {
-  slotMinutes: number;
-  appointmentDurationMinutes?: number;
-  now?: Date;
-}): TimeSlot[] {
+export function useTimeSlotsForDate(params: TimeSlotsForDateParams): TimeSlot[] {
+  const {
+    availabilityData,
+    timeOffsData,
+    appointments,
+    date,
+    slotMinutes,
+    appointmentDurationMinutes,
+    now,
+  } = params;
+
   return useMemo(
     () =>
       getTimeSlotsForDate({
