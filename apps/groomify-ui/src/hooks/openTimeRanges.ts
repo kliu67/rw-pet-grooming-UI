@@ -450,7 +450,7 @@ export function getTimeSlotsForDate({
   for (const range of availabilityRanges) {
     for (
       let cursor = range.startMinutes;
-      cursor + slotMinutes <= range.endMinutes;
+      cursor <= range.endMinutes;
       cursor += slotMinutes
     ) {
       const slotRange: TimeRange = {
@@ -466,7 +466,7 @@ export function getTimeSlotsForDate({
       slotStart.setHours(0, slotRange.startMinutes, 0, 0);
       const slotEnd = new Date(dayStart.getTime() + slotRange.endMinutes * 60 * 1000);
       const slotIsFutureEnough = slotStart.getTime() > minBookableAt.getTime();
-      const fitsAvailability = appointmentRange.endMinutes <= range.endMinutes;
+      const fitsAvailability = appointmentRange.startMinutes <= range.endMinutes;
       const hasOverlap = unavailableRanges.some((r) => rangesOverlap(appointmentRange, r));
 
       slots.push({
