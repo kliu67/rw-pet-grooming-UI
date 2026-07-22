@@ -29,6 +29,12 @@ type UseOpenTimeRangesParams = {
   date?: Date;
 };
 
+type TimeSlotsForDateParams = UseOpenTimeRangesParams & {
+  slotMinutes: number;
+  appointmentDurationMinutes?: number;
+  now?: Date;
+};
+
 type DayRelation = "same_day" | "previous_day" | null;
 
 function toArray(data: unknown): UnknownRecord[] {
@@ -419,11 +425,7 @@ export function getTimeSlotsForDate({
   slotMinutes,
   appointmentDurationMinutes,
   now = new Date(),
-}: UseOpenTimeRangesParams & {
-  slotMinutes: number;
-  appointmentDurationMinutes?: number;
-  now?: Date;
-}): TimeSlot[] {
+}: TimeSlotsForDateParams): TimeSlot[] {
   if (!date || !Number.isFinite(slotMinutes) || slotMinutes <= 0) return [];
   const durationMinutes = Number(appointmentDurationMinutes) || slotMinutes;
 
@@ -448,7 +450,7 @@ export function getTimeSlotsForDate({
   for (const range of availabilityRanges) {
     for (
       let cursor = range.startMinutes;
-      cursor + slotMinutes <= range.endMinutes;
+      cursor <= range.endMinutes;
       cursor += slotMinutes
     ) {
       const slotRange: TimeRange = {
@@ -464,7 +466,7 @@ export function getTimeSlotsForDate({
       slotStart.setHours(0, slotRange.startMinutes, 0, 0);
       const slotEnd = new Date(dayStart.getTime() + slotRange.endMinutes * 60 * 1000);
       const slotIsFutureEnough = slotStart.getTime() > minBookableAt.getTime();
-      const fitsAvailability = appointmentRange.endMinutes <= range.endMinutes;
+      const fitsAvailability = appointmentRange.startMinutes <= range.endMinutes;
       const hasOverlap = unavailableRanges.some((r) => rangesOverlap(appointmentRange, r));
 
       slots.push({
@@ -482,19 +484,17 @@ export function getTimeSlotsForDate({
   return slots;
 }
 
-export function useTimeSlotsForDate({
-  availabilityData,
-  timeOffsData,
-  appointments = [],
-  date,
-  slotMinutes,
-  appointmentDurationMinutes,
-  now,
-}: UseOpenTimeRangesParams & {
-  slotMinutes: number;
-  appointmentDurationMinutes?: number;
-  now?: Date;
-}): TimeSlot[] {
+export function useTimeSlotsForDate(params: TimeSlotsForDateParams): TimeSlot[] {
+  const {
+    availabilityData,
+    timeOffsData,
+    appointments,
+    date,
+    slotMinutes,
+    appointmentDurationMinutes,
+    now,
+  } = params;
+
   return useMemo(
     () =>
       getTimeSlotsForDate({

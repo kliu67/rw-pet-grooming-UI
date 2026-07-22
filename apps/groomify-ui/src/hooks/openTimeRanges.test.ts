@@ -137,11 +137,18 @@ describe("openTimeRanges", () => {
         startStrAMPM: "11:30AM",
         endStrAMPM: "12:00PM",
         bookable: true
+      },
+      {
+        start: new Date("2026-03-15T12:00:00").toISOString(),
+        end: new Date("2026-03-15T12:30:00").toISOString(),
+        startStrAMPM: "12:00PM",
+        endStrAMPM: "12:30PM",
+        bookable: true
       }
     ]);
   });
 
-  it("marks slots unbookable when full appointment duration does not fit", () => {
+  it("allows slots whose appointment duration extends past availability", () => {
     const date = new Date("2026-03-15T00:00:00");
 
     const result = getTimeSlotsForDate({
@@ -154,8 +161,9 @@ describe("openTimeRanges", () => {
 
     expect(result.map((slot) => ({ start: slot.startStrAMPM, bookable: slot.bookable }))).toEqual([
       { start: "9:00AM", bookable: true },
-      { start: "9:20AM", bookable: false },
-      { start: "9:40AM", bookable: false }
+      { start: "9:20AM", bookable: true },
+      { start: "9:40AM", bookable: true },
+      { start: "10:00AM", bookable: true }
     ]);
   });
 });
